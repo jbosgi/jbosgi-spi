@@ -1,0 +1,9 @@
+<project name="${project.name} - ${project.version}">
+    
+  <body>
+	<menu ref="parent" />
+	<menu ref="modules" />
+    <menu ref="reports"/>
+  </body>
+  
+</project>
