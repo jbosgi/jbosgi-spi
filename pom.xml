@@ -32,9 +32,7 @@
   <!-- Properties -->
   <properties>
     <version.args4j>2.0.12</version.args4j>
-	<version.jboss.deployers>2.0.5.SP1</version.jboss.deployers>
     <version.jboss.logging>2.0.5.GA</version.jboss.logging>
-    <version.jboss.microcontainer>2.0.5.GA</version.jboss.microcontainer>
     <version.jboss.vfs>2.1.0.GA</version.jboss.vfs>
     <version.osgi>r4v42</version.osgi>
   </properties>
@@ -75,24 +73,6 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
       <version>${version.osgi}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.deployers</groupId>
-      <artifactId>jboss-deployers-vfs</artifactId>
-      <version>${version.jboss.deployers}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.deployers</groupId>
-      <artifactId>jboss-deployers-client-spi</artifactId>
-      <version>${version.jboss.deployers}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.microcontainer</groupId>
-      <artifactId>jboss-kernel</artifactId>
-      <version>${version.jboss.microcontainer}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
