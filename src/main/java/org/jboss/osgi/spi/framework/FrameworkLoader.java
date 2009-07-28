@@ -67,5 +67,4 @@ public abstract class FrameworkLoader
       
       return factory.newFramework(configuration);
    }
-   
 }
