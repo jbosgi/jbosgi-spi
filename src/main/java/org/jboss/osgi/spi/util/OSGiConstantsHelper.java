@@ -25,7 +25,6 @@ package org.jboss.osgi.spi.util;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
-import org.osgi.service.log.LogService;
 
 /**
  * String representation for common OSGi Constants
@@ -86,23 +85,27 @@ public abstract class OSGiConstantsHelper
    }
    
    /**
-    * Return the string representation of a {@link LogService} level
+    * Return the string representation of a LogService level
     */
    public static String logLevel(int level)
    {
       String logLevel = "[" + level + "]";
       switch (level)
       {
-         case LogService.LOG_DEBUG:
+         // LogService.LOG_DEBUG:
+         case 0x4:
             logLevel = "DEBUG";
             break;
-         case LogService.LOG_INFO:
+         // LogService.LOG_INFO:
+         case 0x3:
             logLevel = "INFO";
             break;
-         case LogService.LOG_WARNING:
+         // LogService.LOG_WARNING:
+         case 0x2:
             logLevel = "WARN";
             break;
-         case LogService.LOG_ERROR:
+         // LogService.LOG_ERROR
+         case 0x1:
             logLevel = "ERROR";
             break;
       }

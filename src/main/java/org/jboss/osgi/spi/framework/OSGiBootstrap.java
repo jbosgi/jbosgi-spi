@@ -44,7 +44,9 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.launch.Framework;
 
 /**
  * The OSGiBootstrap provides an {@link OSGiFramework} through a {@link OSGiBootstrapProvider}.
@@ -102,7 +104,7 @@ public class OSGiBootstrap
       initBootstrap();
 
       OSGiBootstrapProvider bootProvider = getBootstrapProvider();
-      OSGiFramework framework = bootProvider.getFramework();
+      Framework framework = bootProvider.getFramework();
 
       Runtime runtime = Runtime.getRuntime();
       runtime.addShutdownHook(new ShutdownThread(framework));
@@ -206,7 +208,7 @@ public class OSGiBootstrap
    {
       try
       {
-         return file.toURL();
+         return file.toURI().toURL();
       }
       catch (MalformedURLException e)
       {
@@ -216,9 +218,9 @@ public class OSGiBootstrap
 
    class StartupThread extends Thread
    {
-      private OSGiFramework framework;
+      private Framework framework;
 
-      public StartupThread(OSGiFramework framework)
+      public StartupThread(Framework framework)
       {
          this.framework = framework;
       }
@@ -227,7 +229,14 @@ public class OSGiBootstrap
       {
          // Start the framework
          final long beforeStart = System.currentTimeMillis();
-         framework.start();
+         try
+         {
+            framework.start();
+         }
+         catch (BundleException ex)
+         {
+            throw new IllegalStateException("Cannot start framework", ex);
+         }
          final long afterStart = System.currentTimeMillis();
 
          // Report how long it took to boot and do the first scan
@@ -278,9 +287,9 @@ public class OSGiBootstrap
 
    class ShutdownThread extends Thread
    {
-      private OSGiFramework framework;
+      private Framework framework;
 
-      public ShutdownThread(OSGiFramework framework)
+      public ShutdownThread(Framework framework)
       {
          this.framework = framework;
       }
@@ -288,7 +297,14 @@ public class OSGiBootstrap
       public void run()
       {
          log.info("Initiating shutdown ...");
-         framework.stop();
+         try
+         {
+            framework.stop();
+         }
+         catch (BundleException ex)
+         {
+            log.error("Cannot stop framework", ex);
+         }
          log.info("Shutdown complete");
       }
    }

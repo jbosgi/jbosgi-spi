@@ -35,8 +35,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.jboss.osgi.spi.capability.Capability;
-import org.jboss.osgi.spi.logging.LogEntryCache;
-import org.jboss.osgi.spi.logging.RemoteLogReaderService;
 import org.jboss.osgi.spi.management.MBeanProxy;
 import org.jboss.osgi.spi.management.MBeanProxyException;
 import org.jboss.osgi.spi.management.ManagedBundleMBean;
@@ -48,12 +46,8 @@ import org.jboss.osgi.spi.testing.OSGiRuntime;
 import org.jboss.osgi.spi.testing.OSGiServiceReference;
 import org.jboss.osgi.spi.testing.OSGiTestHelper;
 import org.jboss.osgi.spi.util.BundleDeploymentFactory;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.log.LogReaderService;
-import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * A remote implementation of the {@link OSGiRuntime}
@@ -65,10 +59,6 @@ public class RemoteRuntime extends OSGiRuntimeImpl
 {
    private MBeanServerConnection mbeanServer;
    private ManagedFrameworkMBean managedFramework;
-
-   // Needed for remote logging
-   private EmbeddedRuntime embeddedRuntime;
-   private RemoteLogCapability remoteLogCapability;
 
    public RemoteRuntime(OSGiTestHelper helper)
    {
@@ -178,57 +168,6 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       }
 
       return srefs;
-   }
-
-   public void startLogEntryTracking(final LogEntryCache logEntryCache)
-   {
-      super.startLogEntryTracking(logEntryCache);
-
-      try
-      {
-         remoteLogCapability = new RemoteLogCapability();
-         addCapability(remoteLogCapability);
-
-         embeddedRuntime = (EmbeddedRuntime)getTestHelper().getEmbeddedRuntime();
-         embeddedRuntime.addCapability(remoteLogCapability);
-
-         // Track the RemoteLogReaderService to add the LogEntryCache as LogListener
-         BundleContext context = embeddedRuntime.getBundleContext();
-         ServiceTracker tracker = new ServiceTracker(context, RemoteLogReaderService.class.getName(), null)
-         {
-            @Override
-            public Object addingService(ServiceReference sref)
-            {
-               LogReaderService logReaderService = (LogReaderService)super.addingService(sref);
-               logReaderService.addLogListener(logEntryCache);
-               setLogReaderService(logReaderService);
-               return logReaderService;
-            }
-         };
-         tracker.open();
-      }
-      catch (BundleException ex)
-      {
-         throw new IllegalStateException("Cannot start log entry tracking", ex);
-      }
-   }
-
-   @Override
-   public void stopLogEntryTracking()
-   {
-      if (remoteLogCapability != null)
-      {
-         removeCapability(remoteLogCapability);
-         remoteLogCapability = null;
-      }
-
-      if (embeddedRuntime != null)
-      {
-         embeddedRuntime.shutdown();
-         embeddedRuntime = null;
-      }
-
-      super.stopLogEntryTracking();
    }
 
    public MBeanServerConnection getMBeanServer()

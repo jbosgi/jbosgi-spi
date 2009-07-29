@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,8 +38,20 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.jboss.logging.Logger;
+import org.jboss.osgi.spi.FrameworkException;
 import org.jboss.osgi.spi.NotImplementedException;
 import org.jboss.osgi.spi.internal.StringPropertyReplacer;
+import org.jboss.osgi.spi.logging.ExportedPackageHelper;
+import org.jboss.osgi.spi.util.ServiceLoader;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
+import org.osgi.framework.launch.Framework;
+import org.osgi.framework.launch.FrameworkFactory;
 
 /**
  * A simple properties based bootstrap provider
@@ -82,13 +95,14 @@ import org.jboss.osgi.spi.internal.StringPropertyReplacer;
  */
 public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
 {
+   // Provide logging
+   final Logger log = Logger.getLogger(PropertiesBootstrapProvider.class);
+   
    /** The default framework property: jboss.osgi.framework.properties */
    public static final String OSGI_FRAMEWORK_CONFIG = "jboss.osgi.framework.properties";
    /** The default framework config: jboss-osgi-framework.properties */
    public static final String DEFAULT_OSGI_FRAMEWORK_PROPERTIES = "jboss-osgi-framework.properties";
 
-   /** The OSGi framework integration class: org.jboss.osgi.spi.framework.impl */
-   public static final String PROP_OSGI_FRAMEWORK_IMPL = "org.jboss.osgi.spi.framework.impl";
    /** Optional list of bundles that get installed automatically: org.jboss.osgi.spi.framework.autoInstall */
    public static final String PROP_OSGI_FRAMEWORK_AUTO_INSTALL = "org.jboss.osgi.spi.framework.autoInstall";
    /** Optional list of bundles that get started automatically: org.jboss.osgi.spi.framework.autoStart */
@@ -99,13 +113,12 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
    private static Set<String> internalProps = new HashSet<String>();
    static
    {
-      internalProps.add(PROP_OSGI_FRAMEWORK_IMPL);
       internalProps.add(PROP_OSGI_FRAMEWORK_AUTO_INSTALL);
       internalProps.add(PROP_OSGI_FRAMEWORK_AUTO_START);
       internalProps.add(PROP_OSGI_FRAMEWORK_EXTRA);
    }
 
-   private OSGiFramework framework;
+   private Framework framework;
    private boolean configured;
 
    public void configure()
@@ -116,28 +129,87 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
    public void configure(URL urlConfig)
    {
       // Read the configuration properties
-      Properties props = getBootstrapProperties(urlConfig);
+      final Map<String, Object> props = getBootstrapProperties(urlConfig);
 
       // Load the framework instance
-      framework = loadFrameworkImpl(urlConfig, props);
+      FrameworkFactory factory = ServiceLoader.loadService(FrameworkFactory.class);
+      final Framework frameworkImpl = factory.newFramework(props);
+      framework = new FrameworkDelegate(frameworkImpl)
+      {
+         @Override
+         public void start() throws BundleException
+         {
+            super.start();
+            
+            // Get system bundle context
+            BundleContext context = framework.getBundleContext();
+            if (context == null)
+               throw new FrameworkException("Cannot obtain system context");
 
-      // Process Framework props
-      initFrameworkProperties(props);
+            // Log the the framework packages
+            ExportedPackageHelper packageHelper = new ExportedPackageHelper(context);
+            packageHelper.logExportedPackages(frameworkImpl);
+            
+            // Init the the autoInstall URLs
+            List<URL> autoInstall = getBundleURLs(props, PROP_OSGI_FRAMEWORK_AUTO_INSTALL);
 
-      // Init the the autoInstall URLs
-      List<URL> installURLs = getBundleURLs(props, PROP_OSGI_FRAMEWORK_AUTO_INSTALL);
-      framework.setAutoInstall(installURLs);
+            // Init the the autoStart URLs
+            List<URL> autoStart = getBundleURLs(props, PROP_OSGI_FRAMEWORK_AUTO_START);
 
-      // Init the the autoStart URLs
-      List<URL> startURLs = getBundleURLs(props, PROP_OSGI_FRAMEWORK_AUTO_START);
-      framework.setAutoStart(startURLs);
+            Map<URL, Bundle> autoBundles = new HashMap<URL, Bundle>();
 
+            // Add the autoStart bundles to autoInstall
+            for (URL bundleURL : autoStart)
+            {
+               autoInstall.add(bundleURL);
+            }
+
+            // Install autoInstall bundles
+            for (URL bundleURL : autoInstall)
+            {
+               try
+               {
+                  Bundle bundle = context.installBundle(bundleURL.toString());
+                  long bundleId = bundle.getBundleId();
+                  log.info("Installed bundle [" + bundleId + "]: " + bundle.getSymbolicName());
+                  autoBundles.put(bundleURL, bundle);
+               }
+               catch (BundleException ex)
+               {
+                  //framework.stop();
+                  throw new IllegalStateException("Cannot install bundle: " + bundleURL, ex);
+               }
+            }
+
+            // Start autoStart bundles
+            for (URL bundleURL : autoStart)
+            {
+               try
+               {
+                  Bundle bundle = autoBundles.get(bundleURL);
+                  if (bundle != null)
+                  {
+                     bundle.start();
+                     packageHelper.logExportedPackages(bundle);
+                     log.info("Started bundle: " + bundle.getSymbolicName());
+                  }
+               }
+               catch (BundleException ex)
+               {
+                  //framework.stop();
+                  throw new IllegalStateException("Cannot start bundle: " + bundleURL, ex);
+               }
+            }
+         }
+      };
+
+      
       configured = true;
    }
 
-   private List<URL> getBundleURLs(Properties props, String key)
+   private List<URL> getBundleURLs(Map<String, Object> props, String key)
    {
-      String bundleList = props.getProperty(key);
+      String bundleList = (String)props.get(key);
       if (bundleList == null)
          bundleList = "";
 
@@ -181,7 +253,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
       throw new NotImplementedException();
    }
 
-   public OSGiFramework getFramework()
+   public Framework getFramework()
    {
       if (configured == false)
       {
@@ -191,59 +263,8 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
       return framework;
    }
 
-   public OSGiFramework getFramework(String name)
-   {
-      throw new NotImplementedException();
-   }
-
-   public Object getInstance(String name)
-   {
-      throw new NotImplementedException();
-   }
-
-   public <T> T getInstance(String name, Class<T> expectedType)
-   {
-      throw new NotImplementedException();
-   }
-
-   private void initFrameworkProperties(Properties props)
-   {
-      Map<String, Object> frameworkProps = new HashMap<String, Object>();
-      Enumeration<?> keys = props.propertyNames();
-      while (keys.hasMoreElements())
-      {
-         String key = (String)keys.nextElement();
-         if (internalProps.contains(key) == false)
-         {
-            String value = props.getProperty(key);
-            frameworkProps.put(key, value);
-         }
-      }
-      framework.setProperties(frameworkProps);
-   }
-
-   private OSGiFramework loadFrameworkImpl(URL urlConfig, Properties props)
-   {
-      String frameworkImpl = props.getProperty(PROP_OSGI_FRAMEWORK_IMPL);
-      if (frameworkImpl == null)
-         throw new IllegalStateException("Cannot get : " + urlConfig);
-
-      OSGiFramework framework;
-      try
-      {
-         ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
-         Class<?> frameworkClass = ctxLoader.loadClass(frameworkImpl);
-         framework = (OSGiFramework)frameworkClass.newInstance();
-      }
-      catch (Exception ex)
-      {
-         throw new IllegalStateException("Cannot load framework: " + frameworkImpl, ex);
-      }
-      return framework;
-   }
-
    @SuppressWarnings("unchecked")
-   private Properties getBootstrapProperties(URL urlConfig)
+   private Map<String, Object> getBootstrapProperties(URL urlConfig)
    {
       Properties props = new Properties();
       try
@@ -257,13 +278,31 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
          throw new IllegalStateException("Cannot load properties from: " + urlConfig, ex);
       }
 
-      // Replace system properties
+      Map<String, Object> propMap = new HashMap<String, Object>();
+      
+      // Process property list
       Enumeration<String> keys = (Enumeration<String>)props.propertyNames();
       while (keys.hasMoreElements())
       {
          String key = keys.nextElement();
          String value = props.getProperty(key);
-         props.setProperty(key, StringPropertyReplacer.replaceProperties(value));
+         
+         // Replace property variables
+         propMap.put(key, StringPropertyReplacer.replaceProperties(value));
+         
+         if (key.endsWith(".instance"))
+         {
+            try
+            {
+               String subkey = key.substring(0, key.lastIndexOf(".instance"));
+               Object instance = Class.forName(value).newInstance();
+               propMap.put(subkey, instance);
+            }
+            catch (Exception ex)
+            {
+               log.error("Cannot load " + key + "=" + value, ex);
+            }
+         }
       }
 
       // Merge optional extra properties
@@ -284,7 +323,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
             File propsFile = new File(extraPropsValue);
             try
             {
-               extraPropsURL = propsFile.toURL();
+               extraPropsURL = propsFile.toURI().toURL();
             }
             catch (MalformedURLException e)
             {
@@ -295,12 +334,169 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
          if (extraPropsURL == null)
             throw new IllegalStateException("Invalid properties URL: " + extraPropsValue);
 
-         props.remove(PROP_OSGI_FRAMEWORK_EXTRA);
-         Properties extraProps = getBootstrapProperties(extraPropsURL);
-         props.putAll(extraProps);
+         propMap.remove(PROP_OSGI_FRAMEWORK_EXTRA);
+         Map<String, Object> extraProps = getBootstrapProperties(extraPropsURL);
+         propMap.putAll(extraProps);
       }
 
-      return props;
+      return propMap;
    }
 
+   class FrameworkDelegate implements Framework
+   {
+      private Framework framework;
+
+      FrameworkDelegate(Framework framework)
+      {
+         this.framework = framework;
+      }
+
+      @SuppressWarnings("unchecked")
+      public Enumeration findEntries(String path, String filePattern, boolean recurse)
+      {
+         return framework.findEntries(path, filePattern, recurse);
+      }
+
+      public BundleContext getBundleContext()
+      {
+         return framework.getBundleContext();
+      }
+
+      public long getBundleId()
+      {
+         return framework.getBundleId();
+      }
+
+      public URL getEntry(String path)
+      {
+         return framework.getEntry(path);
+      }
+
+      @SuppressWarnings("unchecked")
+      public Enumeration getEntryPaths(String path)
+      {
+         return framework.getEntryPaths(path);
+      }
+
+      @SuppressWarnings("unchecked")
+      public Dictionary getHeaders()
+      {
+         return framework.getHeaders();
+      }
+
+      @SuppressWarnings("unchecked")
+      public Dictionary getHeaders(String locale)
+      {
+         return framework.getHeaders(locale);
+      }
+
+      public long getLastModified()
+      {
+         return framework.getLastModified();
+      }
+
+      public String getLocation()
+      {
+         return framework.getLocation();
+      }
+
+      public ServiceReference[] getRegisteredServices()
+      {
+         return framework.getRegisteredServices();
+      }
+
+      public URL getResource(String name)
+      {
+         return framework.getResource(name);
+      }
+
+      @SuppressWarnings("unchecked")
+      public Enumeration getResources(String name) throws IOException
+      {
+         return framework.getResources(name);
+      }
+
+      public ServiceReference[] getServicesInUse()
+      {
+         return framework.getServicesInUse();
+      }
+
+      @SuppressWarnings("unchecked")
+      public Map getSignerCertificates(int signersType)
+      {
+         return framework.getSignerCertificates(signersType);
+      }
+
+      public int getState()
+      {
+         return framework.getState();
+      }
+
+      public String getSymbolicName()
+      {
+         return framework.getSymbolicName();
+      }
+
+      public Version getVersion()
+      {
+         return framework.getVersion();
+      }
+
+      public boolean hasPermission(Object permission)
+      {
+         return framework.hasPermission(permission);
+      }
+
+      public void init() throws BundleException
+      {
+         framework.init();
+      }
+
+      @SuppressWarnings("unchecked")
+      public Class loadClass(String name) throws ClassNotFoundException
+      {
+         return framework.loadClass(name);
+      }
+
+      public void start() throws BundleException
+      {
+         framework.start();
+      }
+
+      public void start(int options) throws BundleException
+      {
+         framework.start(options);
+      }
+
+      public void stop() throws BundleException
+      {
+         framework.stop();
+      }
+
+      public void stop(int options) throws BundleException
+      {
+         framework.stop(options);
+      }
+
+      public void uninstall() throws BundleException
+      {
+         framework.uninstall();
+      }
+
+      public void update() throws BundleException
+      {
+         framework.update();
+      }
+
+      public void update(InputStream in) throws BundleException
+      {
+         framework.update(in);
+      }
+
+      public FrameworkEvent waitForStop(long timeout) throws InterruptedException
+      {
+         return framework.waitForStop(timeout);
+      }
+      
+   }
 }

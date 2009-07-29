@@ -26,36 +26,24 @@ package org.jboss.osgi.spi.framework;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.osgi.framework.launch.Framework;
+
 /**
- * An OSGiBootstrapProvider provides an OSGiFramework
+ * An OSGiBootstrapProvider provides an OSGi Framework
  * <p/>
- * Implementations would configure the OSGiFramework through some form of descriptor.
- * <p/>
- * Natively, the SPI provides an OSGiBootstrapProvider that is based on the Microkernel.
+ * Implementations would configure the OSGi Framework through some form of descriptor.
  * 
  * @author thomas.diesler@jboss.com
  * @since 18-Jun-2008
  */
-public interface OSGiBootstrapProvider extends NamedInstanceProvider
+public interface OSGiBootstrapProvider
 {
-   /** The Framework bean name - jboss.osgi:service=Framework */
-   public static final String DEFAULT_FRAMEWORK_NAME = "jboss.osgi:service=Framework";
-
    /**
-    * Get the OSGiFramework that registerd with the default name
+    * Get the configured OSGi Framework
     * 
     * @return The configured instance of a Framework
-    * @throws IllegalArgumentException if this is not AttributeProvider instance
     */
-   OSGiFramework getFramework();
-
-   /**
-    * Get an OSGiFramework with a given name from this OSGiBootstrapProvider
-    * 
-    * @param name the framework name
-    * @return The configured instance of a Framework, or null
-    */
-   OSGiFramework getFramework(String name);
+   Framework getFramework();
 
    /**
     * Configure this provider with the default configuration

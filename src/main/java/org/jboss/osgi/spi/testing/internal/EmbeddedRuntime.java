@@ -35,8 +35,6 @@ import javax.management.MBeanServerFactory;
 
 import org.jboss.osgi.spi.capability.Capability;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
-import org.jboss.osgi.spi.framework.OSGiFramework;
-import org.jboss.osgi.spi.logging.LogEntryCache;
 import org.jboss.osgi.spi.service.DeployerService;
 import org.jboss.osgi.spi.testing.OSGiBundle;
 import org.jboss.osgi.spi.testing.OSGiPackageAdmin;
@@ -48,9 +46,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.log.LogReaderService;
+import org.osgi.framework.launch.Framework;
 import org.osgi.service.packageadmin.PackageAdmin;
-import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * An embedded implementation of the {@link OSGiRuntime}
@@ -125,37 +122,36 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
       super.addCapability(capability);
    }
    
-   public void startLogEntryTracking(final LogEntryCache logEntryCache)
-   {
-      super.startLogEntryTracking(logEntryCache);
-      
-      // Track the LogReaderService to add the LogEntryCache as LogListener
-      ServiceTracker tracker = new ServiceTracker(getBundleContext(), LogReaderService.class.getName(), null)
-      {
-         @Override
-         public Object addingService(ServiceReference sref)
-         {
-            LogReaderService logReaderService = (LogReaderService)super.addingService(sref); 
-            logReaderService.addLogListener(logEntryCache);
-            setLogReaderService(logReaderService);
-            return logReaderService;
-         }
-      };
-      tracker.open();
-   }
-   
    @Override
    public void shutdown()
    {
       super.shutdown();
       OSGiBootstrapProvider bootProvider = getTestHelper().getBootstrapProvider();
-      bootProvider.getFramework().stop();
+      try
+      {
+         bootProvider.getFramework().stop();
+      }
+      catch (BundleException ex)
+      {
+         log.error("Cannot stop the framework", ex);
+      }
    }
    
    public BundleContext getBundleContext()
    {
       OSGiBootstrapProvider bootProvider = getTestHelper().getBootstrapProvider();
-      OSGiFramework framework = bootProvider.getFramework();
+      Framework framework = bootProvider.getFramework();
+      if (framework.getState() != Bundle.ACTIVE)
+      {
+         try
+         {
+            framework.start();
+         }
+         catch (BundleException ex)
+         {
+            throw new IllegalStateException("Cannot start framework", ex);
+         }
+      }
       return framework.getBundleContext();
    }
 

@@ -26,7 +26,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.jboss.osgi.spi.capability.Capability;
-import org.jboss.osgi.spi.logging.LogEntryCache;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.packageadmin.PackageAdmin;
@@ -95,16 +94,6 @@ public interface OSGiRuntime
     */
    OSGiServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException;
    
-   /**
-    * Start log entry tracking for this {@link OSGiRuntime}
-    */
-   void startLogEntryTracking(LogEntryCache logEntryCache);
-
-   /**
-    * Stop log entry tracking for this {@link OSGiRuntime}
-    */
-   void stopLogEntryTracking();
-
    /**
     * Get the initial naming context for this {@link OSGiRuntime}
     */

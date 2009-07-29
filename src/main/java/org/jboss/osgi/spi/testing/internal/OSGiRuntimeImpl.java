@@ -41,7 +41,6 @@ import javax.naming.NamingException;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.capability.Capability;
-import org.jboss.osgi.spi.logging.LogEntryCache;
 import org.jboss.osgi.spi.testing.OSGiBundle;
 import org.jboss.osgi.spi.testing.OSGiRuntime;
 import org.jboss.osgi.spi.testing.OSGiServiceReference;
@@ -49,7 +48,6 @@ import org.jboss.osgi.spi.testing.OSGiTestHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
-import org.osgi.service.log.LogReaderService;
 
 /**
  * An abstract implementation of the {@link OSGiRuntime}
@@ -65,9 +63,6 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    private OSGiTestHelper helper;
    private Map<String, OSGiBundle> bundles = new LinkedHashMap<String, OSGiBundle>();
    private List<Capability> capabilities = new ArrayList<Capability>();
-   private LogReaderService logReaderService;
-
-   private LogEntryCache logEntryCache;
 
    public OSGiRuntimeImpl(OSGiTestHelper helper)
    {
@@ -77,16 +72,6 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    public OSGiTestHelper getTestHelper()
    {
       return helper;
-   }
-
-   protected void setLogReaderService(LogReaderService logReaderService)
-   {
-      this.logReaderService = logReaderService;
-   }
-
-   protected LogReaderService getLogReaderService()
-   {
-      return logReaderService;
    }
 
    public void addCapability(Capability capability) throws BundleException
@@ -143,26 +128,9 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
          removeCapability(dependency);
    }
 
-   public void startLogEntryTracking(LogEntryCache logEntryCache)
-   {
-      this.logEntryCache = logEntryCache;
-   }
-
-   public void stopLogEntryTracking()
-   {
-      if (logReaderService != null && logEntryCache != null)
-      {
-         logReaderService.removeLogListener(logEntryCache);
-         logReaderService = null;
-         logEntryCache = null;
-      }
-   }
-
    public void shutdown()
    {
       log.debug("Start Shutdown");
-
-      stopLogEntryTracking();
 
       // Uninstall the registered bundles
       ArrayList<String> locations = new ArrayList<String>(bundles.keySet());
