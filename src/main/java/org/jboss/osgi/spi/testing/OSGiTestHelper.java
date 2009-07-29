@@ -98,7 +98,7 @@ public class OSGiTestHelper
       try
       {
          File resourceFile = getResourceFile(resource);
-         resURL = resourceFile.toURI().toURL();
+         resURL = resourceFile.toURL();
       }
       catch (MalformedURLException e)
       {
@@ -112,7 +112,7 @@ public class OSGiTestHelper
    {
       try
       {
-         return getTestArchiveFile(archive).toURI().toURL();
+         return getTestArchiveFile(archive).toURL();
       }
       catch (MalformedURLException ex)
       {

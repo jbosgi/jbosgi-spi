@@ -288,7 +288,8 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
          String value = props.getProperty(key);
          
          // Replace property variables
-         propMap.put(key, StringPropertyReplacer.replaceProperties(value));
+         value = StringPropertyReplacer.replaceProperties(value);
+         propMap.put(key, value);
          
          if (key.endsWith(".instance"))
          {
@@ -306,7 +307,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
       }
 
       // Merge optional extra properties
-      String extraPropsValue = props.getProperty(PROP_OSGI_FRAMEWORK_EXTRA);
+      String extraPropsValue = (String)propMap.get(PROP_OSGI_FRAMEWORK_EXTRA);
       if (extraPropsValue != null)
       {
          URL extraPropsURL = null;
@@ -323,7 +324,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
             File propsFile = new File(extraPropsValue);
             try
             {
-               extraPropsURL = propsFile.toURI().toURL();
+               extraPropsURL = propsFile.toURL();
             }
             catch (MalformedURLException e)
             {

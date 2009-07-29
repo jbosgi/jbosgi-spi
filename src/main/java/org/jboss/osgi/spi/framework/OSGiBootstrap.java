@@ -208,7 +208,7 @@ public class OSGiBootstrap
    {
       try
       {
-         return file.toURI().toURL();
+         return file.toURL();
       }
       catch (MalformedURLException e)
       {

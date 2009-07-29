@@ -50,17 +50,18 @@ public final class ExportedPackageHelper
    public ExportedPackageHelper(BundleContext context)
    {
       ServiceReference sref = context.getServiceReference(PackageAdmin.class.getName());
-      packageAdmin = (PackageAdmin)context.getService(sref);
+      if (sref != null)
+         packageAdmin = (PackageAdmin)context.getService(sref);
    }
 
    public boolean resolveBundle(Bundle bundle)
    {
-      return packageAdmin.resolveBundles(new Bundle[] { bundle });
+      return packageAdmin != null ? packageAdmin.resolveBundles(new Bundle[] { bundle }) : false;
    }
 
    public boolean resolveBundles(Bundle[] bundles)
    {
-      return packageAdmin.resolveBundles(bundles);
+      return packageAdmin != null ? packageAdmin.resolveBundles(bundles) : false;
    }
 
    /*
@@ -68,18 +69,21 @@ public final class ExportedPackageHelper
     */
    public void logExportedPackages(Bundle bundle)
    {
-      log.debug("Exported-Packages: " + bundle.getSymbolicName());
-      
-      ExportedPackage[] exportedPackages = packageAdmin.getExportedPackages(bundle);
-      if (exportedPackages != null)
+      if (packageAdmin != null)
       {
-         List<String> packages = new ArrayList<String>();
-         for (ExportedPackage exp : exportedPackages)
-            packages.add("  " + exp.getName() + ";version=" + exp.getVersion());
+         log.debug("Exported-Packages: " + bundle.getSymbolicName());
          
-         Collections.sort(packages);
-         for (String exp : packages)
-            log.debug(exp);
+         ExportedPackage[] exportedPackages = packageAdmin.getExportedPackages(bundle);
+         if (exportedPackages != null)
+         {
+            List<String> packages = new ArrayList<String>();
+            for (ExportedPackage exp : exportedPackages)
+               packages.add("  " + exp.getName() + ";version=" + exp.getVersion());
+            
+            Collections.sort(packages);
+            for (String exp : packages)
+               log.debug(exp);
+         }
       }
    }
 }
