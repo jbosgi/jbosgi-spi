@@ -97,7 +97,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
 {
    // Provide logging
    final Logger log = Logger.getLogger(PropertiesBootstrapProvider.class);
-   
+
    /** The default framework property: jboss.osgi.framework.properties */
    public static final String OSGI_FRAMEWORK_CONFIG = "jboss.osgi.framework.properties";
    /** The default framework config: jboss-osgi-framework.properties */
@@ -140,7 +140,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
          public void start() throws BundleException
          {
             super.start();
-            
+
             // Get system bundle context
             BundleContext context = framework.getBundleContext();
             if (context == null)
@@ -149,7 +149,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
             // Log the the framework packages
             ExportedPackageHelper packageHelper = new ExportedPackageHelper(context);
             packageHelper.logExportedPackages(frameworkImpl);
-            
+
             // Init the the autoInstall URLs
             List<URL> autoInstall = getBundleURLs(props, PROP_OSGI_FRAMEWORK_AUTO_INSTALL);
 
@@ -167,43 +167,26 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
             // Install autoInstall bundles
             for (URL bundleURL : autoInstall)
             {
-               try
-               {
-                  Bundle bundle = context.installBundle(bundleURL.toString());
-                  long bundleId = bundle.getBundleId();
-                  log.info("Installed bundle [" + bundleId + "]: " + bundle.getSymbolicName());
-                  autoBundles.put(bundleURL, bundle);
-               }
-               catch (BundleException ex)
-               {
-                  //framework.stop();
-                  throw new IllegalStateException("Cannot install bundle: " + bundleURL, ex);
-               }
+               Bundle bundle = context.installBundle(bundleURL.toString());
+               long bundleId = bundle.getBundleId();
+               log.info("Installed bundle [" + bundleId + "]: " + bundle.getSymbolicName());
+               autoBundles.put(bundleURL, bundle);
             }
 
             // Start autoStart bundles
             for (URL bundleURL : autoStart)
             {
-               try
+               Bundle bundle = autoBundles.get(bundleURL);
+               if (bundle != null)
                {
-                  Bundle bundle = autoBundles.get(bundleURL);
-                  if (bundle != null)
-                  {
-                     bundle.start();
-                     packageHelper.logExportedPackages(bundle);
-                     log.info("Started bundle: " + bundle.getSymbolicName());
-                  }
-               }
-               catch (BundleException ex)
-               {
-                  //framework.stop();
-                  throw new IllegalStateException("Cannot start bundle: " + bundleURL, ex);
+                  bundle.start();
+                  packageHelper.logExportedPackages(bundle);
+                  log.info("Started bundle: " + bundle.getSymbolicName());
                }
             }
          }
       };
 
-      
       configured = true;
    }
 
@@ -279,18 +262,18 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
       }
 
       Map<String, Object> propMap = new HashMap<String, Object>();
-      
+
       // Process property list
       Enumeration<String> keys = (Enumeration<String>)props.propertyNames();
       while (keys.hasMoreElements())
       {
          String key = keys.nextElement();
          String value = props.getProperty(key);
-         
+
          // Replace property variables
          value = StringPropertyReplacer.replaceProperties(value);
          propMap.put(key, value);
-         
+
          if (key.endsWith(".instance"))
          {
             try
@@ -498,6 +481,6 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
       {
          return framework.waitForStop(timeout);
       }
-      
+
    }
 }
