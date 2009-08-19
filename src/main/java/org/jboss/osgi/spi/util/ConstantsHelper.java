@@ -25,6 +25,8 @@ package org.jboss.osgi.spi.util;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.ServiceEvent;
 
 /**
  * String representation for common OSGi Constants
@@ -32,7 +34,7 @@ import org.osgi.framework.BundleEvent;
  * @author thomas.diesler@jboss.com
  * @since 04-Mar-2009
  */
-public abstract class OSGiConstantsHelper 
+public abstract class ConstantsHelper 
 {
    /**
     * Return the string representation of a {@link Bundle} state
@@ -81,6 +83,49 @@ public abstract class OSGiConstantsHelper
          retType = "UNRESOLVED";
       else if (BundleEvent.UPDATED == eventType)
          retType = "UPDATED";
+      return retType;
+   }
+   
+   /**
+    * Return the string representation of a {@link ServiceEvent} type
+    */
+   public static String serviceEvent(int eventType)
+   {
+      String retType = "[" + eventType + "]";
+      if (ServiceEvent.REGISTERED == eventType)
+         retType = "REGISTERED";
+      else if (ServiceEvent.UNREGISTERING == eventType)
+         retType = "UNREGISTERING";
+      else if (ServiceEvent.MODIFIED == eventType)
+         retType = "MODIFIED";
+      else if (ServiceEvent.MODIFIED_ENDMATCH == eventType)
+         retType = "MODIFIED_ENDMATCH";
+      return retType;
+   }
+   
+   public static String frameworkEvent(int eventType)
+   {
+      String retType = "[" + eventType + "]";
+      if (FrameworkEvent.ERROR == eventType)
+         retType = "ERROR";
+      else if (FrameworkEvent.INFO == eventType)
+         retType = "INFO";
+      else if (FrameworkEvent.PACKAGES_REFRESHED == eventType)
+         retType = "PACKAGES_REFRESHED";
+      else if (FrameworkEvent.STARTED == eventType)
+         retType = "STARTED";
+      else if (FrameworkEvent.STARTLEVEL_CHANGED == eventType)
+         retType = "STARTLEVEL_CHANGED";
+      else if (FrameworkEvent.STOPPED == eventType)
+         retType = "STOPPED";
+      else if (FrameworkEvent.STOPPED_BOOTCLASSPATH_MODIFIED == eventType)
+         retType = "STOPPED_BOOTCLASSPATH_MODIFIED";
+      else if (FrameworkEvent.STOPPED_UPDATE == eventType)
+         retType = "STOPPED_UPDATE";
+      else if (FrameworkEvent.WAIT_TIMEDOUT == eventType)
+         retType = "WAIT_TIMEDOUT";
+      else if (FrameworkEvent.WARNING == eventType)
+         retType = "WARNING";
       return retType;
    }
    
