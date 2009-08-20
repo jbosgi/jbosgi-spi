@@ -79,18 +79,37 @@ public class ManagedFramework implements ManagedFrameworkMBean
    }
 
    @SuppressWarnings("unchecked")
-   public ObjectName getBundle(String symbolicName)
+   public ObjectName getBundle(String symbolicName, String version)
    {
+      ObjectName oname = null;
+      
       ObjectName pattern = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":bundle=" + symbolicName + ",*");
       Set<ObjectName> names = mbeanServer.queryNames(pattern, null);
 
-      if (names.size() < 1)
-         return null;
+      if (names.size() > 0)
+      {
+         // [TODO] Support bundle version 
+         if (names.size() > 1)
+            throw new IllegalArgumentException("Multiple bundles found: " + names);
+         
+         oname = names.iterator().next();
+      }
 
-      if (names.size() > 1)
-         throw new IllegalArgumentException("Multiple bundles found: " + names);
+      return oname;
+   }
 
-      return names.iterator().next();
+   @SuppressWarnings("unchecked")
+   public ObjectName getBundle(long bundleId)
+   {
+      ObjectName oname = null;
+      
+      ObjectName pattern = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":id=" + bundleId + ",*");
+      Set<ObjectName> names = mbeanServer.queryNames(pattern, null);
+
+      if (names.size() > 0)
+         oname = names.iterator().next();
+
+      return oname;
    }
 
    @SuppressWarnings("unchecked")

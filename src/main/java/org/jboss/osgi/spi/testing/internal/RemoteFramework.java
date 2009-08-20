@@ -45,7 +45,12 @@ public interface RemoteFramework
    /**
     * Get the installed bundle 
     */
-   ManagedBundleMBean getBundle(String symbolicName);
+   ManagedBundleMBean getBundle(String symbolicName, String version);
+
+   /**
+    * Get the installed bundle by id
+    */
+   ManagedBundleMBean getBundle(long bundleId);
 
    /**
     * Returns a ServiceReference object for a service that implements and was registered 

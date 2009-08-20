@@ -75,6 +75,13 @@ public interface OSGiRuntime
    OSGiBundle getBundle(String symbolicName, String version);
 
    /**
+    * Get the {@link OSGiBundle} for a given bundle id.
+    * 
+    * @return The bundle or null if there is none
+    */
+   OSGiBundle getBundle(long bundleId);
+
+   /**
     * Get an abstraction of the {@link PackageAdmin}.
     */
    OSGiPackageAdmin getPackageAdmin();

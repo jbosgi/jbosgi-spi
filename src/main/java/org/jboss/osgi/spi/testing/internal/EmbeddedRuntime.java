@@ -44,6 +44,7 @@ import org.jboss.osgi.spi.testing.OSGiTestHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
@@ -64,14 +65,15 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
 
    public OSGiBundle installBundle(String location) throws BundleException
    {
-      String symbolicName = getSymbolicName(location);
+      String symbolicName = getManifestEntry(location, Constants.BUNDLE_SYMBOLICNAME);
+      String version = getManifestEntry(location, Constants.BUNDLE_VERSION);
       
       URL bundleURL = getTestHelper().getTestArchiveURL(location);
       ServiceReference sref = getBundleContext().getServiceReference(DeployerService.class.getName());
       DeployerService service = (DeployerService)getBundleContext().getService(sref);
       service.deploy(bundleURL);
       
-      OSGiBundle bundle = getBundle(symbolicName, null);
+      OSGiBundle bundle = getBundle(symbolicName, version);
       return registerBundle(location, bundle);
    }
 
@@ -85,6 +87,12 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
       OSGiBundle[] bundleArr = new OSGiBundle[absBundles.size()];
       absBundles.toArray(bundleArr);
       return bundleArr;
+   }
+   
+   public OSGiBundle getBundle(long bundleId)
+   {
+      Bundle bundle = getBundleContext().getBundle(bundleId);
+      return bundle != null ? new EmbeddedBundle(this, bundle) : null;
    }
    
    public OSGiServiceReference getServiceReference(String clazz)

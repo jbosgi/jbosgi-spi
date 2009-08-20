@@ -88,7 +88,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
 
          for (String location : capability.getBundles())
          {
-            String symName = getSymbolicName(location);
+            String symName = getManifestEntry(location, Constants.BUNDLE_SYMBOLICNAME);
             if (bundles.get(location) == null && getBundle(symName, null) == null)
             {
                OSGiBundle bundle = installBundle(location);
@@ -198,7 +198,15 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       return bundle;
    }
 
-   protected String getSymbolicName(String location)
+   protected String getManifestEntry(String location, String key)
+   {
+      Manifest manifest = getManifest(location);
+      Attributes attribs = manifest.getMainAttributes();
+      String value = attribs.getValue(key);
+      return value;
+   }
+
+   private Manifest getManifest(String location)
    {
       Manifest manifest;
       try
@@ -213,13 +221,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
          throw new IllegalStateException("Cannot get manifest from: " + location);
 
       }
-
-      Attributes attribs = manifest.getMainAttributes();
-      String symbolicName = attribs.getValue(Constants.BUNDLE_SYMBOLICNAME);
-      if (symbolicName == null)
-         throw new IllegalArgumentException("Cannot obtain Bundle-SymbolicName for: " + location);
-
-      return symbolicName;
+      return manifest;
    }
 
    OSGiBundle registerBundle(String location, OSGiBundle bundle)

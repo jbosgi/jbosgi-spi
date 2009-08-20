@@ -48,7 +48,12 @@ public interface ManagedFrameworkMBean
    /**
     * Get the installed bundle 
     */
-   ObjectName getBundle(String symbolicName);
+   ObjectName getBundle(String symbolicName, String version);
+   
+   /**
+    * Get the installed bundle 
+    */
+   ObjectName getBundle(long bundleId);
    
    /**
     * Returns a ServiceReference object for a service that implements and was registered 

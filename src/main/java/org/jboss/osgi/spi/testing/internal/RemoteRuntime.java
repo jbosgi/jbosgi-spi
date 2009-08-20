@@ -47,6 +47,7 @@ import org.jboss.osgi.spi.testing.OSGiServiceReference;
 import org.jboss.osgi.spi.testing.OSGiTestHelper;
 import org.jboss.osgi.spi.util.BundleDeploymentFactory;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 
 /**
@@ -67,11 +68,12 @@ public class RemoteRuntime extends OSGiRuntimeImpl
 
    public OSGiBundle installBundle(String location) throws BundleException
    {
-      String symbolicName = getSymbolicName(location);
+      String symbolicName = getManifestEntry(location, Constants.BUNDLE_SYMBOLICNAME);
+      String version = getManifestEntry(location, Constants.BUNDLE_VERSION);
       try
       {
          deploy(location);
-         ManagedBundleMBean bundleMBean = getRemoteFramework().getBundle(symbolicName);
+         ManagedBundleMBean bundleMBean = getRemoteFramework().getBundle(symbolicName, version);
          RemoteBundle bundle = new RemoteBundle(this, bundleMBean, location);
          return registerBundle(location, bundle);
       }
@@ -149,6 +151,12 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       }
    }
 
+   public OSGiBundle getBundle(long bundleId)
+   {
+      ManagedBundleMBean bundle = getRemoteFramework().getBundle(bundleId);
+      return bundle != null ? new RemoteBundle(this, bundle, null) : null;
+   }
+   
    public OSGiServiceReference getServiceReference(String clazz)
    {
       ManagedServiceReference manref = getRemoteFramework().getServiceReference(clazz);
@@ -213,11 +221,27 @@ public class RemoteRuntime extends OSGiRuntimeImpl
 
       return new RemoteFramework()
       {
-         public ManagedBundleMBean getBundle(String symbolicName)
+         public ManagedBundleMBean getBundle(String symbolicName, String version)
          {
-            ObjectName oname = managedFramework.getBundle(symbolicName);
+            ObjectName oname = managedFramework.getBundle(symbolicName, version);
             if (oname == null)
                throw new IllegalArgumentException("Cannot get remote bundle for: " + symbolicName);
+
+            try
+            {
+               return MBeanProxy.get(ManagedBundleMBean.class, oname, getMBeanServer());
+            }
+            catch (MBeanProxyException ex)
+            {
+               throw new RemoteFrameworkException(ex);
+            }
+         }
+
+         public ManagedBundleMBean getBundle(long bundleId)
+         {
+            ObjectName oname = managedFramework.getBundle(bundleId);
+            if (oname == null)
+               throw new IllegalArgumentException("Cannot get remote bundle for: " + bundleId);
 
             try
             {

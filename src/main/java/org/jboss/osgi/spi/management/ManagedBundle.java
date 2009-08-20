@@ -32,6 +32,7 @@ import javax.management.ObjectName;
 import org.jboss.osgi.spi.Constants;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Version;
 
 /**
  * The managed view of an OSGi Bundle
@@ -47,7 +48,11 @@ public class ManagedBundle implements ManagedBundleMBean
    public ManagedBundle(Bundle bundle)
    {
       this.bundle = bundle;
-      this.oname = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":bundle=" + bundle.getSymbolicName() + ",id=" + bundle.getBundleId());
+      
+      long id = bundle.getBundleId();
+      String name = bundle.getSymbolicName();
+      Version version = bundle.getVersion();
+      this.oname = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":id=" + id + ",bundle=" + name + ",version=" + version);
    }
 
    public ObjectName getObjectName()
