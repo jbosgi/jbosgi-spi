@@ -26,7 +26,6 @@ package org.jboss.osgi.spi.framework;
 import static org.jboss.osgi.spi.Constants.OSGI_HOME;
 import static org.jboss.osgi.spi.Constants.OSGI_SERVER_HOME;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,11 +34,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.service.DeploymentScannerService;
 import org.jboss.osgi.spi.service.DeploymentScannerService.ScanListener;
+import org.jboss.osgi.spi.util.ServiceLoader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -158,48 +159,30 @@ public class OSGiBootstrap
    }
 
    /*
-    * * Get an instance of an OSGiBootstrapProvider.
+    * Get an instance of an OSGiBootstrapProvider.
     */
    public static OSGiBootstrapProvider getBootstrapProvider()
    {
-      OSGiBootstrapProvider provider;
+      OSGiBootstrapProvider provider = null;
 
-      // Get the provider name from the System property
-      String providerName = System.getProperty(OSGiBootstrapProvider.class.getName());
-
-      // Get the provider name from the resource file
-      if (providerName == null)
+      List<OSGiBootstrapProvider> providers = ServiceLoader.loadServices(OSGiBootstrapProvider.class);
+      for (OSGiBootstrapProvider aux : providers)
       {
-         ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
-         URL providerURL = ctxLoader.getResource(OSGiBootstrapProvider.class.getName());
-         if (providerURL == null)
-            throw new IllegalStateException("Cannot find resource: " + OSGiBootstrapProvider.class.getName());
-
          try
          {
-            providerName = new BufferedReader(new InputStreamReader(providerURL.openStream())).readLine();
+            aux.configure();
+            provider = aux;
+            break;
          }
-         catch (Exception e)
+         catch (Exception ex)
          {
-            throw new IllegalStateException("Cannot read bootstrap provider name from: " + providerURL);
+            Logger tmplog = Logger.getLogger(OSGiBootstrap.class);
+            tmplog.debug("Cannot configure [" + aux.getClass().getName() + "], cause: " + ex);
          }
       }
 
-      // Verify that we have a provider name
-      if (providerName == null)
+      if (provider == null)
          throw new IllegalStateException("Cannot obtain bootstrap provider");
-
-      // Load the bootstrap provider
-      try
-      {
-         ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
-         Class<?> providerClass = ctxLoader.loadClass(providerName);
-         provider = (OSGiBootstrapProvider)providerClass.newInstance();
-      }
-      catch (Exception e)
-      {
-         throw new IllegalStateException("Cannot load bootstrap provider: " + providerName);
-      }
 
       return provider;
    }

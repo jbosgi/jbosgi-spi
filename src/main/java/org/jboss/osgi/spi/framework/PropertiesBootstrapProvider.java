@@ -59,7 +59,6 @@ import org.osgi.framework.launch.FrameworkFactory;
  * The PropertiesBootstrapProvider supports the following properties
  * 
  * <ul>
- * <li><b>org.jboss.osgi.spi.framework.impl</b> - The OSGiFramework implementation</li>
  * <li><b>org.jboss.osgi.spi.framework.autoInstall</b> - Bundles that need to be installed with the Framework automatically</li>
  * <li><b>org.jboss.osgi.spi.framework.autoStart</b> - Bundles that need to be started automatically</li>
  * </ul>
@@ -67,9 +66,6 @@ import org.osgi.framework.launch.FrameworkFactory;
  * All other properties are passed on to configure the framework.
  * 
  * <pre>
- *    # The OSGiFramework implementation 
- *    org.jboss.osgi.spi.framework.impl=org.jboss.osgi.felix.framework.FelixIntegration
- *    
  *    # Properties to configure the Framework
  *    org.osgi.framework.storage.clean=onFirstInit
  *    org.osgi.framework.system.packages=\
@@ -123,7 +119,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
 
    public void configure()
    {
-      configure(DEFAULT_OSGI_FRAMEWORK_PROPERTIES);
+      configure(System.getProperty(OSGI_FRAMEWORK_CONFIG, DEFAULT_OSGI_FRAMEWORK_PROPERTIES));
    }
 
    public void configure(URL urlConfig)

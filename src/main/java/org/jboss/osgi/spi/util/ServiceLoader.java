@@ -22,50 +22,89 @@
 package org.jboss.osgi.spi.util;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jboss.logging.Logger;
 
 /**
- * Loads a service from the requesters classpath.
+ * Loads service implementations from the requesters classpath.
  * 
  * @author Thomas.Diesler@jboss.com
  * @since 14-Dec-2006
  */
 public abstract class ServiceLoader
 {
+   // Provide logging
+   final static Logger log = Logger.getLogger(ServiceLoader.class);
+   
    /**
-    * Loads the requested service from META-INF/services/${serviceClass}
+    * Loads a list of service implementations defined in META-INF/services/${serviceClass}
     */
    @SuppressWarnings("unchecked")
-   public static <T> T loadService(Class<T> serviceClass)
+   public static <T> List<T> loadServices(Class<T> serviceClass)
    {
-      T factory = null;
-      String factoryName = null;
+      List<T> services = new ArrayList<T>();
       ClassLoader loader = serviceClass.getClassLoader();
-
+      
       // Use the Services API (as detailed in the JAR specification), if available, to determine the classname.
       String filename = "META-INF/services/" + serviceClass.getName();
       InputStream inStream = loader.getResourceAsStream(filename);
+      if (inStream == null)
+         log.debug ("Cannot find resource: " + filename);
+      
       if (inStream != null)
       {
          try
          {
             BufferedReader br = new BufferedReader(new InputStreamReader(inStream, "UTF-8"));
-            factoryName = br.readLine();
-            br.close();
-            if (factoryName != null)
+            String implClassName = br.readLine();
+            while(implClassName != null)
             {
-               factoryName = factoryName.trim();
-               Class<T> factoryClass = (Class<T>)loader.loadClass(factoryName);
-               factory = factoryClass.newInstance();
+               int hashIndex = implClassName.indexOf("#");
+               if (hashIndex > 0)
+                  implClassName = implClassName.substring(0, hashIndex);
+               
+               implClassName = implClassName.trim();
+               
+               if (implClassName.length() > 0)
+               {
+                  try
+                  {
+                     Class<T> implClass = (Class<T>)loader.loadClass(implClassName);
+                     services.add(implClass.newInstance());
+                  }
+                  catch (Exception ex)
+                  {
+                     log.debug ("Cannot load service: " + implClassName);
+                  }
+               }
+               
+               implClassName = br.readLine();
             }
+            br.close();
          }
-         catch (Throwable t)
+         catch (IOException ex)
          {
-            throw new IllegalStateException("Failed to load " + serviceClass.getName() + ": " + factoryName, t);
+            throw new IllegalStateException("Failed to load services for: " + serviceClass.getName());
          }
       }
       
-      return factory;
+      if (services.size() == 0)
+         throw new IllegalStateException("Failed to load services for: " + serviceClass.getName());
+      
+      return services;
+   }
+
+   /**
+    * Loads the first of a list of service implementations defined in META-INF/services/${serviceClass}
+    */
+   public static <T> T loadService(Class<T> serviceClass)
+   {
+      List<T> services = loadServices(serviceClass);
+      return services.get(0); 
    }
 }

@@ -68,12 +68,22 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
       String symbolicName = getManifestEntry(location, Constants.BUNDLE_SYMBOLICNAME);
       String version = getManifestEntry(location, Constants.BUNDLE_VERSION);
       
-      URL bundleURL = getTestHelper().getTestArchiveURL(location);
-      ServiceReference sref = getBundleContext().getServiceReference(DeployerService.class.getName());
-      DeployerService service = (DeployerService)getBundleContext().getService(sref);
-      service.deploy(bundleURL);
+      OSGiBundle bundle;
       
-      OSGiBundle bundle = getBundle(symbolicName, version);
+      BundleContext context = getBundleContext();
+      URL bundleURL = getTestHelper().getTestArchiveURL(location);
+      ServiceReference sref = context.getServiceReference(DeployerService.class.getName());
+      if (sref != null)
+      {
+         DeployerService service = (DeployerService)context.getService(sref);
+         service.deploy(bundleURL);
+         bundle = getBundle(symbolicName, version);
+      }
+      else
+      {
+         Bundle auxBundle = context.installBundle(bundleURL.toExternalForm());
+         bundle = new EmbeddedBundle(this, auxBundle);
+      }
       return registerBundle(location, bundle);
    }
 
