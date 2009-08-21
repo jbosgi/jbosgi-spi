@@ -262,7 +262,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
             if (bundle.getState() != Bundle.UNINSTALLED)
                bundle.uninstall();
          }
-         catch (BundleException ex)
+         catch (Exception ex)
          {
             log.warn("Cannot uninstall bundle: " + bundle, ex);
          }

@@ -143,15 +143,18 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
    @Override
    public void shutdown()
    {
-      super.shutdown();
       OSGiBootstrapProvider bootProvider = getTestHelper().getBootstrapProvider();
-      try
+      if (bootProvider != null)
       {
-         bootProvider.getFramework().stop();
-      }
-      catch (BundleException ex)
-      {
-         log.error("Cannot stop the framework", ex);
+         super.shutdown();
+         try
+         {
+            bootProvider.getFramework().stop();
+         }
+         catch (BundleException ex)
+         {
+            log.error("Cannot stop the framework", ex);
+         }
       }
    }
    

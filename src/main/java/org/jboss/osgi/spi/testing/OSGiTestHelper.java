@@ -47,6 +47,7 @@ public class OSGiTestHelper
 
    // The OSGiBootstrapProvider is a lazy property of the helper
    private OSGiBootstrapProvider bootProvider;
+   private boolean skipCreateBootstrapProvider;
    
    private static String testResourcesDir;
    private static String testArchiveDir;
@@ -59,9 +60,18 @@ public class OSGiTestHelper
 
    public OSGiBootstrapProvider getBootstrapProvider()
    {
-      if (bootProvider == null)
-         bootProvider = OSGiBootstrap.getBootstrapProvider();
-      
+      if (bootProvider == null && skipCreateBootstrapProvider == false)
+      {
+         try
+         {
+            bootProvider = OSGiBootstrap.getBootstrapProvider();
+         }
+         catch (RuntimeException rte)
+         {
+            skipCreateBootstrapProvider = true;
+            throw rte;
+         }
+      }
       return bootProvider;
    }
    

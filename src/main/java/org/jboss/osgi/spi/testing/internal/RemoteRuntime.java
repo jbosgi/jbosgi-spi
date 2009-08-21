@@ -35,6 +35,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.jboss.osgi.spi.capability.Capability;
+import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.management.MBeanProxy;
 import org.jboss.osgi.spi.management.MBeanProxyException;
 import org.jboss.osgi.spi.management.ManagedBundleMBean;
@@ -203,8 +204,12 @@ public class RemoteRuntime extends OSGiRuntimeImpl
    @Override
    public void shutdown()
    {
-      super.shutdown();
-      getPackageAdmin().refreshPackages(null);
+      OSGiBootstrapProvider bootProvider = getTestHelper().getBootstrapProvider();
+      if (bootProvider != null)
+      {
+         super.shutdown();
+         getPackageAdmin().refreshPackages(null);
+      }
    }
 
    private RemoteFramework getRemoteFramework()
