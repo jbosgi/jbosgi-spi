@@ -153,6 +153,14 @@ public abstract class OSGiTest
    }
 
    /**
+    * Delegates to {@link OSGiTestHelper#getTestArchivePath(String)}
+    */
+   protected String getTestArchivePath(String archive)
+   {
+      return getTestHelper().getTestArchivePath(archive);
+   }
+
+   /**
     * Delegates to {@link OSGiTestHelper#getTestArchiveFile(String)}
     */
    protected File getTestArchiveFile(String archive)

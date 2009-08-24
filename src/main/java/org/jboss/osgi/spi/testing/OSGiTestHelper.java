@@ -48,10 +48,10 @@ public class OSGiTestHelper
    // The OSGiBootstrapProvider is a lazy property of the helper
    private OSGiBootstrapProvider bootProvider;
    private boolean skipCreateBootstrapProvider;
-   
+
    private static String testResourcesDir;
    private static String testArchiveDir;
-   
+
    public OSGiTestHelper()
    {
       testResourcesDir = System.getProperty(SYSPROP_TEST_RESOURCES_DIRECTORY, "target/test-classes");
@@ -74,23 +74,23 @@ public class OSGiTestHelper
       }
       return bootProvider;
    }
-   
+
    public OSGiRuntime getDefaultRuntime()
    {
       OSGiRuntime runtime;
-      
+
       String target = System.getProperty("target.container");
       if (target == null)
       {
          runtime = getEmbeddedRuntime();
       }
-      else 
+      else
       {
          runtime = getRemoteRuntime();
       }
-      return runtime; 
+      return runtime;
    }
-   
+
    public OSGiRuntime getEmbeddedRuntime()
    {
       return new EmbeddedRuntime(this);
@@ -117,6 +117,20 @@ public class OSGiTestHelper
       return resURL;
    }
 
+   /** Try to discover the File for the test resource */
+   public File getResourceFile(String resource)
+   {
+      File file = new File(resource);
+      if (file.exists())
+         return file;
+
+      file = new File(testResourcesDir + "/" + resource);
+      if (file.exists())
+         return file;
+
+      throw new IllegalArgumentException("Cannot obtain '" + testResourcesDir + "/" + resource + "'");
+   }
+
    /** Try to discover the URL for the deployment archive */
    public URL getTestArchiveURL(String archive)
    {
@@ -130,18 +144,10 @@ public class OSGiTestHelper
       }
    }
 
-   /** Try to discover the File for the test resource */
-   public File getResourceFile(String resource)
+   /** Try to discover the absolute path for the deployment archive */
+   public String getTestArchivePath(String archive)
    {
-      File file = new File(resource);
-      if (file.exists())
-         return file;
-
-      file = new File(testResourcesDir + "/" + resource);
-      if (file.exists())
-         return file;
-
-      throw new IllegalArgumentException("Cannot obtain '" + testResourcesDir + "/" + resource + "'");
+      return getTestArchiveFile(archive).getAbsolutePath();
    }
 
    /** Try to discover the File for the deployment archive */
@@ -157,7 +163,7 @@ public class OSGiTestHelper
 
       throw new IllegalArgumentException("Cannot obtain '" + testArchiveDir + "/" + archive + "'.");
    }
-   
+
    @SuppressWarnings("unchecked")
    public InitialContext getInitialContext() throws NamingException
    {
