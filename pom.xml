@@ -33,7 +33,7 @@
   <properties>
     <version.args4j>2.0.12</version.args4j>
     <version.jboss.logging>2.0.5.GA</version.jboss.logging>
-    <version.jboss.vfs>2.1.0.GA</version.jboss.vfs>
+    <version.jboss.vfs>2.1.2.GA</version.jboss.vfs>
     <version.osgi>r4v42-20090728</version.osgi>
   </properties>
   
