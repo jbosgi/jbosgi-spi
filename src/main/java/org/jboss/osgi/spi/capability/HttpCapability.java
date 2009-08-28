@@ -23,8 +23,6 @@ package org.jboss.osgi.spi.capability;
 
 //$Id$
 
-import java.util.Properties;
-
 import org.jboss.osgi.spi.testing.OSGiRuntime;
 import org.osgi.service.http.HttpService;
 
@@ -51,9 +49,7 @@ public class HttpCapability extends Capability
    public HttpCapability()
    {
       super(HttpService.class.getName());
-      
-      Properties props = getProperties();
-      props.setProperty("org.osgi.service.http.port", "8090");
+      addSystemProperty("org.osgi.service.http.port", "8090");
 
       addBundle("bundles/org.apache.felix.http.jetty.jar");
    }

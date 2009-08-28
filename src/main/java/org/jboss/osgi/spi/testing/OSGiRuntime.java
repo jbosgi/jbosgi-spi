@@ -44,7 +44,7 @@ public interface OSGiRuntime
     * Adding a capability recursively adds the orderded set of dependent capabilities
     * before it installs and starts the orderded set bundles. 
     */
-   void addCapability(Capability capability) throws BundleException;
+   void addCapability(Capability capability) throws BundleException, InvalidSyntaxException;
 
    /**
     * Remove a {@link Capability} from the runtime.

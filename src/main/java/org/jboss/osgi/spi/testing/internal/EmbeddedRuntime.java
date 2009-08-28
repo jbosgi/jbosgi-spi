@@ -25,9 +25,9 @@ package org.jboss.osgi.spi.testing.internal;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
@@ -125,16 +125,15 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
    }
 
    @Override
-   public void addCapability(Capability capability) throws BundleException
+   public void addCapability(Capability capability) throws BundleException, InvalidSyntaxException
    {
       // Copy the properties to the System props
-      Properties props = capability.getProperties();
-      Enumeration<?> names = props.propertyNames();
-      while (names.hasMoreElements())
+      Map<String, String> props = capability.getSystemProperties();
+      for (Entry<String, String> entry : props.entrySet())
       {
-         String key = (String)names.nextElement();
-         String value = props.getProperty(key);
-         System.setProperty(key, value);
+         String value = System.getProperty(entry.getKey());
+         if (value == null)
+            System.setProperty(entry.getKey(), entry.getValue());
       }
       
       super.addCapability(capability);

@@ -48,6 +48,7 @@ import org.jboss.osgi.spi.testing.OSGiTestHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
+import org.osgi.framework.InvalidSyntaxException;
 
 /**
  * An abstract implementation of the {@link OSGiRuntime}
@@ -74,15 +75,15 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       return helper;
    }
 
-   public void addCapability(Capability capability) throws BundleException
+   public void addCapability(Capability capability) throws BundleException, InvalidSyntaxException
    {
       // Add dependent capabilies
       for (Capability dependency : capability.getDependencies())
          addCapability(dependency);
 
       // Check if the service provided by the capability exists already
-      OSGiServiceReference sref = getServiceReference(capability.getServiceName());
-      if (sref == null)
+      OSGiServiceReference[] srefs = getServiceReferences(capability.getServiceName(), capability.getFilter());
+      if (srefs == null)
       {
          log.debug("Add capability: " + capability);
 
@@ -113,14 +114,14 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       {
          log.debug("Remove capability : " + capability);
 
-         List<String> bundleLocations = capability.getBundles();
+         List<String> bundleLocations = new ArrayList<String>(capability.getBundles());
          Collections.reverse(bundleLocations);
 
          for (String location : bundleLocations)
             failsafeUninstall(bundles.remove(location));
       }
 
-      List<Capability> dependencies = capability.getDependencies();
+      List<Capability> dependencies = new ArrayList<Capability>(capability.getDependencies());
       Collections.reverse(dependencies);
 
       // Remove dependent capabilities

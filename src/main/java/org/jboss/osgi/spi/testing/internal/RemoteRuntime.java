@@ -25,7 +25,6 @@ package org.jboss.osgi.spi.testing.internal;
 
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.management.MBeanException;
@@ -34,7 +33,6 @@ import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.jboss.osgi.spi.capability.Capability;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.management.MBeanProxy;
 import org.jboss.osgi.spi.management.MBeanProxyException;
@@ -293,23 +291,4 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       ObjectName oname = new ObjectName("jboss.system:service=MainDeployer");
       getMBeanServer().invoke(oname, method, new Object[] { archiveURL }, new String[] { "java.net.URL" });
    }
-
-   /**
-    * A copy of the RemoteLogCapability from the 
-    * jboss-osgi-remotelog bundle, on which the SPI
-    * should not have a dependency. 
-    */
-   class RemoteLogCapability extends Capability
-   {
-      public RemoteLogCapability()
-      {
-         super("org.jboss.osgi.remotelog.RemoteLogService");
-         
-         Properties props = getProperties();
-         props.setProperty("org.jboss.osgi.service.remote.log.reader", "true");
-         props.setProperty("org.jboss.osgi.service.remote.log.host", System.getProperty("jboss.bind.address", "localhost"));
-         props.setProperty("org.jboss.osgi.service.remote.log.port", "5400");
-         
-         addBundle("bundles/jboss-osgi-remotelog.jar");
-      }
-   }}
+}
