@@ -148,9 +148,11 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
          super.shutdown();
          try
          {
-            bootProvider.getFramework().stop();
+            Framework framework = bootProvider.getFramework();
+            framework.stop();
+            framework.waitForStop(5000);
          }
-         catch (BundleException ex)
+         catch (Exception ex)
          {
             log.error("Cannot stop the framework", ex);
          }
