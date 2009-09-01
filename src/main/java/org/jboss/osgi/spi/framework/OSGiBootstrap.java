@@ -177,7 +177,7 @@ public class OSGiBootstrap
          catch (Exception ex)
          {
             Logger tmplog = Logger.getLogger(OSGiBootstrap.class);
-            tmplog.debug("Cannot configure [" + aux.getClass().getName() + "], cause: " + ex);
+            tmplog.debug("Cannot configure [" + aux.getClass().getName() + "]", ex);
          }
       }
 
