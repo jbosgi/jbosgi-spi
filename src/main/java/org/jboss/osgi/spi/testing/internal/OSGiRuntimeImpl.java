@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.Version;
 
 /**
  * An abstract implementation of the {@link OSGiRuntime}
@@ -184,21 +186,33 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
 
    public OSGiBundle getBundle(String symbolicName, String version)
    {
+      OSGiBundle bundle = getBundle(symbolicName, version, false);
+      return bundle;
+   }
+
+   protected OSGiBundle getBundle(String symbolicName, String versionStr, boolean mustExist)
+   {
       OSGiBundle bundle = null;
-      for (OSGiBundle aux : getBundles())
+      Version version = Version.parseVersion(versionStr);
+      List<OSGiBundle> bundles = Arrays.asList(getBundles());
+      for (OSGiBundle aux : bundles)
       {
          if (aux.getSymbolicName().equals(symbolicName))
          {
-            if (version == null || version.equals(aux.getVersion()))
+            if (versionStr == null || version.equals(aux.getVersion()))
             {
                bundle = aux;
                break;
             }
          }
       }
+      
+      if (bundle == null && mustExist == true)
+         throw new IllegalStateException("Cannot obtain bundle: " + symbolicName + "-" + version + ". We have " + bundles);
+      
       return bundle;
    }
-
+   
    protected String getManifestEntry(String location, String key)
    {
       Manifest manifest = getManifest(location);

@@ -77,7 +77,7 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
       {
          DeployerService service = (DeployerService)context.getService(sref);
          service.deploy(bundleURL);
-         bundle = getBundle(symbolicName, version);
+         bundle = getBundle(symbolicName, version, true);
       }
       else
       {

@@ -29,6 +29,7 @@ import org.jboss.osgi.spi.testing.OSGiBundle;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
 
 /**
  * An implementation of a remote {@link OSGiBundle}
@@ -48,7 +49,7 @@ public class RemoteBundle extends OSGiBundle
 
    private long bundleId;
    private String symbolicName;
-   private String version;
+   private Version version;
    
    public RemoteBundle(OSGiRuntimeImpl runtime, ManagedBundleMBean bundle, String location)
    {
@@ -58,7 +59,9 @@ public class RemoteBundle extends OSGiBundle
       
       this.bundleId = bundle.getBundleId();
       this.symbolicName = bundle.getSymbolicName();
-      this.version = getHeaders().get(Constants.BUNDLE_VERSION);
+      
+      String versionStr = getHeaders().get(Constants.BUNDLE_VERSION);
+      this.version = Version.parseVersion(versionStr);
    }
 
    @Override
@@ -80,7 +83,7 @@ public class RemoteBundle extends OSGiBundle
    }
 
    @Override
-   public String getVersion()
+   public Version getVersion()
    {
       return version;
    }

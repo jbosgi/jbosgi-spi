@@ -27,7 +27,7 @@ import org.jboss.osgi.spi.logging.ExportedPackageHelper;
 import org.jboss.osgi.spi.testing.OSGiBundle;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
 
 /**
  * An OSGi Test Case
@@ -64,9 +64,9 @@ public class EmbeddedBundle extends OSGiBundle
    }
 
    @Override
-   public String getVersion()
+   public Version getVersion()
    {
-      return getHeaders().get(Constants.BUNDLE_VERSION);
+      return bundle.getVersion();
    }
 
    @Override

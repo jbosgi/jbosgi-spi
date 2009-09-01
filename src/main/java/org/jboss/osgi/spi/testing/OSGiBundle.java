@@ -25,6 +25,7 @@ import java.util.Dictionary;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Version;
 
 /**
  * An abstraction of an OSGi {@link Bundle}.
@@ -45,9 +46,9 @@ public abstract class OSGiBundle
    public abstract String getSymbolicName();
 
    /**
-    * Returns the version of this bundle as specified by its Bundle-Version manifest header.
+    * Returns the version of this bundle.
     */
-   public abstract String getVersion();
+   public abstract Version getVersion();
    
    /**
     * Returns this bundle's Manifest headers and values.
