@@ -165,22 +165,25 @@ public class ManagedFramework implements ManagedFrameworkMBean
    public void refreshPackages(String[] symbolicNames)
    {
       ServiceReference sref = systemContext.getServiceReference(PackageAdmin.class.getName());
-      PackageAdmin service = (PackageAdmin)systemContext.getService(sref);
-
-      Bundle[] bundles = null;
-      if (symbolicNames != null)
+      if (sref != null)
       {
-         List<String> nameList = Arrays.asList(symbolicNames);
-         Set<Bundle> bundleSet = new HashSet<Bundle>();
-         for (Bundle bundle : systemContext.getBundles())
+         PackageAdmin service = (PackageAdmin)systemContext.getService(sref);
+
+         Bundle[] bundles = null;
+         if (symbolicNames != null)
          {
-            if (nameList.contains(bundle.getSymbolicName()))
-               bundleSet.add(bundle);
+            List<String> nameList = Arrays.asList(symbolicNames);
+            Set<Bundle> bundleSet = new HashSet<Bundle>();
+            for (Bundle bundle : systemContext.getBundles())
+            {
+               if (nameList.contains(bundle.getSymbolicName()))
+                  bundleSet.add(bundle);
+            }
+            bundles = new Bundle[bundleSet.size()];
+            bundleSet.toArray(bundles);
          }
-         bundles = new Bundle[bundleSet.size()];
-         bundleSet.toArray(bundles);
+         service.refreshPackages(bundles);
       }
-      service.refreshPackages(bundles);
    }
 
    public void start()
