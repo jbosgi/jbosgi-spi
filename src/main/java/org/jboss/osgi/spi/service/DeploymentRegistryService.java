@@ -26,6 +26,7 @@ package org.jboss.osgi.spi.service;
 import java.net.URL;
 
 import org.jboss.osgi.spi.util.BundleDeployment;
+import org.osgi.framework.Version;
 
 /**
  * A Service to register/unregister bundle deployments.
@@ -45,7 +46,7 @@ public interface DeploymentRegistryService
     * Get the bundle deployment for the given bundle symbolicName and version
     * @return null, if this service does not maintain the bundle deployment
     */
-   BundleDeployment getBundleDeployment(String symbolicName, String version);
+   BundleDeployment getBundleDeployment(String symbolicName, Version version);
 
    /**
     * Register a bundle deployment

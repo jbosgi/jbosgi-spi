@@ -31,6 +31,7 @@ import java.util.jar.Manifest;
 
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
 
 /**
  * A factory for bundle deployments.
@@ -60,7 +61,8 @@ public abstract class BundleDeploymentFactory
       if (symbolicName == null)
          throw new BundleException("Cannot obtain Bundle-SymbolicName for: " + url);
 
-      String version = attribs.getValue(Constants.BUNDLE_VERSION);
+      String versionStr = attribs.getValue(Constants.BUNDLE_VERSION);
+      Version version = Version.parseVersion(versionStr);
       return new BundleDeployment(url, symbolicName, version);
    }
 }
