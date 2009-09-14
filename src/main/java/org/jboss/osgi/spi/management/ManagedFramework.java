@@ -56,33 +56,32 @@ public class ManagedFramework implements ManagedFrameworkMBean
    final Logger log = Logger.getLogger(ManagedFramework.class);
 
    private MBeanServer mbeanServer;
-   private BundleContext systemContext;
+   private BundleContext bundleContext;
 
-   public ManagedFramework(BundleContext systemContext, MBeanServer mbeanServer)
+   public ManagedFramework(BundleContext bundleContext, MBeanServer mbeanServer)
    {
-      this.systemContext = systemContext;
+      if (bundleContext == null)
+         throw new IllegalArgumentException("Null BundleContext");
+      this.bundleContext = bundleContext;
+      
+      if (mbeanServer == null)
+         throw new IllegalArgumentException("Null MBeanServer");
       this.mbeanServer = mbeanServer;
+      
+      if (bundleContext.getBundle().getBundleId() != 0)
+         throw new IllegalArgumentException ("Not the system bundle context: " + bundleContext);
    }
 
-   public ManagedFramework()
+   public BundleContext getBundleContext()
    {
-   }
-
-   public void setMbeanServer(MBeanServer server)
-   {
-      this.mbeanServer = server;
-   }
-
-   public void setSystemContext(BundleContext systemContext)
-   {
-      this.systemContext = systemContext;
+      return bundleContext;
    }
 
    @SuppressWarnings("unchecked")
    public ObjectName getBundle(String symbolicName, String version)
    {
       ObjectName oname = null;
-      
+
       ObjectName pattern = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":bundle=" + symbolicName + ",*");
       Set<ObjectName> names = mbeanServer.queryNames(pattern, null);
 
@@ -91,7 +90,7 @@ public class ManagedFramework implements ManagedFrameworkMBean
          // [TODO] Support bundle version 
          if (names.size() > 1)
             throw new IllegalArgumentException("Multiple bundles found: " + names);
-         
+
          oname = names.iterator().next();
       }
 
@@ -102,7 +101,7 @@ public class ManagedFramework implements ManagedFrameworkMBean
    public ObjectName getBundle(long bundleId)
    {
       ObjectName oname = null;
-      
+
       ObjectName pattern = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":id=" + bundleId + ",*");
       Set<ObjectName> names = mbeanServer.queryNames(pattern, null);
 
@@ -126,23 +125,23 @@ public class ManagedFramework implements ManagedFrameworkMBean
 
    public ManagedServiceReference getServiceReference(String clazz)
    {
-      ManagedServiceReference manref = null;
-      ServiceReference sref = systemContext.getServiceReference(clazz);
-      if (sref != null)
-      {
-         Map<String, Object> props = new HashMap<String, Object>();
-         for (String key : sref.getPropertyKeys())
-            props.put(key, sref.getProperty(key));
+      ServiceReference sref = getBundleContext().getServiceReference(clazz);
+      if (sref == null)
+         return null;
 
-         manref = new ManagedServiceReference(props);
+      Map<String, Object> props = new HashMap<String, Object>();
+      for (String key : sref.getPropertyKeys())
+      {
+         props.put(key, sref.getProperty(key));
       }
-      return manref;
+      
+      return new ManagedServiceReference(props);
    }
 
    public ManagedServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException
    {
       List<ManagedServiceReference> foundRefs = new ArrayList<ManagedServiceReference>();
-      ServiceReference[] srefs = systemContext.getServiceReferences(clazz, filter);
+      ServiceReference[] srefs = getBundleContext().getServiceReferences(clazz, filter);
       if (srefs != null)
       {
          for (ServiceReference sref : srefs)
@@ -164,17 +163,17 @@ public class ManagedFramework implements ManagedFrameworkMBean
 
    public void refreshPackages(String[] symbolicNames)
    {
-      ServiceReference sref = systemContext.getServiceReference(PackageAdmin.class.getName());
+      ServiceReference sref = getBundleContext().getServiceReference(PackageAdmin.class.getName());
       if (sref != null)
       {
-         PackageAdmin service = (PackageAdmin)systemContext.getService(sref);
+         PackageAdmin service = (PackageAdmin)getBundleContext().getService(sref);
 
          Bundle[] bundles = null;
          if (symbolicNames != null)
          {
             List<String> nameList = Arrays.asList(symbolicNames);
             Set<Bundle> bundleSet = new HashSet<Bundle>();
-            for (Bundle bundle : systemContext.getBundles())
+            for (Bundle bundle : getBundleContext().getBundles())
             {
                if (nameList.contains(bundle.getSymbolicName()))
                   bundleSet.add(bundle);
