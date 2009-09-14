@@ -87,6 +87,12 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
       return registerBundle(location, bundle);
    }
 
+   public OSGiBundle installCompendium() throws BundleException
+   {
+      String compendiumLocation = System.getProperty("org.osgi.compendium.jar", "bundles/org.osgi.compendium.jar");
+      return installBundle(compendiumLocation);
+   }
+
    public OSGiBundle[] getBundles()
    {
       List<OSGiBundle> absBundles = new ArrayList<OSGiBundle>();
