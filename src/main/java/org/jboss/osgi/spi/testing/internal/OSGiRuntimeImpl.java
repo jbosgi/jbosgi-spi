@@ -176,7 +176,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    protected void invokeDeployerService(String method, URL archiveURL) throws Exception
    {
       ObjectName oname = new ObjectName("jboss.osgi:service=DeployerService");
-      getMBeanServer().invoke(oname, method, new Object[] { archiveURL }, new String[] { "java.net.URL" });
+      getMBeanServer().invoke(oname, method, new Object[] { archiveURL }, new String[] { URL.class.getName() });
    }
 
    public InitialContext getInitialContext() throws NamingException

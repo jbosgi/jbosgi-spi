@@ -44,9 +44,9 @@ import org.jboss.osgi.spi.testing.OSGiPackageAdmin;
 import org.jboss.osgi.spi.testing.OSGiRuntime;
 import org.jboss.osgi.spi.testing.OSGiServiceReference;
 import org.jboss.osgi.spi.testing.OSGiTestHelper;
+import org.jboss.osgi.spi.util.BundleDeployment;
 import org.jboss.osgi.spi.util.BundleDeploymentFactory;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 
 /**
@@ -67,11 +67,15 @@ public class RemoteRuntime extends OSGiRuntimeImpl
 
    public OSGiBundle installBundle(String location) throws BundleException
    {
-      String symbolicName = getManifestEntry(location, Constants.BUNDLE_SYMBOLICNAME);
-      String version = getManifestEntry(location, Constants.BUNDLE_VERSION);
       try
       {
-         deploy(location);
+         URL bundleURL = getTestHelper().getTestArchiveURL(location);
+         BundleDeployment bundleDep = BundleDeploymentFactory.createBundleDeployment(bundleURL);
+         
+         invokeDeployerService("deploy", bundleURL);
+         
+         String symbolicName = bundleDep.getSymbolicName();
+         String version = bundleDep.getVersion().toString();
          ManagedBundleMBean bundleMBean = getRemoteFramework().getBundle(symbolicName, version);
          RemoteBundle bundle = new RemoteBundle(this, bundleMBean, location);
          return registerBundle(location, bundle);
@@ -98,36 +102,14 @@ public class RemoteRuntime extends OSGiRuntimeImpl
    public void deploy(String location) throws Exception
    {
       URL archiveURL = getTestHelper().getTestArchiveURL(location);
-      
-      if (isBundleArchive(location))
-         invokeDeployerService("deploy", archiveURL);
-      else
-         invokeMainDeployer("deploy", archiveURL);
+      invokeMainDeployer("deploy", archiveURL);
    }
 
    @Override
    public void undeploy(String location) throws Exception
    {
       URL archiveURL = getTestHelper().getTestArchiveURL(location);
-      
-      if (isBundleArchive(location))
-         invokeDeployerService("undeploy", archiveURL);
-      else
-         invokeMainDeployer("undeploy", archiveURL);
-   }
-
-   private boolean isBundleArchive(String location)
-   {
-      try
-      {
-         URL archiveURL = getTestHelper().getTestArchiveURL(location);
-         BundleDeploymentFactory.createBundleDeployment(archiveURL);
-         return true;
-      }
-      catch (BundleException ex)
-      {
-         return false;
-      }
+      invokeMainDeployer("undeploy", archiveURL);
    }
 
    public OSGiBundle[] getBundles()
@@ -289,6 +271,6 @@ public class RemoteRuntime extends OSGiRuntimeImpl
    private void invokeMainDeployer(String method, URL archiveURL) throws Exception
    {
       ObjectName oname = new ObjectName("jboss.system:service=MainDeployer");
-      getMBeanServer().invoke(oname, method, new Object[] { archiveURL }, new String[] { "java.net.URL" });
+      getMBeanServer().invoke(oname, method, new Object[] { archiveURL }, new String[] { URL.class.getName() });
    }
 }
