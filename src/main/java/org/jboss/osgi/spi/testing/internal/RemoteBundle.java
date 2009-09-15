@@ -132,7 +132,7 @@ public class RemoteBundle extends OSGiBundle
       }
       catch (Exception ex)
       {
-         log.error("Cannot uninstall: " + location);
+         log.error("Cannot uninstall: " + location, ex);
       }
    }
 

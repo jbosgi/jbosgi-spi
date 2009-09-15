@@ -72,7 +72,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
          URL bundleURL = getTestHelper().getTestArchiveURL(location);
          BundleDeployment bundleDep = BundleDeploymentFactory.createBundleDeployment(bundleURL);
          
-         invokeDeployerService("deploy", bundleURL);
+         deployInternal(location, true);
          
          String symbolicName = bundleDep.getSymbolicName();
          String version = bundleDep.getVersion().toString();
@@ -98,18 +98,41 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       }
    }
    
-   @Override
    public void deploy(String location) throws Exception
    {
-      URL archiveURL = getTestHelper().getTestArchiveURL(location);
-      invokeMainDeployer("deploy", archiveURL);
+      deployInternal(location, false);
    }
-
-   @Override
+   
+   private void deployInternal(String location, boolean isBundle) throws Exception
+   {
+      URL archiveURL = getTestHelper().getTestArchiveURL(location);
+      if (isBundle)
+         invokeDeployerService("deploy", archiveURL);
+      else
+         invokeMainDeployer("deploy", archiveURL);
+   }
+   
    public void undeploy(String location) throws Exception
    {
       URL archiveURL = getTestHelper().getTestArchiveURL(location);
-      invokeMainDeployer("undeploy", archiveURL);
+      if (isBundleArchive(location))
+         invokeDeployerService("undeploy", archiveURL);
+      else
+         invokeMainDeployer("undeploy", archiveURL);
+   }
+
+   private boolean isBundleArchive(String location)
+   {
+      try
+      {
+         URL archiveURL = getTestHelper().getTestArchiveURL(location);
+         BundleDeploymentFactory.createBundleDeployment(archiveURL);
+         return true;
+      }
+      catch (BundleException ex)
+      {
+         return false;
+      }
    }
 
    public OSGiBundle[] getBundles()
