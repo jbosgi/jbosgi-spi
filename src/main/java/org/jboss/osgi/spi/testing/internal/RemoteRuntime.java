@@ -94,37 +94,6 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       }
    }
    
-   public OSGiBundle installCompendium() throws BundleException
-   {
-      try
-      {
-         RemoteBundle bundle = null;
-         
-         // Asume that the compendium is already installed in the remote runtime
-         for (ManagedBundleMBean bundleMBean : getRemoteFramework().getBundles())
-         {
-            String symbolicName = bundleMBean.getSymbolicName();
-            if (symbolicName.equals("org.osgi.compendium") || symbolicName.equals("osgi.cmpn"))
-            {
-               bundle = new RemoteBundle(this, bundleMBean, null);
-            }
-         }
-         
-         if (bundle == null)
-            throw new BundleException("Cannot obtain compendium");
-         
-         return bundle;
-      }
-      catch (RuntimeException rte)
-      {
-         throw rte;
-      }
-      catch (Exception ex)
-      {
-         throw new BundleException("Cannot obtain compendium", ex);
-      }
-   }
-
    @Override
    public void deploy(String location) throws Exception
    {

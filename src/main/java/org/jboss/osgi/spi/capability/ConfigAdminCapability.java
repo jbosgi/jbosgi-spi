@@ -42,6 +42,9 @@ public class ConfigAdminCapability extends Capability
    public ConfigAdminCapability()
    {
       super(ConfigurationAdmin.class.getName());
+      
+      addDependency(new CompendiumCapability());
+      
       addBundle("bundles/org.apache.felix.metatype.jar");
       addBundle("bundles/org.apache.felix.configadmin.jar");
    }

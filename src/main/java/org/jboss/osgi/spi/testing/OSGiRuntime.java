@@ -59,11 +59,6 @@ public interface OSGiRuntime
    OSGiBundle installBundle(String location) throws BundleException;
    
    /**
-    * Install the compedium bundle for this runtime
-    */
-   OSGiBundle installCompendium() throws BundleException;
-   
-   /**
     * Get the array of installed {@link OSGiBundle}s
     */
    OSGiBundle[] getBundles();

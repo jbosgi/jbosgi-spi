@@ -43,6 +43,8 @@ public class MicrocontainerCapability extends Capability
    {
       super(MicrocontainerService.class.getName());
       
+      addDependency(new CompendiumCapability());
+      
       addBundle("bundles/jboss-osgi-microcontainer.jar");
    }
 }

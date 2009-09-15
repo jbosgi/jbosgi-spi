@@ -21,29 +21,29 @@
  */
 package org.jboss.osgi.spi.capability;
 
+//$Id$
+
 import org.jboss.osgi.spi.testing.OSGiRuntime;
-import org.osgi.service.log.LogService;
+import org.jboss.osgi.spi.testing.OSGiTestHelper;
 
 /**
- * Adds the OSGi compedium LogService capability to the {@link OSGiRuntime}
+ * Adds the OSGi compedium capability to the {@link OSGiRuntime}
  * under test. 
  * 
- * It is ignored if the {@link LogService} is already registered.
- * 
- * Installed bundles: org.apache.felix.log.jar, jboss-osgi-common.jar
+ * Installed bundle: org.osgi.compendium.jar
  * 
  * @author thomas.diesler@jboss.com
- * @since 14-Sep-2009
+ * @since 16-Sep-2009
  */
-public class LogServiceCapability extends Capability
+public class CompendiumCapability extends Capability
 {
-   public LogServiceCapability()
+   public CompendiumCapability()
    {
-      super(LogService.class.getName());
+      super(null);
       
-      addDependency(new CompendiumCapability());
-      
-      addBundle("bundles/org.apache.felix.log.jar");
-      addBundle("bundles/jboss-osgi-common.jar");
+      if (new OSGiTestHelper().isFrameworkEquinox())
+         addBundle("bundles/org.eclipse.osgi.services.jar");
+      else
+         addBundle("bundles/org.osgi.compendium.jar");
    }
 }

@@ -191,4 +191,44 @@ public abstract class OSGiTest
    {
       return getTestHelper().getServerHost();
    }
+   
+   /**
+    * Delegates to {@link OSGiTestHelper#getTargetContainer()}
+    */
+   public String getTargetContainer()
+   {
+      return getTestHelper().getTargetContainer();
+   }
+   
+   /**
+    * Delegates to {@link OSGiTestHelper#getFramework()}
+    */
+   public String getFramework()
+   {
+      return getTestHelper().getFramework();
+   }
+   
+   /**
+    * Delegates to {@link OSGiTestHelper#isFrameworkEquinox()}
+    */
+   public boolean isFrameworkEquinox()
+   {
+      return getTestHelper().isFrameworkEquinox();
+   }
+   
+   /**
+    * Delegates to {@link OSGiTestHelper#isFrameworkFelix()}
+    */
+   public boolean isFrameworkFelix()
+   {
+      return getTestHelper().isFrameworkFelix();
+   }
+   
+   /**
+    * Delegates to {@link OSGiTestHelper#isFrameworkJBossMC()}
+    */
+   public boolean isFrameworkJBossMC()
+   {
+      return getTestHelper().isFrameworkJBossMC();
+   }
 }

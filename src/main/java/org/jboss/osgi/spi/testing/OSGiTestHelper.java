@@ -184,4 +184,29 @@ public class OSGiTestHelper
    {
       return System.getProperty("jboss.bind.address", "localhost");
    }
+   
+   public String getTargetContainer()
+   {
+      return System.getProperty("target.container");
+   }
+   
+   public String getFramework()
+   {
+      return System.getProperty("framework");
+   }
+   
+   public boolean isFrameworkEquinox()
+   {
+      return "equinox".equals(getTargetContainer());
+   }
+   
+   public boolean isFrameworkFelix()
+   {
+      return "felix".equals(getTargetContainer());
+   }
+   
+   public boolean isFrameworkJBossMC()
+   {
+      return "jbossmc".equals(getTargetContainer());
+   }
 }

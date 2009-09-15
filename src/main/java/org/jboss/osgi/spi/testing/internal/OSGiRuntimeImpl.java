@@ -83,9 +83,14 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       for (Capability dependency : capability.getDependencies())
          addCapability(dependency);
 
+      OSGiServiceReference[] srefs = null;
+      
       // Check if the service provided by the capability exists already
-      OSGiServiceReference[] srefs = getServiceReferences(capability.getServiceName(), capability.getFilter());
-      if (srefs == null)
+      String serviceName = capability.getServiceName();
+      if (serviceName != null)
+         srefs = getServiceReferences(serviceName, capability.getFilter());
+      
+      if (srefs == null || srefs.length == 0)
       {
          log.debug("Add capability: " + capability);
 
