@@ -189,22 +189,21 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       return helper.getServerHost();
    }
 
-   public OSGiBundle getBundle(String symbolicName, String version)
+   public OSGiBundle getBundle(String symbolicName, Version version)
    {
       OSGiBundle bundle = getBundle(symbolicName, version, false);
       return bundle;
    }
 
-   protected OSGiBundle getBundle(String symbolicName, String versionStr, boolean mustExist)
+   protected OSGiBundle getBundle(String symbolicName, Version version, boolean mustExist)
    {
       OSGiBundle bundle = null;
-      Version version = Version.parseVersion(versionStr);
       List<OSGiBundle> bundles = Arrays.asList(getBundles());
       for (OSGiBundle aux : bundles)
       {
          if (aux.getSymbolicName().equals(symbolicName))
          {
-            if (versionStr == null || version.equals(aux.getVersion()))
+            if (version == null || version.equals(aux.getVersion()))
             {
                bundle = aux;
                break;

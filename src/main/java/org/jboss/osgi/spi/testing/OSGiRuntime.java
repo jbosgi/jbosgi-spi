@@ -28,6 +28,7 @@ import javax.naming.NamingException;
 import org.jboss.osgi.spi.capability.Capability;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.Version;
 import org.osgi.service.packageadmin.PackageAdmin;
 
 /**
@@ -72,7 +73,7 @@ public interface OSGiRuntime
     * @param version may be null
     * @return The bundle or null if there is none
     */
-   OSGiBundle getBundle(String symbolicName, String version);
+   OSGiBundle getBundle(String symbolicName, Version version);
 
    /**
     * Get the {@link OSGiBundle} for a given bundle id.

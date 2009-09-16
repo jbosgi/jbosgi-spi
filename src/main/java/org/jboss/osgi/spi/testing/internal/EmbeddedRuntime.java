@@ -41,12 +41,14 @@ import org.jboss.osgi.spi.testing.OSGiPackageAdmin;
 import org.jboss.osgi.spi.testing.OSGiRuntime;
 import org.jboss.osgi.spi.testing.OSGiServiceReference;
 import org.jboss.osgi.spi.testing.OSGiTestHelper;
+import org.jboss.osgi.spi.util.BundleDeployment;
+import org.jboss.osgi.spi.util.BundleDeploymentFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
 import org.osgi.service.packageadmin.PackageAdmin;
 
@@ -65,13 +67,14 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
 
    public OSGiBundle installBundle(String location) throws BundleException
    {
-      String symbolicName = getManifestEntry(location, Constants.BUNDLE_SYMBOLICNAME);
-      String version = getManifestEntry(location, Constants.BUNDLE_VERSION);
+      URL bundleURL = getTestHelper().getTestArchiveURL(location);
+      BundleDeployment bundleDep = BundleDeploymentFactory.createBundleDeployment(bundleURL);
+      String symbolicName = bundleDep.getSymbolicName();
+      Version version = bundleDep.getVersion();
       
       OSGiBundle bundle;
       
       BundleContext context = getBundleContext();
-      URL bundleURL = getTestHelper().getTestArchiveURL(location);
       ServiceReference sref = context.getServiceReference(DeployerService.class.getName());
       if (sref != null)
       {
