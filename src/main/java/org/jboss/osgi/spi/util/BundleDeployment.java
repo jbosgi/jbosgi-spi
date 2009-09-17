@@ -24,8 +24,6 @@ package org.jboss.osgi.spi.util;
 import java.io.Serializable;
 import java.net.URL;
 
-import org.osgi.framework.Version;
-
 //$Id$
 
 /**
@@ -40,17 +38,20 @@ public class BundleDeployment implements Serializable
    
    private URL location;
    private String symbolicName;
-   private Version version;
+   private String version;
    private int startLevel;
    private boolean autoStart;
    private Object metadata;
 
-   public BundleDeployment(URL location, String symbolicName, Version version)
+   public BundleDeployment(URL location, String symbolicName, String version)
    {
       if (location == null)
          throw new IllegalArgumentException("Location cannot be null");
       if (symbolicName == null)
          throw new IllegalArgumentException("Symbolic name cannot be null");
+      
+      if (version == null)
+         version = "0.0.0";
       
       this.symbolicName = symbolicName;
       this.location = location;
@@ -76,7 +77,7 @@ public class BundleDeployment implements Serializable
    /**
     * Get the bundle version
     */
-   public Version getVersion()
+   public String getVersion()
    {
       return version;
    }
@@ -148,6 +149,6 @@ public class BundleDeployment implements Serializable
    @Override
    public String toString()
    {
-      return "[" + symbolicName + ":" + version + "]";
+      return "[" + symbolicName + "-" + version + ",url=" + location + "]";
    }
 }

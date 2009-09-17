@@ -68,9 +68,10 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
    public OSGiBundle installBundle(String location) throws BundleException
    {
       URL bundleURL = getTestHelper().getTestArchiveURL(location);
+      
       BundleDeployment bundleDep = BundleDeploymentFactory.createBundleDeployment(bundleURL);
       String symbolicName = bundleDep.getSymbolicName();
-      Version version = bundleDep.getVersion();
+      Version version = Version.parseVersion(bundleDep.getVersion());
       
       OSGiBundle bundle;
       
