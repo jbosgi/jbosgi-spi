@@ -192,21 +192,21 @@ public class OSGiTestHelper
    
    public String getFramework()
    {
-      return System.getProperty("framework");
+      return System.getProperty("framework", "jbossmc");
    }
    
    public boolean isFrameworkEquinox()
    {
-      return "equinox".equals(getTargetContainer());
+      return "equinox".equals(getFramework());
    }
    
    public boolean isFrameworkFelix()
    {
-      return "felix".equals(getTargetContainer());
+      return "felix".equals(getFramework());
    }
    
    public boolean isFrameworkJBossMC()
    {
-      return "jbossmc".equals(getTargetContainer());
+      return "jbossmc".equals(getFramework());
    }
 }
