@@ -20,21 +20,21 @@
   <artifactId>jboss-osgi-spi</artifactId>
   <packaging>jar</packaging>
 
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   
   <!-- Parent -->
   <parent>
     <groupId>org.jboss.osgi</groupId>
     <artifactId>jboss-osgi-parent</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
   </parent>
 
   <!-- Properties -->
   <properties>
     <version.args4j>2.0.12</version.args4j>
     <version.jboss.logging>2.0.5.GA</version.jboss.logging>
-    <version.jboss.vfs>2.1.3-SNAPSHOT</version.jboss.vfs>
-    <version.osgi>r4v42-20090728</version.osgi>
+    <version.jboss.vfs>2.1.3.GA</version.jboss.vfs>
+    <version.osgi>r4v42</version.osgi>
   </properties>
   
   <!-- Dependencies -->
@@ -129,4 +129,10 @@
     </repository>
   </repositories>
 
+
+  <scm>
+    <connection>scm:svn:http://anonsvn.jboss.org/repos/jbossas/projects/jboss-osgi/tags/jboss-osgi-spi-1.0.1</connection>
+    <developerConnection>scm:svn:https://svn.jboss.org/repos/jbossas/projects/jboss-osgi/tags/jboss-osgi-spi-1.0.1</developerConnection>
+    <url>http://fisheye.jboss.com/qsearch/JBossOSGi/tags/jboss-osgi-spi-1.0.1</url>
+  </scm>
 </project>
