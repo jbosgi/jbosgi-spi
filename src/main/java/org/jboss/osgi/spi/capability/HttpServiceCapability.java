@@ -32,7 +32,7 @@ import org.osgi.service.http.HttpService;
  * 
  * It is ignored if the {@link HttpService} is already registered.
  * 
- * Installed bundles: org.apache.felix.http.jetty.jar
+ * Installed bundles: pax-web-jetty-bundle.jar
  * 
  * Default properties set by this capability
  * 
@@ -44,13 +44,13 @@ import org.osgi.service.http.HttpService;
  * @author thomas.diesler@jboss.com
  * @since 05-May-2009
  */
-public class HttpCapability extends Capability
+public class HttpServiceCapability extends Capability
 {
-   public HttpCapability()
+   public HttpServiceCapability()
    {
       super(HttpService.class.getName());
       addSystemProperty("org.osgi.service.http.port", "8090");
 
-      addBundle("bundles/org.apache.felix.http.jetty.jar");
+      addBundle("bundles/pax-web-jetty-bundle.jar");
    }
 }
