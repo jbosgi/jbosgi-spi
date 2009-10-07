@@ -55,6 +55,11 @@ public abstract class Capability
     * 
     * If the service name is already registered with the {@link OSGiRuntime} adding this capability
     * does nothing.
+    * 
+    * If the service name is null the capability will install each associated bundle unless a bundle with the 
+    * same symbolic name is already installed. 
+    * 
+    * @param serviceName The service that would be registered by this capability.  
     */
    public Capability(String serviceName)
    {
