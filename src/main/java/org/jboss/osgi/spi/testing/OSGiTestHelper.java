@@ -182,17 +182,20 @@ public class OSGiTestHelper
 
    public String getServerHost()
    {
-      return System.getProperty("jboss.bind.address", "localhost");
+      String bindAddress = System.getProperty("jboss.bind.address", "localhost");
+      return bindAddress;
    }
    
    public String getTargetContainer()
    {
-      return System.getProperty("target.container");
+      String targetContainer = System.getProperty("target.container");
+      return targetContainer;
    }
    
    public String getFramework()
    {
-      return System.getProperty("framework", "jbossmc");
+      String framework = System.getProperty("framework", "jbossmc");
+      return framework;
    }
    
    public boolean isFrameworkEquinox()
