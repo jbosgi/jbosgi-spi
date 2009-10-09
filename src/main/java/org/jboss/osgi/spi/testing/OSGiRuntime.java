@@ -100,7 +100,7 @@ public interface OSGiRuntime
     * The returned array of ServiceReference objects contains services that were registered under the specified 
     * class and match the specified filter criteria. 
     */
-   OSGiServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException;
+   OSGiServiceReference[] getServiceReferences(String clazz, String filter);
    
    /**
     * Get the initial naming context for this {@link OSGiRuntime}

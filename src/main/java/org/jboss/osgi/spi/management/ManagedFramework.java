@@ -138,10 +138,20 @@ public class ManagedFramework implements ManagedFrameworkMBean
       return new ManagedServiceReference(props);
    }
 
-   public ManagedServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException
+   public ManagedServiceReference[] getServiceReferences(String clazz, String filter)
    {
       List<ManagedServiceReference> foundRefs = new ArrayList<ManagedServiceReference>();
-      ServiceReference[] srefs = getBundleContext().getServiceReferences(clazz, filter);
+      
+      ServiceReference[] srefs;
+      try
+      {
+         srefs = getBundleContext().getServiceReferences(clazz, filter);
+      }
+      catch (InvalidSyntaxException e)
+      {
+         throw new IllegalArgumentException("Invalid filter syntax: " + filter);
+      }
+      
       if (srefs != null)
       {
          for (ServiceReference sref : srefs)

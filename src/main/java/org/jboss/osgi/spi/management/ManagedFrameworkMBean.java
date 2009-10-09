@@ -27,8 +27,6 @@ import java.util.Set;
 
 import javax.management.ObjectName;
 
-import org.osgi.framework.InvalidSyntaxException;
-
 /**
  * The managed view of an OSGi Framework
  * 
@@ -67,7 +65,7 @@ public interface ManagedFrameworkMBean
     * that were registered under the specified class, match the specified filter criteria, 
     * and the packages for the class names under which the services were registered.
     */
-   ManagedServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException;
+   ManagedServiceReference[] getServiceReferences(String clazz, String filter);
    
    /**
     * Refresh packages through the PackageAdmin service

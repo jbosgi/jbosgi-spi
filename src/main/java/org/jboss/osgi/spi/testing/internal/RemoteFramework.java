@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.jboss.osgi.spi.management.ManagedBundleMBean;
 import org.jboss.osgi.spi.management.ManagedServiceReference;
-import org.osgi.framework.InvalidSyntaxException;
 
 /**
  * The supported functionality of a remote OSGi Framework
@@ -64,5 +63,5 @@ public interface RemoteFramework
     * that were registered under the specified class, match the specified filter criteria, 
     * and the packages for the class names under which the services were registered.
     */
-   ManagedServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException;
+   ManagedServiceReference[] getServiceReferences(String clazz, String filter);
 }

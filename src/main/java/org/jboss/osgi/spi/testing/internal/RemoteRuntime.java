@@ -47,7 +47,6 @@ import org.jboss.osgi.spi.testing.OSGiTestHelper;
 import org.jboss.osgi.spi.util.BundleDeployment;
 import org.jboss.osgi.spi.util.BundleDeploymentFactory;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.InvalidSyntaxException;
 
 /**
  * A remote implementation of the {@link OSGiRuntime}
@@ -167,7 +166,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       return manref != null ? new RemoteServiceReference(manref) : null;
    }
 
-   public OSGiServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException
+   public OSGiServiceReference[] getServiceReferences(String clazz, String filter)
    {
       OSGiServiceReference[] srefs = null;
 
@@ -284,7 +283,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
             return managedFramework.getServiceReference(clazz);
          }
 
-         public ManagedServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException
+         public ManagedServiceReference[] getServiceReferences(String clazz, String filter)
          {
             return managedFramework.getServiceReferences(clazz, filter);
          }

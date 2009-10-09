@@ -49,7 +49,6 @@ import org.jboss.osgi.spi.testing.OSGiTestHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.Version;
 
 /**
@@ -77,7 +76,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       return helper;
    }
 
-   public void addCapability(Capability capability) throws BundleException, InvalidSyntaxException
+   public void addCapability(Capability capability) throws BundleException
    {
       // Add dependent capabilies
       for (Capability dependency : capability.getDependencies())

@@ -115,10 +115,20 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
       return (sref != null ? new EmbeddedServiceReference(sref) : null);
    }
 
-   public OSGiServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException
+   public OSGiServiceReference[] getServiceReferences(String clazz, String filter)
    {
       OSGiServiceReference[] retRefs = null;
-      ServiceReference[] srefs = getBundleContext().getServiceReferences(clazz, filter);
+      
+      ServiceReference[] srefs;
+      try
+      {
+         srefs = getBundleContext().getServiceReferences(clazz, filter);
+      }
+      catch (InvalidSyntaxException e)
+      {
+         throw new IllegalArgumentException("Invalid filter syntax: " + filter);
+      }
+      
       if (srefs != null)
       {
          retRefs = new OSGiServiceReference[srefs.length];
@@ -129,7 +139,7 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
    }
 
    @Override
-   public void addCapability(Capability capability) throws BundleException, InvalidSyntaxException
+   public void addCapability(Capability capability) throws BundleException
    {
       // Copy the properties to the System props
       Map<String, String> props = capability.getSystemProperties();
