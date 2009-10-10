@@ -29,7 +29,7 @@ package org.jboss.osgi.spi;
  * @author thomas.diesler@jboss.com
  * @since 04-Mar-2009
  */
-public interface Constants 
+public interface OSGiConstants
 {
    /** The JBossOSGi domain 'jboss.osgi' */
    String DOMAIN_NAME = "jboss.osgi";
@@ -65,4 +65,10 @@ public interface Constants
     * The JBossOSGi runtime system property that denotes the path to the active runtime profile
     */
    String OSGI_SERVER_HOME = "osgi.server.home";
+
+   /**
+    * A JBossOSGi deployment unit attachment key that containe the bundle's symbolic name. 
+    */
+   String KEY_BUNDLE_SYMBOLIC_NAME = "org.jboss.osgi.bundle.symbolic.name";
+
 }

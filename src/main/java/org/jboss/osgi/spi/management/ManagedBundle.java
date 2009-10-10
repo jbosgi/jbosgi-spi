@@ -29,7 +29,7 @@ import java.util.Hashtable;
 
 import javax.management.ObjectName;
 
-import org.jboss.osgi.spi.Constants;
+import org.jboss.osgi.spi.OSGiConstants;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
@@ -52,7 +52,7 @@ public class ManagedBundle implements ManagedBundleMBean
       long id = bundle.getBundleId();
       String name = bundle.getSymbolicName();
       Version version = bundle.getVersion();
-      this.oname = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":id=" + id + ",bundle=" + name + ",version=" + version);
+      this.oname = ObjectNameFactory.create(OSGiConstants.DOMAIN_NAME + ":id=" + id + ",bundle=" + name + ",version=" + version);
    }
 
    public ObjectName getObjectName()

@@ -23,8 +23,8 @@ package org.jboss.osgi.spi.framework;
 
 //$Id$
 
-import static org.jboss.osgi.spi.Constants.OSGI_HOME;
-import static org.jboss.osgi.spi.Constants.OSGI_SERVER_HOME;
+import static org.jboss.osgi.spi.OSGiConstants.OSGI_HOME;
+import static org.jboss.osgi.spi.OSGiConstants.OSGI_SERVER_HOME;
 
 import java.io.File;
 import java.io.IOException;

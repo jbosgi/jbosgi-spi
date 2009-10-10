@@ -37,7 +37,7 @@ import javax.management.ObjectName;
 import javax.management.QueryExp;
 
 import org.jboss.logging.Logger;
-import org.jboss.osgi.spi.Constants;
+import org.jboss.osgi.spi.OSGiConstants;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -82,7 +82,7 @@ public class ManagedFramework implements ManagedFrameworkMBean
    {
       ObjectName oname = null;
 
-      ObjectName pattern = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":bundle=" + symbolicName + ",*");
+      ObjectName pattern = ObjectNameFactory.create(OSGiConstants.DOMAIN_NAME + ":bundle=" + symbolicName + ",*");
       Set<ObjectName> names = mbeanServer.queryNames(pattern, null);
 
       if (names.size() > 0)
@@ -102,7 +102,7 @@ public class ManagedFramework implements ManagedFrameworkMBean
    {
       ObjectName oname = null;
 
-      ObjectName pattern = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":id=" + bundleId + ",*");
+      ObjectName pattern = ObjectNameFactory.create(OSGiConstants.DOMAIN_NAME + ":id=" + bundleId + ",*");
       Set<ObjectName> names = mbeanServer.queryNames(pattern, null);
 
       if (names.size() > 0)
@@ -118,7 +118,7 @@ public class ManagedFramework implements ManagedFrameworkMBean
       // ObjectName pattern = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":bundle=*,*");
       // Set<ObjectName> names = mbeanServer.queryNames(pattern, null);
 
-      ObjectName pattern = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":*");
+      ObjectName pattern = ObjectNameFactory.create(OSGiConstants.DOMAIN_NAME + ":*");
       Set<ObjectName> names = mbeanServer.queryNames(pattern, new IsBundleQueryExp());
       return names;
    }
