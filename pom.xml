@@ -29,6 +29,13 @@
     <version>1.0.3</version>
   </parent>
 
+  <!-- Subversion -->
+  <scm>
+    <connection>scm:svn:http://anonsvn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/trunk</connection>
+    <developerConnection>scm:svn:https://svn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/trunk</developerConnection>
+    <url>http://fisheye.jboss.com/qsearch/JBossOSGi</url>
+  </scm>
+  
   <!-- Properties -->
   <properties>
     <version.args4j>2.0.12</version.args4j>
