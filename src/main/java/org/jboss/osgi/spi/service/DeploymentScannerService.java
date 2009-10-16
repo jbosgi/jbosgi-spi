@@ -77,31 +77,4 @@ public interface DeploymentScannerService
     * Returns the array of bundles currently known to the deployemtn scanner. 
     */
    BundleDeployment[] getBundleDeployments();
-   
-   /**
-    * Add a scan listener to this service
-    */
-   void addScanListener(ScanListener listener);
-   
-   /**
-    * Remove the scan listener from this service
-    */
-   void removeScanListener(ScanListener listener);
-   
-   /**
-    * A ScanListener can be registered with the {@link DeploymentScannerService}
-    * to monitor the progress of deployed bundles 
-    */
-   interface ScanListener
-   {
-      /**
-       * Called before every scan
-       */
-      void beforeScan(DeploymentScannerService service);
-      
-      /**
-       * Called after every scan
-       */
-      void afterScan(DeploymentScannerService service);
-   }
 }

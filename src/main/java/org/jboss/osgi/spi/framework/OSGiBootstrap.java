@@ -38,15 +38,11 @@ import java.util.List;
 import java.util.Properties;
 
 import org.jboss.logging.Logger;
-import org.jboss.osgi.spi.service.DeploymentScannerService;
-import org.jboss.osgi.spi.service.DeploymentScannerService.ScanListener;
 import org.jboss.osgi.spi.util.ServiceLoader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
 
 /**
@@ -211,7 +207,6 @@ public class OSGiBootstrap
       public void run()
       {
          // Start the framework
-         final long beforeStart = System.currentTimeMillis();
          try
          {
             framework.start();
@@ -220,37 +215,6 @@ public class OSGiBootstrap
          {
             throw new IllegalStateException("Cannot start framework", ex);
          }
-         final long afterStart = System.currentTimeMillis();
-
-         // Report how long it took to boot and do the first scan
-         BundleContext context = framework.getBundleContext();
-         ServiceReference sref = context.getServiceReference(DeploymentScannerService.class.getName());
-         if (sref != null)
-         {
-            DeploymentScannerService scannerService = (DeploymentScannerService)context.getService(sref);
-            ScanListener listener = new ScanListener()
-            {
-               public void beforeScan(DeploymentScannerService service)
-               {
-                  // do nothing
-               }
-
-               public void afterScan(DeploymentScannerService service)
-               {
-                  long lastChange = service.getLastChange();
-                  if (lastChange > afterStart)
-                  {
-                     float diff = (lastChange - beforeStart) / 1000f;
-                     log.info("JBossOSGi Runtime started in " + diff + "sec");
-                  }
-                  service.removeScanListener(this);
-               }
-            };
-            scannerService.addScanListener(listener);
-         }
-
-         float diff = (afterStart - beforeStart) / 1000f;
-         log.info("JBossOSGi Runtime booted in " + diff + "sec");
 
          Reader br = new InputStreamReader(System.in);
          try
