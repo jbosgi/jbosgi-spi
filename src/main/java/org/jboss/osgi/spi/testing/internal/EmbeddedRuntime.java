@@ -23,6 +23,7 @@ package org.jboss.osgi.spi.testing.internal;
 
 // $Id$
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,10 +63,10 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
 
    public OSGiBundle installBundle(String location) throws BundleException
    {
-      location = getTestHelper().getTestArchivePath(location);
+      URL url = getTestHelper().getTestArchiveURL(location);
       
       BundleContext context = getBundleContext();
-      Bundle auxBundle = context.installBundle(location);
+      Bundle auxBundle = context.installBundle(url.toExternalForm());
       OSGiBundle bundle = new EmbeddedBundle(this, auxBundle);
       
       return registerBundle(location, bundle);
