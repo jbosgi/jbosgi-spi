@@ -32,29 +32,28 @@ import java.util.Map;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.FrameworkException;
 import org.jboss.osgi.spi.logging.ExportedPackageHelper;
-import org.jboss.osgi.spi.util.ServiceLoader;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
-import org.osgi.framework.launch.FrameworkFactory;
 
 /**
- * An abstraction of an OSGi Framework
+ * An abstraction of an OSGi Framework.
+ * 
+ * In addition to the standard {@link Framework} this implementation also
+ * supports properties and initial bundle provisioning.
  * 
  * @author thomas.diesler@jboss.com
  * @since 23-Jan-2009
  */
-public class FrameworkIntegration
+public abstract class FrameworkIntegration
 {
    // Provide logging
    final Logger log = Logger.getLogger(FrameworkIntegration.class);
 
-   protected Map<String, Object> properties = new HashMap<String, Object>();
-   protected List<URL> autoInstall = new ArrayList<URL>();
-   protected List<URL> autoStart = new ArrayList<URL>();
-
-   protected Framework framework;
+   private Map<String, Object> properties = new HashMap<String, Object>();
+   private List<URL> autoInstall = new ArrayList<URL>();
+   private List<URL> autoStart = new ArrayList<URL>();
 
    public Map<String, Object> getProperties()
    {
@@ -86,22 +85,27 @@ public class FrameworkIntegration
       this.autoStart = autoStart;
    }
 
+   /** Overwrite to create the framework */
+   protected abstract void createFramework(Map<String, Object> properties);
+
+   /** Overwrite to provide the framework */
+   protected abstract Framework getFramework();
+   
    public Bundle getBundle()
    {
       assertFrameworkStart();
-      return framework;
+      return getFramework();
    }
 
    public BundleContext getBundleContext()
    {
-      return getBundle().getBundleContext();
+      assertFrameworkStart();
+      return getFramework().getBundleContext();
    }
 
    public void create()
    {
-      // Load the framework instance
-      FrameworkFactory factory = ServiceLoader.loadService(FrameworkFactory.class);
-      framework = factory.newFramework(properties);
+      createFramework(properties);
    }
 
    public void start()
@@ -112,7 +116,7 @@ public class FrameworkIntegration
       // Start the System Bundle
       try
       {
-         framework.start();
+         getFramework().start();
       }
       catch (BundleException ex)
       {
@@ -120,7 +124,7 @@ public class FrameworkIntegration
       }
       
       // Get system bundle context
-      BundleContext context = framework.getBundleContext();
+      BundleContext context = getFramework().getBundleContext();
       if (context == null)
          throw new FrameworkException("Cannot obtain system context");
 
@@ -176,6 +180,7 @@ public class FrameworkIntegration
 
    public void stop()
    {
+      Framework framework = getFramework();
       if (framework != null)
       {
          try
@@ -198,14 +203,14 @@ public class FrameworkIntegration
 
    private void assertFrameworkCreate()
    {
-      if (framework == null)
+      if (getFramework() == null)
          create();
    }
 
    private void assertFrameworkStart()
    {
       assertFrameworkCreate();
-      if ((framework.getState() & Bundle.ACTIVE) == 0)
+      if ((getFramework().getState() & Bundle.ACTIVE) == 0)
          start();
    }
 }
