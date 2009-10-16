@@ -44,8 +44,7 @@ import org.jboss.osgi.spi.testing.OSGiPackageAdmin;
 import org.jboss.osgi.spi.testing.OSGiRuntime;
 import org.jboss.osgi.spi.testing.OSGiServiceReference;
 import org.jboss.osgi.spi.testing.OSGiTestHelper;
-import org.jboss.osgi.spi.util.BundleDeployment;
-import org.jboss.osgi.spi.util.BundleDeploymentFactory;
+import org.jboss.osgi.spi.util.BundleInfo;
 import org.osgi.framework.BundleException;
 
 /**
@@ -69,12 +68,12 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       try
       {
          URL bundleURL = getTestHelper().getTestArchiveURL(location);
-         BundleDeployment bundleDep = BundleDeploymentFactory.createBundleDeployment(bundleURL);
+         BundleInfo bundleInfo = BundleInfo.createBundleInfo(bundleURL);
          
          deployInternal(location, true);
          
-         String symbolicName = bundleDep.getSymbolicName();
-         String version = bundleDep.getVersion().toString();
+         String symbolicName = bundleInfo.getSymbolicName();
+         String version = bundleInfo.getVersion().toString();
          ManagedBundleMBean bundleMBean = getRemoteFramework().getBundle(symbolicName, version);
          RemoteBundle bundle = new RemoteBundle(this, bundleMBean, location);
          return registerBundle(location, bundle);
@@ -125,7 +124,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       try
       {
          URL archiveURL = getTestHelper().getTestArchiveURL(location);
-         BundleDeploymentFactory.createBundleDeployment(archiveURL);
+         BundleInfo.createBundleInfo(archiveURL);
          return true;
       }
       catch (BundleException ex)

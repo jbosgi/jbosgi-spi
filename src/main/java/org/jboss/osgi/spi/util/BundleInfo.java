@@ -21,7 +21,7 @@
  */
 package org.jboss.osgi.spi.util;
 
-//$Id: BundleDeployment.java 90925 2009-07-08 10:12:31Z thomas.diesler@jboss.com $
+//$Id$
 
 import java.io.File;
 import java.io.IOException;
@@ -35,14 +35,19 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 
 /**
- * A factory for bundle deployments.
+ * An abstraction of a bundle
  * 
  * @author thomas.diesler@jboss.com
- * @since 08-Jul-2009
+ * @since 16-Oct-2009
  */
-public abstract class BundleDeploymentFactory
+public class BundleInfo
 {
-   public static BundleDeployment createBundleDeployment(String location) throws BundleException
+   private URL location;
+   private Manifest manifest;
+   private String symbolicName;
+   private String version;
+
+   public static BundleInfo createBundleInfo(String location) throws BundleException
    {
       // Try location as URL
       URL url = null;
@@ -73,10 +78,10 @@ public abstract class BundleDeploymentFactory
       if (url == null)
          throw new IllegalArgumentException("Invalid bundle location: " + location);
 
-      return createBundleDeployment(url);
+      return createBundleInfo(url);
    }
 
-   public static BundleDeployment createBundleDeployment(URL url) throws BundleException
+   public static BundleInfo createBundleInfo(URL url) throws BundleException
    {
       Manifest manifest;
       try
@@ -91,12 +96,65 @@ public abstract class BundleDeploymentFactory
 
       }
 
-      Attributes attribs = manifest.getMainAttributes();
-      String symbolicName = attribs.getValue(Constants.BUNDLE_SYMBOLICNAME);
+      return new BundleInfo(url, manifest);
+   }
+   
+   private BundleInfo(URL location, Manifest manifest) throws BundleException
+   {
+      if (location == null)
+         throw new IllegalArgumentException("Location cannot be null");
+      if (manifest == null)
+         throw new IllegalArgumentException("Manifest cannot be null");
+      
+      this.manifest = manifest;
+      this.location = location;
+      
+      symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
       if (symbolicName == null)
-         throw new BundleException("Cannot obtain Bundle-SymbolicName for: " + url);
+         throw new BundleException("Cannot obtain Bundle-SymbolicName for: " + location);
 
-      String version = attribs.getValue(Constants.BUNDLE_VERSION);
-      return new BundleDeployment(url, symbolicName, version);
+      version = getManifestHeader(Constants.BUNDLE_VERSION);
+      if (version == null)
+         version = "0.0.0";
+   }
+   
+   /**
+    * Get the manifest header for the given key.
+    */
+   public String getManifestHeader(String key)
+   {
+      Attributes attribs = manifest.getMainAttributes();
+      String value = attribs.getValue(key);
+      return value;
+   }
+
+   /**
+    * Get the bundle location
+    */
+   public URL getLocation()
+   {
+      return location;
+   }
+
+   /**
+    * Get the bundle symbolic name
+    */
+   public String getSymbolicName()
+   {
+      return symbolicName;
+   }
+
+   /**
+    * Get the bundle version
+    */
+   public String getVersion()
+   {
+      return version;
+   }
+
+   @Override
+   public String toString()
+   {
+      return "[" + symbolicName + "-" + version + ",url=" + location + "]";
    }
 }
