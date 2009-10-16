@@ -23,7 +23,9 @@ package org.jboss.osgi.spi.util;
 
 //$Id: BundleDeployment.java 90925 2009-07-08 10:12:31Z thomas.diesler@jboss.com $
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -38,8 +40,42 @@ import org.osgi.framework.Constants;
  * @author thomas.diesler@jboss.com
  * @since 08-Jul-2009
  */
-public abstract class BundleDeploymentFactory 
+public abstract class BundleDeploymentFactory
 {
+   public static BundleDeployment createBundleDeployment(String location) throws BundleException
+   {
+      // Try location as URL
+      URL url = null;
+      try
+      {
+         url = new URL(location);
+      }
+      catch (MalformedURLException ex)
+      {
+         // ignore
+      }
+
+      // Try location as File
+      if (url == null)
+      {
+         try
+         {
+            File file = new File(location);
+            if (file.exists())
+               url = file.toURI().toURL();
+         }
+         catch (MalformedURLException e)
+         {
+            // ignore
+         }
+      }
+      
+      if (url == null)
+         throw new IllegalArgumentException("Invalid bundle location: " + location);
+
+      return createBundleDeployment(url);
+   }
+
    public static BundleDeployment createBundleDeployment(URL url) throws BundleException
    {
       Manifest manifest;

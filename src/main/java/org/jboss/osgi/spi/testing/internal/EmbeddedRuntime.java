@@ -23,7 +23,6 @@ package org.jboss.osgi.spi.testing.internal;
 
 // $Id$
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,20 +34,16 @@ import javax.management.MBeanServerFactory;
 
 import org.jboss.osgi.spi.capability.Capability;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
-import org.jboss.osgi.spi.service.DeployerService;
 import org.jboss.osgi.spi.testing.OSGiBundle;
 import org.jboss.osgi.spi.testing.OSGiPackageAdmin;
 import org.jboss.osgi.spi.testing.OSGiRuntime;
 import org.jboss.osgi.spi.testing.OSGiServiceReference;
 import org.jboss.osgi.spi.testing.OSGiTestHelper;
-import org.jboss.osgi.spi.util.BundleDeployment;
-import org.jboss.osgi.spi.util.BundleDeploymentFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
 import org.osgi.service.packageadmin.PackageAdmin;
 
@@ -67,27 +62,12 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
 
    public OSGiBundle installBundle(String location) throws BundleException
    {
-      URL bundleURL = getTestHelper().getTestArchiveURL(location);
-      
-      BundleDeployment bundleDep = BundleDeploymentFactory.createBundleDeployment(bundleURL);
-      String symbolicName = bundleDep.getSymbolicName();
-      Version version = Version.parseVersion(bundleDep.getVersion());
-      
-      OSGiBundle bundle;
+      location = getTestHelper().getTestArchivePath(location);
       
       BundleContext context = getBundleContext();
-      ServiceReference sref = context.getServiceReference(DeployerService.class.getName());
-      if (sref != null)
-      {
-         DeployerService service = (DeployerService)context.getService(sref);
-         service.deploy(bundleURL);
-         bundle = getBundle(symbolicName, version, true);
-      }
-      else
-      {
-         Bundle auxBundle = context.installBundle(bundleURL.toExternalForm());
-         bundle = new EmbeddedBundle(this, auxBundle);
-      }
+      Bundle auxBundle = context.installBundle(location);
+      OSGiBundle bundle = new EmbeddedBundle(this, auxBundle);
+      
       return registerBundle(location, bundle);
    }
 
