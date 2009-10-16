@@ -30,13 +30,14 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Map;
 
-import org.jboss.logging.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A generic Framework wrapper that delegates all method calls to the underlying 
@@ -48,7 +49,7 @@ import org.osgi.framework.launch.Framework;
 public class FrameworkWrapper implements Framework
 {
    // Provide logging
-   final Logger log = Logger.getLogger(FrameworkWrapper.class);
+   final Logger log = LoggerFactory.getLogger(FrameworkWrapper.class);
 
    protected Framework framework;
 

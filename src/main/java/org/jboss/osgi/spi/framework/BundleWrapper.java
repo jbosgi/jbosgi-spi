@@ -30,12 +30,13 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Map;
 
-import org.jboss.logging.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A generic Bundle wrapper that delegates all method calls to the underlying 
@@ -47,7 +48,7 @@ import org.osgi.framework.Version;
 public class BundleWrapper implements Bundle
 {
    // Provide logging
-   final Logger log = Logger.getLogger(BundleWrapper.class);
+   final Logger log = LoggerFactory.getLogger(BundleWrapper.class);
 
    protected Bundle bundle;
 

@@ -37,13 +37,14 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
-import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.util.ServiceLoader;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The OSGiBootstrap provides an {@link OSGiFramework} through a {@link OSGiBootstrapProvider}.
@@ -129,7 +130,7 @@ public class OSGiBootstrap
 
       // This property must be set before the logger is obtained
       System.setProperty(OSGI_SERVER_HOME, osgiServerHome);
-      log = Logger.getLogger(OSGiBootstrap.class);
+      log = LoggerFactory.getLogger(OSGiBootstrap.class);
 
       Properties defaults = new Properties();
       defaults.setProperty(OSGI_SERVER_NAME, serverName);
@@ -172,7 +173,7 @@ public class OSGiBootstrap
          }
          catch (Exception ex)
          {
-            Logger tmplog = Logger.getLogger(OSGiBootstrap.class);
+            Logger tmplog = LoggerFactory.getLogger(OSGiBootstrap.class);
             tmplog.debug("Cannot configure [" + aux.getClass().getName() + "]", ex);
          }
       }

@@ -36,13 +36,14 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.QueryExp;
 
-import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.OSGiConstants;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.PackageAdmin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The managed view of an OSGi Framework
@@ -53,7 +54,7 @@ import org.osgi.service.packageadmin.PackageAdmin;
 public class ManagedFramework implements ManagedFrameworkMBean
 {
    // Provide logging
-   final Logger log = Logger.getLogger(ManagedFramework.class);
+   final Logger log = LoggerFactory.getLogger(ManagedFramework.class);
 
    private MBeanServer mbeanServer;
    private BundleContext bundleContext;

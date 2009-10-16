@@ -27,10 +27,11 @@ import java.net.URL;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.jboss.logging.Logger;
 import org.jboss.virtual.VFS;
 import org.junit.After;
 import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An abstract OSGi Test.
@@ -44,7 +45,7 @@ import org.junit.Before;
 public abstract class OSGiTest 
 {
    // Provide logging
-   final Logger log = Logger.getLogger(OSGiTest.class);
+   final Logger log = LoggerFactory.getLogger(OSGiTest.class);
 
    private OSGiTestHelper helper;
 

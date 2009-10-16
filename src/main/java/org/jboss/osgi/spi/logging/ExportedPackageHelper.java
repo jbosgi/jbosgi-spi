@@ -27,12 +27,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jboss.logging.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.packageadmin.ExportedPackage;
 import org.osgi.service.packageadmin.PackageAdmin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A helper the logs the exported packages for a bundle.
@@ -43,7 +44,7 @@ import org.osgi.service.packageadmin.PackageAdmin;
 public final class ExportedPackageHelper
 {
    // Provide logging
-   final Logger log = Logger.getLogger(ExportedPackageHelper.class);
+   final Logger log = LoggerFactory.getLogger(ExportedPackageHelper.class);
 
    private PackageAdmin packageAdmin;
 

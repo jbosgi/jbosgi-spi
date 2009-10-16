@@ -28,7 +28,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Loads service implementations from the requesters classpath.
@@ -39,7 +40,7 @@ import org.jboss.logging.Logger;
 public abstract class ServiceLoader
 {
    // Provide logging
-   final static Logger log = Logger.getLogger(ServiceLoader.class);
+   static final Logger log = LoggerFactory.getLogger(ServiceLoader.class);
    
    /**
     * Loads a list of service implementations defined in META-INF/services/${serviceClass}

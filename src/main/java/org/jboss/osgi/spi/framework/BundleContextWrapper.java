@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Dictionary;
 
-import org.jboss.logging.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -38,6 +37,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A generic BundleContext wrapper that delegates all method calls to the underlying 
@@ -49,7 +50,7 @@ import org.osgi.framework.ServiceRegistration;
 public class BundleContextWrapper implements BundleContext
 {
    // Provide logging
-   final Logger log = Logger.getLogger(BundleContextWrapper.class);
+   final Logger log = LoggerFactory.getLogger(BundleContextWrapper.class);
 
    protected BundleContext context;
 

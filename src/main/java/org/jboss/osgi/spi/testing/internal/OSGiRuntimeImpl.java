@@ -40,7 +40,6 @@ import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.capability.Capability;
 import org.jboss.osgi.spi.testing.OSGiBundle;
 import org.jboss.osgi.spi.testing.OSGiRuntime;
@@ -50,6 +49,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An abstract implementation of the {@link OSGiRuntime}
@@ -60,7 +61,7 @@ import org.osgi.framework.Version;
 public abstract class OSGiRuntimeImpl implements OSGiRuntime
 {
    // Provide logging
-   final Logger log = Logger.getLogger(OSGiRuntimeImpl.class);
+   final Logger log = LoggerFactory.getLogger(OSGiRuntimeImpl.class);
 
    private OSGiTestHelper helper;
    private Map<String, OSGiBundle> bundles = new LinkedHashMap<String, OSGiBundle>();

@@ -21,15 +21,18 @@
  */
 package org.jboss.osgi.spi.testing.internal;
 
+// $Id$
+
 import java.util.Dictionary;
 
-import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.management.ManagedBundleMBean;
 import org.jboss.osgi.spi.testing.OSGiBundle;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of a remote {@link OSGiBundle}
@@ -40,7 +43,7 @@ import org.osgi.framework.Version;
 public class RemoteBundle extends OSGiBundle
 {
    // Provide logging
-   private static final Logger log = Logger.getLogger(RemoteBundle.class);
+   private final Logger log = LoggerFactory.getLogger(RemoteBundle.class);
    
    private OSGiRuntimeImpl runtime;
    private ManagedBundleMBean bundle;
