@@ -31,6 +31,8 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import org.jboss.virtual.VFSUtils;
+import org.jboss.virtual.VirtualFile;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 
@@ -92,10 +94,26 @@ public class BundleInfo
       }
       catch (IOException ex)
       {
-         throw new BundleException("Cannot get manifest from: " + url);
+         throw new BundleException("Cannot get manifest from: " + url, ex);
 
       }
 
+      return new BundleInfo(url, manifest);
+   }
+   
+   public static BundleInfo createBundleInfo(VirtualFile vFile) throws BundleException
+   {
+      URL url;
+      Manifest manifest;
+      try
+      {
+         manifest = VFSUtils.getManifest(vFile);
+         url = vFile.toURL();
+      }
+      catch (Exception ex)
+      {
+         throw new BundleException("Cannot get manifest from: " + vFile, ex);
+      }
       return new BundleInfo(url, manifest);
    }
    
