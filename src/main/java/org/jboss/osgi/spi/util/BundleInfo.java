@@ -45,6 +45,7 @@ import org.osgi.framework.Constants;
 public class BundleInfo
 {
    private VirtualFile root;
+   private String location;
    private Manifest manifest;
    private String symbolicName;
    private String version;
@@ -83,7 +84,17 @@ public class BundleInfo
       if (url == null)
          throw new IllegalArgumentException("Invalid bundle location: " + location);
 
-      return createBundleInfo(url);
+      VirtualFile root;
+      try
+      {
+         root = VFS.getRoot(url);
+      }
+      catch (IOException e)
+      {
+         throw new BundleException("Invalid bundle location=" + url, e);
+      }
+      
+      return new BundleInfo(root, location);
    }
 
    public static BundleInfo createBundleInfo(URL url) throws BundleException
@@ -100,23 +111,37 @@ public class BundleInfo
       {
          throw new BundleException("Invalid bundle location=" + url, e);
       }
-      return createBundleInfo(root);
+      
+      return new BundleInfo(root, url.toExternalForm());
    }
    
    public static BundleInfo createBundleInfo(VirtualFile root) throws BundleException
    {
-      if (root == null)
-         throw new IllegalArgumentException("VirtualFile cannot be null");
-      
-      return new BundleInfo(root);
+      return new BundleInfo(root, null);
    }
    
-   private BundleInfo(VirtualFile root) throws BundleException
+   private BundleInfo(VirtualFile root, String location) throws BundleException
    {
       if (root == null)
          throw new IllegalArgumentException("VirtualFile cannot be null");
+      
       this.root = root;
+      
+      // Derive the location from the root
+      if (location == null)
+      {
+         try
+         {
+            location = root.toURL().toExternalForm();
+         }
+         catch (Exception e)
+         {
+            throw new IllegalStateException("Cannot obtain URL from: " + root);
+         }
+      }
+      this.location = location;      
 
+      // Get the Manifest
       try
       {
          manifest = VFSUtils.getManifest(root);
@@ -148,16 +173,9 @@ public class BundleInfo
    /**
     * Get the bundle location
     */
-   public URL getLocation()
+   public String getLocation()
    {
-      try
-      {
-         return root.toURL();
-      }
-      catch (Exception e)
-      {
-         throw new IllegalStateException("Cannot obtain URL from: " + root);
-      }
+      return location;
    }
    
    /**
