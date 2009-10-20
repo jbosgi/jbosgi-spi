@@ -28,9 +28,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.jar.Attributes;
-import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import org.jboss.virtual.VFS;
 import org.jboss.virtual.VFSUtils;
 import org.jboss.virtual.VirtualFile;
 import org.osgi.framework.BundleException;
@@ -44,13 +44,16 @@ import org.osgi.framework.Constants;
  */
 public class BundleInfo
 {
-   private URL location;
+   private VirtualFile root;
    private Manifest manifest;
    private String symbolicName;
    private String version;
 
    public static BundleInfo createBundleInfo(String location) throws BundleException
    {
+      if (location == null)
+         throw new IllegalArgumentException("Location cannot be null");
+      
       // Try location as URL
       URL url = null;
       try
@@ -85,51 +88,47 @@ public class BundleInfo
 
    public static BundleInfo createBundleInfo(URL url) throws BundleException
    {
-      Manifest manifest;
+      if (url == null)
+         throw new IllegalArgumentException("URL cannot be null");
+      
+      VirtualFile root;
       try
       {
-         JarFile jarFile = new JarFile(url.getPath());
-         manifest = jarFile.getManifest();
-         jarFile.close();
+         root = VFS.getRoot(url);
       }
-      catch (IOException ex)
+      catch (IOException e)
       {
-         throw new BundleException("Cannot get manifest from: " + url, ex);
-
+         throw new BundleException("Invalid bundle location=" + url, e);
       }
-
-      return new BundleInfo(url, manifest);
+      return createBundleInfo(root);
    }
    
-   public static BundleInfo createBundleInfo(VirtualFile vFile) throws BundleException
+   public static BundleInfo createBundleInfo(VirtualFile root) throws BundleException
    {
-      URL url;
-      Manifest manifest;
+      if (root == null)
+         throw new IllegalArgumentException("VirtualFile cannot be null");
+      
+      return new BundleInfo(root);
+   }
+   
+   private BundleInfo(VirtualFile root) throws BundleException
+   {
+      if (root == null)
+         throw new IllegalArgumentException("VirtualFile cannot be null");
+      this.root = root;
+
       try
       {
-         manifest = VFSUtils.getManifest(vFile);
-         url = vFile.toURL();
+         manifest = VFSUtils.getManifest(root);
       }
       catch (Exception ex)
       {
-         throw new BundleException("Cannot get manifest from: " + vFile, ex);
+         throw new BundleException("Cannot get manifest from: " + root, ex);
       }
-      return new BundleInfo(url, manifest);
-   }
-   
-   private BundleInfo(URL location, Manifest manifest) throws BundleException
-   {
-      if (location == null)
-         throw new IllegalArgumentException("Location cannot be null");
-      if (manifest == null)
-         throw new IllegalArgumentException("Manifest cannot be null");
-      
-      this.manifest = manifest;
-      this.location = location;
       
       symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
       if (symbolicName == null)
-         throw new BundleException("Cannot obtain Bundle-SymbolicName for: " + location);
+         throw new BundleException("Cannot obtain Bundle-SymbolicName for: " + root);
 
       version = getManifestHeader(Constants.BUNDLE_VERSION);
       if (version == null)
@@ -151,7 +150,22 @@ public class BundleInfo
     */
    public URL getLocation()
    {
-      return location;
+      try
+      {
+         return root.toURL();
+      }
+      catch (Exception e)
+      {
+         throw new IllegalStateException("Cannot obtain URL from: " + root);
+      }
+   }
+   
+   /**
+    * Get the bundle root file
+    */
+   public VirtualFile getRoot()
+   {
+      return root;
    }
 
    /**
@@ -171,8 +185,24 @@ public class BundleInfo
    }
 
    @Override
+   public boolean equals(Object obj)
+   {
+      if (!(obj instanceof BundleInfo))
+         return false;
+      
+      BundleInfo other = (BundleInfo)obj;
+      return root.equals(other.root);
+   }
+
+   @Override
+   public int hashCode()
+   {
+      return toString().hashCode();
+   }
+
+   @Override
    public String toString()
    {
-      return "[" + symbolicName + "-" + version + ",url=" + location + "]";
+      return "[" + symbolicName + "-" + version + ",url=" + root + "]";
    }
 }
