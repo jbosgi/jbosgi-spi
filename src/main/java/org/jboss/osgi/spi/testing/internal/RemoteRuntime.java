@@ -127,7 +127,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
          BundleInfo.createBundleInfo(archiveURL);
          return true;
       }
-      catch (BundleException ex)
+      catch (RuntimeException ex)
       {
          return false;
       }

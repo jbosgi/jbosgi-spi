@@ -33,7 +33,6 @@ import java.util.jar.Manifest;
 import org.jboss.virtual.VFS;
 import org.jboss.virtual.VFSUtils;
 import org.jboss.virtual.VirtualFile;
-import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 
 /**
@@ -50,7 +49,7 @@ public class BundleInfo
    private String symbolicName;
    private String version;
 
-   public static BundleInfo createBundleInfo(String location) throws BundleException
+   public static BundleInfo createBundleInfo(String location)
    {
       if (location == null)
          throw new IllegalArgumentException("Location cannot be null");
@@ -91,13 +90,13 @@ public class BundleInfo
       }
       catch (IOException e)
       {
-         throw new BundleException("Invalid bundle location=" + url, e);
+         throw new IllegalArgumentException("Invalid bundle location=" + url, e);
       }
       
       return new BundleInfo(root, location);
    }
 
-   public static BundleInfo createBundleInfo(URL url) throws BundleException
+   public static BundleInfo createBundleInfo(URL url)
    {
       if (url == null)
          throw new IllegalArgumentException("URL cannot be null");
@@ -109,18 +108,18 @@ public class BundleInfo
       }
       catch (IOException e)
       {
-         throw new BundleException("Invalid bundle location=" + url, e);
+         throw new IllegalArgumentException("Invalid bundle location=" + url, e);
       }
       
       return new BundleInfo(root, url.toExternalForm());
    }
    
-   public static BundleInfo createBundleInfo(VirtualFile root) throws BundleException
+   public static BundleInfo createBundleInfo(VirtualFile root)
    {
       return new BundleInfo(root, null);
    }
    
-   private BundleInfo(VirtualFile root, String location) throws BundleException
+   private BundleInfo(VirtualFile root, String location)
    {
       if (root == null)
          throw new IllegalArgumentException("VirtualFile cannot be null");
@@ -148,12 +147,12 @@ public class BundleInfo
       }
       catch (Exception ex)
       {
-         throw new BundleException("Cannot get manifest from: " + root, ex);
+         throw new IllegalArgumentException("Cannot get manifest from: " + root, ex);
       }
       
       symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
       if (symbolicName == null)
-         throw new BundleException("Cannot obtain Bundle-SymbolicName for: " + root);
+         throw new IllegalArgumentException("Cannot obtain Bundle-SymbolicName for: " + root);
 
       version = getManifestHeader(Constants.BUNDLE_VERSION);
       if (version == null)
