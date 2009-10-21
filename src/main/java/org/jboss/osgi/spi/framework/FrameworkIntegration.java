@@ -56,6 +56,8 @@ public abstract class FrameworkIntegration
    private List<URL> autoInstall = new ArrayList<URL>();
    private List<URL> autoStart = new ArrayList<URL>();
 
+   private Framework framework;
+   
    public Map<String, Object> getProperties()
    {
       return properties;
@@ -86,12 +88,6 @@ public abstract class FrameworkIntegration
       this.autoStart = autoStart;
    }
 
-   /** Overwrite to create the framework */
-   protected abstract void createFramework(Map<String, Object> properties);
-
-   /** Overwrite to provide the framework */
-   protected abstract Framework getFramework();
-   
    public Bundle getBundle()
    {
       assertFrameworkStart();
@@ -104,10 +100,22 @@ public abstract class FrameworkIntegration
       return getFramework().getBundleContext();
    }
 
+   public Framework getFramework()
+   {
+      if (framework == null)
+         framework = createFramework(properties);
+      
+      return framework;
+   }
+
    public void create()
    {
-      createFramework(properties);
+      if (framework == null)
+         framework = createFramework(properties);
    }
+
+   /** Overwrite to create the framework */
+   protected abstract Framework createFramework(Map<String, Object> properties);
 
    public void start()
    {
