@@ -208,6 +208,7 @@ public class OSGiBootstrap
       public void run()
       {
          // Start the framework
+         long beforeStart = System.currentTimeMillis();
          try
          {
             framework.start();
@@ -216,7 +217,10 @@ public class OSGiBootstrap
          {
             throw new IllegalStateException("Cannot start framework", ex);
          }
-
+         
+         float diff = (System.currentTimeMillis() - beforeStart) / 1000f;
+         log.info("JBossOSGi Runtime booted in " + diff + "sec");
+         
          Reader br = new InputStreamReader(System.in);
          try
          {
