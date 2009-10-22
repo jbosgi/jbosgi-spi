@@ -75,6 +75,11 @@ public class OSGiTestHelper
       return bootProvider;
    }
 
+   public void ungetBootstrapProvider()
+   {
+      bootProvider = null;
+   }
+
    public OSGiRuntime getDefaultRuntime()
    {
       OSGiRuntime runtime;
@@ -91,12 +96,12 @@ public class OSGiTestHelper
       return runtime;
    }
 
-   public OSGiRuntime getEmbeddedRuntime()
+   public EmbeddedRuntime getEmbeddedRuntime()
    {
       return new EmbeddedRuntime(this);
    }
 
-   public OSGiRuntime getRemoteRuntime()
+   public RemoteRuntime getRemoteRuntime()
    {
       return new RemoteRuntime(this);
    }

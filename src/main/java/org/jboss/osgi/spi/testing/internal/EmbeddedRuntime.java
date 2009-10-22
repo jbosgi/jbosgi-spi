@@ -151,6 +151,7 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
          {
             log.error("Cannot stop the framework", ex);
          }
+         getTestHelper().ungetBootstrapProvider();
       }
    }
    

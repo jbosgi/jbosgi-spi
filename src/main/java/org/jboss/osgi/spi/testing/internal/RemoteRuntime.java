@@ -210,6 +210,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       {
          super.shutdown();
          getPackageAdmin().refreshPackages(null);
+         getTestHelper().ungetBootstrapProvider();
       }
    }
 

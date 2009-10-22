@@ -47,10 +47,10 @@ import org.slf4j.LoggerFactory;
  * @author thomas.diesler@jboss.com
  * @since 23-Jan-2009
  */
-public abstract class FrameworkIntegration
+public abstract class FrameworkIntegrationBean
 {
    // Provide logging
-   final Logger log = LoggerFactory.getLogger(FrameworkIntegration.class);
+   final Logger log = LoggerFactory.getLogger(FrameworkIntegrationBean.class);
 
    private Map<String, Object> properties = new HashMap<String, Object>();
    private List<URL> autoInstall = new ArrayList<URL>();
@@ -149,6 +149,9 @@ public abstract class FrameworkIntegration
          autoInstall.add(bundleURL);
       }
 
+      // Register system services
+      registerSystemServices(context);
+      
       // Install autoInstall bundles
       for (URL bundleURL : autoInstall)
       {
@@ -192,6 +195,9 @@ public abstract class FrameworkIntegration
       Framework framework = getFramework();
       if (framework != null)
       {
+         // Unregister system services
+         unregisterSystemServices(getBundleContext());
+         
          try
          {
             framework.stop();
@@ -210,6 +216,22 @@ public abstract class FrameworkIntegration
       }
    }
 
+   /**
+    * Overwrite to register system services before bundles get installed.
+    */
+   protected void registerSystemServices(BundleContext context)
+   {
+      // no default system services
+   }
+   
+   /**
+    * Overwrite to unregister system services before bundles get installed.
+    */
+   protected void unregisterSystemServices(BundleContext context)
+   {
+      // no default system services
+   }
+   
    private void assertFrameworkCreate()
    {
       if (getFramework() == null)

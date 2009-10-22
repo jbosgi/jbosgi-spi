@@ -27,6 +27,8 @@ import java.net.URL;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.jboss.osgi.spi.testing.internal.EmbeddedRuntime;
+import org.jboss.osgi.spi.testing.internal.RemoteRuntime;
 import org.jboss.virtual.VFS;
 import org.junit.After;
 import org.junit.Before;
@@ -116,7 +118,7 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#getEmbeddedRuntime()}
     */
-   protected OSGiRuntime getEmbeddedRuntime()
+   protected EmbeddedRuntime getEmbeddedRuntime()
    {
       return getTestHelper().getEmbeddedRuntime();
    }
@@ -124,7 +126,7 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#getRemoteRuntime()}
     */
-   public OSGiRuntime getRemoteRuntime()
+   public RemoteRuntime getRemoteRuntime()
    {
       return getTestHelper().getRemoteRuntime();
    }
