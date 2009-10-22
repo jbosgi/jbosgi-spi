@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,9 +45,6 @@ import org.jboss.osgi.spi.util.ServiceLoader;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
@@ -130,7 +126,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
       // Load the framework instance
       FrameworkFactory factory = ServiceLoader.loadService(FrameworkFactory.class);
       final Framework frameworkImpl = factory.newFramework(props);
-      framework = new FrameworkDelegate(frameworkImpl)
+      framework = new FrameworkWrapper(frameworkImpl)
       {
          @Override
          public void start() throws BundleException
@@ -138,7 +134,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
             super.start();
 
             // Get system bundle context
-            BundleContext context = framework.getBundleContext();
+            BundleContext context = getBundleContext();
             if (context == null)
                throw new FrameworkException("Cannot obtain system context");
 
@@ -160,6 +156,9 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
                autoInstall.add(bundleURL);
             }
 
+            // Register system services
+            registerSystemServices(context);
+            
             // Install autoInstall bundles
             for (URL bundleURL : autoInstall)
             {
@@ -181,11 +180,36 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
                }
             }
          }
+
+         @Override
+         public void stop() throws BundleException
+         {
+            // Unregister system services
+            unregisterSystemServices(getBundleContext());
+            
+            super.stop();
+         }
       };
 
       configured = true;
    }
 
+   /**
+    * Overwrite to register system services before bundles get installed.
+    */
+   protected void registerSystemServices(BundleContext context)
+   {
+      // no default system services
+   }
+   
+   /**
+    * Overwrite to unregister system services before bundles get installed.
+    */
+   protected void unregisterSystemServices(BundleContext context)
+   {
+      // no default system services
+   }
+   
    private List<URL> getBundleURLs(Map<String, Object> props, String key)
    {
       String bundleList = (String)props.get(key);
@@ -320,163 +344,5 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
       }
 
       return propMap;
-   }
-
-   class FrameworkDelegate implements Framework
-   {
-      private Framework framework;
-
-      FrameworkDelegate(Framework framework)
-      {
-         this.framework = framework;
-      }
-
-      @SuppressWarnings("unchecked")
-      public Enumeration findEntries(String path, String filePattern, boolean recurse)
-      {
-         return framework.findEntries(path, filePattern, recurse);
-      }
-
-      public BundleContext getBundleContext()
-      {
-         return framework.getBundleContext();
-      }
-
-      public long getBundleId()
-      {
-         return framework.getBundleId();
-      }
-
-      public URL getEntry(String path)
-      {
-         return framework.getEntry(path);
-      }
-
-      @SuppressWarnings("unchecked")
-      public Enumeration getEntryPaths(String path)
-      {
-         return framework.getEntryPaths(path);
-      }
-
-      @SuppressWarnings("unchecked")
-      public Dictionary getHeaders()
-      {
-         return framework.getHeaders();
-      }
-
-      @SuppressWarnings("unchecked")
-      public Dictionary getHeaders(String locale)
-      {
-         return framework.getHeaders(locale);
-      }
-
-      public long getLastModified()
-      {
-         return framework.getLastModified();
-      }
-
-      public String getLocation()
-      {
-         return framework.getLocation();
-      }
-
-      public ServiceReference[] getRegisteredServices()
-      {
-         return framework.getRegisteredServices();
-      }
-
-      public URL getResource(String name)
-      {
-         return framework.getResource(name);
-      }
-
-      @SuppressWarnings("unchecked")
-      public Enumeration getResources(String name) throws IOException
-      {
-         return framework.getResources(name);
-      }
-
-      public ServiceReference[] getServicesInUse()
-      {
-         return framework.getServicesInUse();
-      }
-
-      @SuppressWarnings("unchecked")
-      public Map getSignerCertificates(int signersType)
-      {
-         return framework.getSignerCertificates(signersType);
-      }
-
-      public int getState()
-      {
-         return framework.getState();
-      }
-
-      public String getSymbolicName()
-      {
-         return framework.getSymbolicName();
-      }
-
-      public Version getVersion()
-      {
-         return framework.getVersion();
-      }
-
-      public boolean hasPermission(Object permission)
-      {
-         return framework.hasPermission(permission);
-      }
-
-      public void init() throws BundleException
-      {
-         framework.init();
-      }
-
-      @SuppressWarnings("unchecked")
-      public Class loadClass(String name) throws ClassNotFoundException
-      {
-         return framework.loadClass(name);
-      }
-
-      public void start() throws BundleException
-      {
-         framework.start();
-      }
-
-      public void start(int options) throws BundleException
-      {
-         framework.start(options);
-      }
-
-      public void stop() throws BundleException
-      {
-         framework.stop();
-      }
-
-      public void stop(int options) throws BundleException
-      {
-         framework.stop(options);
-      }
-
-      public void uninstall() throws BundleException
-      {
-         framework.uninstall();
-      }
-
-      public void update() throws BundleException
-      {
-         framework.update();
-      }
-
-      public void update(InputStream in) throws BundleException
-      {
-         framework.update(in);
-      }
-
-      public FrameworkEvent waitForStop(long timeout) throws InterruptedException
-      {
-         return framework.waitForStop(timeout);
-      }
-
    }
 }

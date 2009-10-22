@@ -57,6 +57,7 @@ public class FrameworkWrapper implements Framework
    {
       if (framework == null)
          throw new IllegalArgumentException("Null framework");
+      
       this.framework = framework;
    }
 
