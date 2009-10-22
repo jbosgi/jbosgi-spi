@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.osgi.spi.testing.OSGiRuntime;
-
 /**
  * An abstract OSGi capability that can be installed in an {@link OSGiRuntime}.
  * 

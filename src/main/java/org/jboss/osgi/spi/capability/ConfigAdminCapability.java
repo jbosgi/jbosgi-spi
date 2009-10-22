@@ -23,7 +23,6 @@ package org.jboss.osgi.spi.capability;
 
 //$Id$
 
-import org.jboss.osgi.spi.testing.OSGiRuntime;
 import org.osgi.service.cm.ConfigurationAdmin;
 
 /**

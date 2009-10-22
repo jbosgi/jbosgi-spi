@@ -40,7 +40,7 @@ import java.util.Set;
 import org.jboss.osgi.spi.FrameworkException;
 import org.jboss.osgi.spi.NotImplementedException;
 import org.jboss.osgi.spi.internal.StringPropertyReplacer;
-import org.jboss.osgi.spi.logging.ExportedPackageHelper;
+import org.jboss.osgi.spi.util.ExportedPackageHelper;
 import org.jboss.osgi.spi.util.ServiceLoader;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;

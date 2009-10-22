@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.capability;
 
-import org.jboss.osgi.spi.testing.OSGiRuntime;
 import org.osgi.service.log.LogService;
 
 /**

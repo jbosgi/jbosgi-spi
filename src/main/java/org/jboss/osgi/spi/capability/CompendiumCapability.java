@@ -23,11 +23,9 @@ package org.jboss.osgi.spi.capability;
 
 //$Id$
 
-import org.jboss.osgi.spi.testing.OSGiRuntime;
-import org.jboss.osgi.spi.testing.OSGiTestHelper;
 
 /**
- * Adds the OSGi compedium capability to the {@link OSGiRuntime}
+ * Adds the OSGi compedium capability to the OSGiRuntime
  * under test. 
  * 
  * Installed bundle: org.osgi.compendium.jar
@@ -41,7 +39,7 @@ public class CompendiumCapability extends Capability
    {
       super(null);
       
-      if (new OSGiTestHelper().isFrameworkEquinox())
+      if ("equinox".equals(System.getProperty("framework")))
          addBundle("bundles/org.eclipse.osgi.services.jar");
       else
          addBundle("bundles/org.osgi.compendium.jar");

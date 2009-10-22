@@ -61,11 +61,6 @@
       <artifactId>jboss-vfs</artifactId>
       <version>${version.jboss.vfs}</version>
     </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${version.junit}</version>
-    </dependency>
 
     <!-- Provided Dependencies -->
     <dependency>
