@@ -34,6 +34,7 @@ import org.jboss.virtual.VFS;
 import org.jboss.virtual.VFSUtils;
 import org.jboss.virtual.VirtualFile;
 import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
 
 /**
  * An abstraction of a bundle
@@ -47,7 +48,7 @@ public class BundleInfo
    private String location;
    private Manifest manifest;
    private String symbolicName;
-   private String version;
+   private Version version;
 
    public static BundleInfo createBundleInfo(String location)
    {
@@ -154,9 +155,8 @@ public class BundleInfo
       if (symbolicName == null)
          throw new IllegalArgumentException("Cannot obtain Bundle-SymbolicName for: " + root);
 
-      version = getManifestHeader(Constants.BUNDLE_VERSION);
-      if (version == null)
-         version = "0.0.0";
+      String versionStr = getManifestHeader(Constants.BUNDLE_VERSION);
+      version = Version.parseVersion(versionStr);
    }
    
    /**
@@ -196,7 +196,7 @@ public class BundleInfo
    /**
     * Get the bundle version
     */
-   public String getVersion()
+   public Version getVersion()
    {
       return version;
    }
