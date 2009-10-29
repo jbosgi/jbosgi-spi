@@ -23,13 +23,14 @@ package org.jboss.osgi.spi.management;
 
 //$Id$
 
+import static org.jboss.osgi.spi.OSGiConstants.DOMAIN_NAME;
+
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.management.ObjectName;
 
-import org.jboss.osgi.spi.OSGiConstants;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
@@ -42,17 +43,31 @@ import org.osgi.framework.Version;
  */
 public class ManagedBundle implements ManagedBundleMBean
 {
+   public static final String PROPERTY_ID = "id";
+   public static final String PROPERTY_SYMBOLIC_NAME = "sname";
+   public static final String PROPERTY_VERSION = "version";
+
    private Bundle bundle;
    private ObjectName oname;
 
    public ManagedBundle(Bundle bundle)
    {
       this.bundle = bundle;
-      
+      this.oname = getObjectName(bundle);
+   }
+
+   public static ObjectName getObjectName(Bundle bundle)
+   {
       long id = bundle.getBundleId();
-      String name = bundle.getSymbolicName();
+      String symbolicName = bundle.getSymbolicName();
       Version version = bundle.getVersion();
-      this.oname = ObjectNameFactory.create(OSGiConstants.DOMAIN_NAME + ":id=" + id + ",bundle=" + name + ",version=" + version);
+      return getObjectName(id, symbolicName, version);
+   }
+
+   public static ObjectName getObjectName(long id, String sname, Version version)
+   {
+      String oname = DOMAIN_NAME + ":" + PROPERTY_ID + "=" + id + "," + PROPERTY_SYMBOLIC_NAME + "=" + sname + "," + PROPERTY_VERSION + "=" + version;
+      return ObjectNameFactory.create(oname);
    }
 
    public ObjectName getObjectName()
@@ -86,7 +101,7 @@ public class ManagedBundle implements ManagedBundleMBean
       Hashtable<String, String> retHeaders = new Hashtable<String, String>();
       Dictionary bundleHeaders = bundle.getHeaders();
       Enumeration keys = bundleHeaders.keys();
-      while(keys.hasMoreElements())
+      while (keys.hasMoreElements())
       {
          String key = (String)keys.nextElement();
          String value = (String)bundleHeaders.get(key);
@@ -94,7 +109,7 @@ public class ManagedBundle implements ManagedBundleMBean
       }
       return retHeaders;
    }
-   
+
    public void start() throws BundleException
    {
       bundle.start();

@@ -23,27 +23,9 @@ package org.jboss.osgi.spi.management;
 
 //$Id$
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import javax.management.JMException;
-import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.management.QueryExp;
-
-import org.jboss.osgi.spi.OSGiConstants;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.packageadmin.PackageAdmin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The managed view of an OSGi Framework
@@ -51,189 +33,39 @@ import org.slf4j.LoggerFactory;
  * @author thomas.diesler@jboss.com
  * @since 04-Mar-2009
  */
-public class ManagedFramework implements ManagedFrameworkMBean
+public interface ManagedFramework
 {
-   // Provide logging
-   final Logger log = LoggerFactory.getLogger(ManagedFramework.class);
-
-   private MBeanServer mbeanServer;
-   private BundleContext bundleContext;
-
-   public ManagedFramework(BundleContext bundleContext, MBeanServer mbeanServer)
-   {
-      if (bundleContext == null)
-         throw new IllegalArgumentException("Null BundleContext");
-      this.bundleContext = bundleContext;
-      
-      if (mbeanServer == null)
-         throw new IllegalArgumentException("Null MBeanServer");
-      this.mbeanServer = mbeanServer;
-      
-      if (bundleContext.getBundle().getBundleId() != 0)
-         throw new IllegalArgumentException ("Not the system bundle context: " + bundleContext);
-   }
-
-   public BundleContext getBundleContext()
-   {
-      return bundleContext;
-   }
-
-   @SuppressWarnings("unchecked")
-   public ObjectName getBundle(String symbolicName, String version)
-   {
-      ObjectName oname = null;
-
-      ObjectName pattern = ObjectNameFactory.create(OSGiConstants.DOMAIN_NAME + ":bundle=" + symbolicName + ",*");
-      Set<ObjectName> names = mbeanServer.queryNames(pattern, null);
-
-      if (names.size() > 0)
-      {
-         // [TODO] Support bundle version 
-         if (names.size() > 1)
-            throw new IllegalArgumentException("Multiple bundles found: " + names);
-
-         oname = names.iterator().next();
-      }
-
-      return oname;
-   }
-
-   @SuppressWarnings("unchecked")
-   public ObjectName getBundle(long bundleId)
-   {
-      ObjectName oname = null;
-
-      ObjectName pattern = ObjectNameFactory.create(OSGiConstants.DOMAIN_NAME + ":id=" + bundleId + ",*");
-      Set<ObjectName> names = mbeanServer.queryNames(pattern, null);
-
-      if (names.size() > 0)
-         oname = names.iterator().next();
-
-      return oname;
-   }
-
-   @SuppressWarnings("unchecked")
-   public Set<ObjectName> getBundles()
-   {
-      // [JBAS-6571] JMX filtering does not work with wildcards
-      // ObjectName pattern = ObjectNameFactory.create(Constants.DOMAIN_NAME + ":bundle=*,*");
-      // Set<ObjectName> names = mbeanServer.queryNames(pattern, null);
-
-      ObjectName pattern = ObjectNameFactory.create(OSGiConstants.DOMAIN_NAME + ":*");
-      Set<ObjectName> names = mbeanServer.queryNames(pattern, new IsBundleQueryExp());
-      return names;
-   }
-
-   public ManagedServiceReference getServiceReference(String clazz)
-   {
-      ServiceReference sref = getBundleContext().getServiceReference(clazz);
-      if (sref == null)
-         return null;
-
-      Map<String, Object> props = new HashMap<String, Object>();
-      for (String key : sref.getPropertyKeys())
-      {
-         props.put(key, sref.getProperty(key));
-      }
-      
-      return new ManagedServiceReference(props);
-   }
-
-   public ManagedServiceReference[] getServiceReferences(String clazz, String filter)
-   {
-      List<ManagedServiceReference> foundRefs = new ArrayList<ManagedServiceReference>();
-      
-      ServiceReference[] srefs;
-      try
-      {
-         srefs = getBundleContext().getServiceReferences(clazz, filter);
-      }
-      catch (InvalidSyntaxException e)
-      {
-         throw new IllegalArgumentException("Invalid filter syntax: " + filter);
-      }
-      
-      if (srefs != null)
-      {
-         for (ServiceReference sref : srefs)
-         {
-            Map<String, Object> props = new HashMap<String, Object>();
-            for (String key : sref.getPropertyKeys())
-               props.put(key, sref.getProperty(key));
-
-            foundRefs.add(new ManagedServiceReference(props));
-         }
-      }
-
-      ManagedServiceReference[] manrefs = null;
-      if (foundRefs.size() > 0)
-         manrefs = foundRefs.toArray(new ManagedServiceReference[foundRefs.size()]);
-
-      return manrefs;
-   }
-
-   public void refreshPackages(String[] symbolicNames)
-   {
-      ServiceReference sref = getBundleContext().getServiceReference(PackageAdmin.class.getName());
-      if (sref != null)
-      {
-         PackageAdmin service = (PackageAdmin)getBundleContext().getService(sref);
-
-         Bundle[] bundles = null;
-         if (symbolicNames != null)
-         {
-            List<String> nameList = Arrays.asList(symbolicNames);
-            Set<Bundle> bundleSet = new HashSet<Bundle>();
-            for (Bundle bundle : getBundleContext().getBundles())
-            {
-               if (nameList.contains(bundle.getSymbolicName()))
-                  bundleSet.add(bundle);
-            }
-            bundles = new Bundle[bundleSet.size()];
-            bundleSet.toArray(bundles);
-         }
-         service.refreshPackages(bundles);
-      }
-   }
-
-   public void start()
-   {
-      try
-      {
-         if (mbeanServer != null)
-            mbeanServer.registerMBean(this, ManagedFrameworkMBean.MBEAN_MANAGED_FRAMEWORK);
-      }
-      catch (JMException ex)
-      {
-         log.warn("Cannot register: " + ManagedFrameworkMBean.MBEAN_MANAGED_FRAMEWORK);
-      }
-   }
-
-   public void stop()
-   {
-      try
-      {
-         if (mbeanServer != null && mbeanServer.isRegistered(MBEAN_MANAGED_FRAMEWORK))
-            mbeanServer.unregisterMBean(ManagedFrameworkMBean.MBEAN_MANAGED_FRAMEWORK);
-      }
-      catch (JMException ex)
-      {
-         log.warn("Cannot register: " + ManagedFrameworkMBean.MBEAN_MANAGED_FRAMEWORK);
-      }
-   }
-
-   // Accept names like "jboss.osgi:bundle=*"
-   static class IsBundleQueryExp implements QueryExp
-   {
-      private static final long serialVersionUID = 1L;
-
-      public boolean apply(ObjectName name)
-      {
-         return name.getKeyProperty("bundle") != null;
-      }
-
-      public void setMBeanServer(MBeanServer server)
-      {
-      }
-   }
+   /**
+    * Get the list of all installed bundles
+    */
+   Set<ObjectName> getBundles();
+   
+   /**
+    * Get the installed bundle 
+    */
+   ObjectName getBundle(String symbolicName, String version);
+   
+   /**
+    * Get the installed bundle 
+    */
+   ObjectName getBundle(long bundleId);
+   
+   /**
+    * Returns a ServiceReference object for a service that implements and was registered 
+    * under the specified class.
+    */
+   ManagedServiceReference getServiceReference(String clazz);
+   
+   /**
+    * Returns an array of ManagedServiceReference objects. 
+    * The returned array of ManagedServiceReference objects contains services 
+    * that were registered under the specified class, match the specified filter criteria, 
+    * and the packages for the class names under which the services were registered.
+    */
+   ManagedServiceReference[] getServiceReferences(String clazz, String filter);
+   
+   /**
+    * Refresh packages through the PackageAdmin service
+    */
+   void refreshPackages(ObjectName[] bundles);
 }

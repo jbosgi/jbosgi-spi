@@ -39,7 +39,7 @@ public class ManagedServiceReference implements Serializable
    
    private Map<String, Object> props;
    
-   ManagedServiceReference(Map<String, Object> props)
+   public ManagedServiceReference(Map<String, Object> props)
    {
       this.props = props;
    }

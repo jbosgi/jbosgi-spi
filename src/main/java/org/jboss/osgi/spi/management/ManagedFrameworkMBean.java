@@ -23,8 +23,6 @@ package org.jboss.osgi.spi.management;
 
 //$Id$
 
-import java.util.Set;
-
 import javax.management.ObjectName;
 
 /**
@@ -33,42 +31,9 @@ import javax.management.ObjectName;
  * @author thomas.diesler@jboss.com
  * @since 04-Mar-2009
  */
-public interface ManagedFrameworkMBean
+public interface ManagedFrameworkMBean extends ManagedFramework
 {
    /** The default object name: jboss.osgi:service=ManagedFramework */
    ObjectName MBEAN_MANAGED_FRAMEWORK = ObjectNameFactory.create("jboss.osgi:service=ManagedFramework");
 
-   /**
-    * Get the list of all installed bundles
-    */
-   Set<ObjectName> getBundles();
-   
-   /**
-    * Get the installed bundle 
-    */
-   ObjectName getBundle(String symbolicName, String version);
-   
-   /**
-    * Get the installed bundle 
-    */
-   ObjectName getBundle(long bundleId);
-   
-   /**
-    * Returns a ServiceReference object for a service that implements and was registered 
-    * under the specified class.
-    */
-   ManagedServiceReference getServiceReference(String clazz);
-   
-   /**
-    * Returns an array of ManagedServiceReference objects. 
-    * The returned array of ManagedServiceReference objects contains services 
-    * that were registered under the specified class, match the specified filter criteria, 
-    * and the packages for the class names under which the services were registered.
-    */
-   ManagedServiceReference[] getServiceReferences(String clazz, String filter);
-   
-   /**
-    * Refresh packages through the PackageAdmin service
-    */
-   void refreshPackages(String[] symbolicNames);
 }
