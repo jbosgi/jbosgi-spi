@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.jboss.osgi.spi.FrameworkException;
 import org.jboss.osgi.spi.NotImplementedException;
 import org.jboss.osgi.spi.internal.StringPropertyReplacer;
 import org.jboss.osgi.spi.util.ExportedPackageHelper;

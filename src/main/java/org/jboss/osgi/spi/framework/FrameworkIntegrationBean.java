@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.osgi.spi.FrameworkException;
 import org.jboss.osgi.spi.util.ExportedPackageHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
