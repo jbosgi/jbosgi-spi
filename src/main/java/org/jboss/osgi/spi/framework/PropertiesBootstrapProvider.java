@@ -40,10 +40,12 @@ import java.util.Set;
 import org.jboss.osgi.spi.NotImplementedException;
 import org.jboss.osgi.spi.internal.StringPropertyReplacer;
 import org.jboss.osgi.spi.util.ExportedPackageHelper;
+import org.jboss.osgi.spi.util.ServiceLoader;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
+import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +84,7 @@ import org.slf4j.LoggerFactory;
  * @author thomas.diesler@jboss.com
  * @since 24-Apr-2009
  */
-public abstract class PropertiesBootstrapProvider implements OSGiBootstrapProvider
+public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
 {
    // Provide logging
    final Logger log = LoggerFactory.getLogger(PropertiesBootstrapProvider.class);
@@ -191,7 +193,12 @@ public abstract class PropertiesBootstrapProvider implements OSGiBootstrapProvid
    }
 
    /** Overwrite to create the framework */
-   protected abstract Framework createFramework(Map<String, Object> properties);
+   protected Framework createFramework(Map<String, Object> properties)
+   {
+      FrameworkFactory factory = ServiceLoader.loadService(FrameworkFactory.class);
+      Framework framework = factory.newFramework(properties);
+      return framework;
+   }
    
    /**
     * Overwrite to register system services before bundles get installed.
