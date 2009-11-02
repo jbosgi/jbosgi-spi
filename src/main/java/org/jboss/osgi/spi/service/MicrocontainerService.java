@@ -26,45 +26,45 @@ package org.jboss.osgi.spi.service;
 import java.util.List;
 
 /**
- * An OSGi Service the gives access to the Kernel and MBeanServer.
+ * An OSGi Service that gives access to Kernel bean registrations.
  * 
  * @author thomas.diesler@jboss.com
  * @since 23-Jan-2009
  */
 public interface MicrocontainerService
 {
-   /*
+   /**
     * The name under which the system bundle context is registered: 'jboss.osgi:service=BundleContext'
     */
    String BEAN_SYSTEM_BUNDLE_CONTEXT = "jboss.osgi:service=BundleContext";
 
-   /*
+   /**
     * The name under which the MBeanServer is registered: 'jboss.osgi:service=MBeanServer'
     */
    String BEAN_MBEAN_SERVER = "jboss.osgi:service=MBeanServer";
 
-   /*
+   /**
     * The name under which the KernelController is registered: 'jboss.kernel:service=KernelController'
     */
    String BEAN_KERNEL_CONTROLLER = "jboss.kernel:service=KernelController";
 
-   /*
+   /**
     * The name under which the Kernel is registered: 'jboss.kernel:service=Kernel'
     */
    String BEAN_KERNEL = "jboss.kernel:service=Kernel";
 
-   /*
+   /**
     * Get the list of registered beans.
     */
    List<String> getRegisteredBeans();
 
-   /*
+   /**
     * Get a registered bean from the Kernel.
     * @return null if there is no bean registered under this name
     */
    Object getRegisteredBean(String beanName);
 
-   /*
+   /**
     * Get a registered bean from the Kernel.
     * @return null if there is no bean registered under this name
     */
