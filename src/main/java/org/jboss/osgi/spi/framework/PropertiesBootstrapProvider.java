@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.jboss.osgi.spi.NotImplementedException;
 import org.jboss.osgi.spi.internal.StringPropertyReplacer;
 import org.jboss.osgi.spi.util.ExportedPackageHelper;
 import org.jboss.osgi.spi.util.ServiceLoader;
@@ -57,6 +56,7 @@ import org.slf4j.LoggerFactory;
  * <ul>
  * <li><b>org.jboss.osgi.spi.framework.autoInstall</b> - Bundles that need to be installed with the Framework automatically</li>
  * <li><b>org.jboss.osgi.spi.framework.autoStart</b> - Bundles that need to be started automatically</li>
+ * <li><b>org.jboss.osgi.spi.framework.extra</b> - An URL to extra properties, which recursivly may conatin this property.</li>
  * </ul>
  * 
  * All other properties are passed on to configure the framework.
@@ -114,14 +114,57 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
 
    public void configure()
    {
-      configure(System.getProperty(OSGI_FRAMEWORK_CONFIG, DEFAULT_OSGI_FRAMEWORK_PROPERTIES));
+      configureInternal(System.getProperty(OSGI_FRAMEWORK_CONFIG, DEFAULT_OSGI_FRAMEWORK_PROPERTIES));
    }
 
+   public void configure(String resourceConfig)
+   {
+      if (resourceConfig == null)
+         throw new IllegalArgumentException("Null resouce name");
+      
+      URL urlConfig = Thread.currentThread().getContextClassLoader().getResource(resourceConfig);
+      if (urlConfig == null)
+         throw new IllegalStateException("Cannot find resource: " + resourceConfig);
+      
+      configure(urlConfig);
+   }
+   
    public void configure(URL urlConfig)
    {
-      // Read the configuration properties
-      final Map<String, Object> props = getBootstrapProperties(urlConfig);
+      if (urlConfig == null)
+         throw new IllegalArgumentException("Null config url");
+      
+      Map<String, Object> props = getBootstrapProperties(urlConfig);
+      initFrameworkInstance(props);
+   }
 
+   public void configure(InputStream streamConfig)
+   {
+      Map<String, Object> props = getBootstrapProperties(streamConfig);
+      initFrameworkInstance(props);
+   }
+
+   private void configureInternal(String resourceConfig)
+   {
+      if (resourceConfig == null)
+         throw new IllegalArgumentException("Null resouce name");
+
+      Map<String, Object> props;
+      URL urlConfig = Thread.currentThread().getContextClassLoader().getResource(resourceConfig);
+      if (urlConfig != null)
+      {
+         props = getBootstrapProperties(urlConfig);
+      }
+      else
+      {
+         props = new HashMap<String, Object>();
+         log.debug("Bootstrap using framework defaults");
+      }
+      initFrameworkInstance(props);
+   }
+
+   private void initFrameworkInstance(final Map<String, Object> props)
+   {
       // Load the framework instance
       final Framework frameworkImpl = createFramework(props);
       framework = new FrameworkWrapper(frameworkImpl)
@@ -156,7 +199,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
 
             // Register system services
             registerSystemServices(context);
-            
+
             // Install autoInstall bundles
             for (URL bundleURL : autoInstall)
             {
@@ -184,11 +227,11 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
          {
             // Unregister system services
             unregisterSystemServices(getBundleContext());
-            
+
             super.stop();
          }
       };
-
+      
       configured = true;
    }
 
@@ -199,7 +242,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
       Framework framework = factory.newFramework(properties);
       return framework;
    }
-   
+
    /**
     * Overwrite to register system services before bundles get installed.
     */
@@ -207,7 +250,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
    {
       // no default system services
    }
-   
+
    /**
     * Overwrite to unregister system services before bundles get installed.
     */
@@ -215,7 +258,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
    {
       // no default system services
    }
-   
+
    private List<URL> getBundleURLs(Map<String, Object> props, String key)
    {
       String bundleList = (String)props.get(key);
@@ -248,107 +291,107 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
       }
    }
 
-   public void configure(String resourceConfig)
-   {
-      URL urlConfig = Thread.currentThread().getContextClassLoader().getResource(resourceConfig);
-      if (urlConfig == null)
-         throw new IllegalStateException("Cannot find resource: " + resourceConfig);
-
-      configure(urlConfig);
-   }
-
-   public void configure(InputStream streamConfig)
-   {
-      throw new NotImplementedException();
-   }
-
    public Framework getFramework()
    {
       if (configured == false)
-      {
-         String defaultFrameworkProps = System.getProperty(OSGI_FRAMEWORK_CONFIG, DEFAULT_OSGI_FRAMEWORK_PROPERTIES);
-         configure(defaultFrameworkProps);
-      }
+         configureInternal(System.getProperty(OSGI_FRAMEWORK_CONFIG, DEFAULT_OSGI_FRAMEWORK_PROPERTIES));
+      
       return framework;
    }
 
-   @SuppressWarnings("unchecked")
    private Map<String, Object> getBootstrapProperties(URL urlConfig)
    {
-      Properties props = new Properties();
+      Map<String, Object> props = null;
       try
       {
-         InputStream inStream = urlConfig.openStream();
-         props.load(inStream);
-         inStream.close();
+         InputStream propStream = urlConfig.openStream();
+         props = getBootstrapProperties(propStream);
+         propStream.close();
       }
       catch (IOException ex)
       {
-         throw new IllegalStateException("Cannot load properties from: " + urlConfig, ex);
+         throw new IllegalStateException("Cannot configure from: " + urlConfig, ex);
       }
+      return props;
+   }
 
+   @SuppressWarnings("unchecked")
+   private Map<String, Object> getBootstrapProperties(InputStream propStream)
+   {
+      if (propStream == null)
+         throw new IllegalArgumentException("Null properties stream");
+      
       Map<String, Object> propMap = new HashMap<String, Object>();
-
-      // Process property list
-      Enumeration<String> keys = (Enumeration<String>)props.propertyNames();
-      while (keys.hasMoreElements())
+      try
       {
-         String key = keys.nextElement();
-         String value = props.getProperty(key);
+         Properties props = new Properties();
+         props.load(propStream);
+         propStream.close();
 
-         // Replace property variables
-         value = StringPropertyReplacer.replaceProperties(value);
-         propMap.put(key, value);
-
-         if (key.endsWith(".instance"))
+         // Process property list
+         Enumeration<String> keys = (Enumeration<String>)props.propertyNames();
+         while (keys.hasMoreElements())
          {
+            String key = keys.nextElement();
+            String value = props.getProperty(key);
+
+            // Replace property variables
+            value = StringPropertyReplacer.replaceProperties(value);
+            propMap.put(key, value);
+
+            if (key.endsWith(".instance"))
+            {
+               try
+               {
+                  String subkey = key.substring(0, key.lastIndexOf(".instance"));
+                  Object instance = Class.forName(value).newInstance();
+                  propMap.put(subkey, instance);
+               }
+               catch (Exception ex)
+               {
+                  log.error("Cannot load " + key + "=" + value, ex);
+               }
+            }
+         }
+
+         // Merge optional extra properties
+         String extraPropsValue = (String)propMap.get(PROP_OSGI_FRAMEWORK_EXTRA);
+         if (extraPropsValue != null)
+         {
+            URL extraPropsURL = null;
             try
             {
-               String subkey = key.substring(0, key.lastIndexOf(".instance"));
-               Object instance = Class.forName(value).newInstance();
-               propMap.put(subkey, instance);
-            }
-            catch (Exception ex)
-            {
-               log.error("Cannot load " + key + "=" + value, ex);
-            }
-         }
-      }
-
-      // Merge optional extra properties
-      String extraPropsValue = (String)propMap.get(PROP_OSGI_FRAMEWORK_EXTRA);
-      if (extraPropsValue != null)
-      {
-         URL extraPropsURL = null;
-         try
-         {
-            extraPropsURL = new URL(extraPropsValue);
-         }
-         catch (MalformedURLException e)
-         {
-            // ignore;
-         }
-         if (extraPropsURL == null)
-         {
-            File propsFile = new File(extraPropsValue);
-            try
-            {
-               extraPropsURL = propsFile.toURL();
+               extraPropsURL = new URL(extraPropsValue);
             }
             catch (MalformedURLException e)
             {
                // ignore;
             }
+            if (extraPropsURL == null)
+            {
+               File propsFile = new File(extraPropsValue);
+               try
+               {
+                  extraPropsURL = propsFile.toURL();
+               }
+               catch (MalformedURLException e)
+               {
+                  // ignore;
+               }
+            }
+
+            if (extraPropsURL == null)
+               throw new IllegalStateException("Invalid properties URL: " + extraPropsValue);
+
+            propMap.remove(PROP_OSGI_FRAMEWORK_EXTRA);
+            Map<String, Object> extraProps = getBootstrapProperties(extraPropsURL.openStream());
+            propMap.putAll(extraProps);
          }
-
-         if (extraPropsURL == null)
-            throw new IllegalStateException("Invalid properties URL: " + extraPropsValue);
-
-         propMap.remove(PROP_OSGI_FRAMEWORK_EXTRA);
-         Map<String, Object> extraProps = getBootstrapProperties(extraPropsURL);
-         propMap.putAll(extraProps);
       }
-
+      catch (IOException ex)
+      {
+         throw new IllegalStateException("Cannot load properties", ex);
+      }
       return propMap;
    }
 }

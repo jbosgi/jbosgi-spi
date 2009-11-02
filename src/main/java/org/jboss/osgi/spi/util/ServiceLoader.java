@@ -94,9 +94,6 @@ public abstract class ServiceLoader
          }
       }
       
-      if (services.size() == 0)
-         throw new IllegalStateException("Failed to load services from: META-INF/services/" + serviceClass.getName());
-      
       return services;
    }
 

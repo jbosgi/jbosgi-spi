@@ -160,6 +160,9 @@ public class OSGiBootstrap
     */
    public static OSGiBootstrapProvider getBootstrapProvider()
    {
+      if (log == null)
+         log = LoggerFactory.getLogger(OSGiBootstrap.class);
+      
       OSGiBootstrapProvider provider = null;
 
       List<OSGiBootstrapProvider> providers = ServiceLoader.loadServices(OSGiBootstrapProvider.class);
@@ -173,13 +176,15 @@ public class OSGiBootstrap
          }
          catch (Exception ex)
          {
-            Logger tmplog = LoggerFactory.getLogger(OSGiBootstrap.class);
-            tmplog.debug("Cannot configure [" + aux.getClass().getName() + "]", ex);
+            log.debug("Cannot configure [" + aux.getClass().getName() + "]", ex);
          }
       }
 
       if (provider == null)
-         throw new IllegalStateException("Cannot obtain bootstrap provider");
+      {
+         provider = new PropertiesBootstrapProvider();
+         log.debug("Using default: " + PropertiesBootstrapProvider.class.getName());
+      }
 
       return provider;
    }
