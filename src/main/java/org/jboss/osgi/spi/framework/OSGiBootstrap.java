@@ -73,7 +73,7 @@ public class OSGiBootstrap
    public String serverName = "default";
 
    @Option(name = "-b", aliases = { "--bind-address" }, usage = "The network address various services can bind to (-b 127.0.0.1)", required = false)
-   public String bindAdress = "localhost";
+   public String bindAddress = "localhost";
 
    private String osgiHome;
    private String osgiServerHome;
@@ -135,7 +135,7 @@ public class OSGiBootstrap
       Properties defaults = new Properties();
       defaults.setProperty(OSGI_SERVER_NAME, serverName);
       defaults.setProperty(OSGI_SERVER_HOME, osgiServerHome);
-      defaults.setProperty(JBOSS_BIND_ADDRESS, bindAdress);
+      defaults.setProperty(JBOSS_BIND_ADDRESS, bindAddress);
       defaults.setProperty(JAVA_PROTOCOL_HANDLERS, "org.jboss.net.protocol|org.jboss.virtual.protocol");
 
       log.debug("JBoss OSGi System Properties");
