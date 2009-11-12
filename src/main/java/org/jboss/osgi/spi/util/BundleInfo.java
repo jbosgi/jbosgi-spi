@@ -120,6 +120,11 @@ public class BundleInfo
       return new BundleInfo(root, null);
    }
    
+   public static BundleInfo createBundleInfo(VirtualFile root, String location)
+   {
+      return new BundleInfo(root, location);
+   }
+   
    private BundleInfo(VirtualFile root, String location)
    {
       if (root == null)
