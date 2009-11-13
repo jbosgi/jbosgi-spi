@@ -45,20 +45,21 @@ import org.osgi.framework.Version;
  */
 public class BundleInfo implements Serializable
 {
-   private static final long serialVersionUID = 2196462922955338109L;
-   
-   private VirtualFile root;
+   private static final long serialVersionUID = -2363297020450715134L;
+
+   private URL rootURL;
    private String location;
    private String symbolicName;
    private String version;
-   
+
+   private transient VirtualFile rootFile;
    private transient Manifest manifest;
 
    public static BundleInfo createBundleInfo(String location)
    {
       if (location == null)
          throw new IllegalArgumentException("Location cannot be null");
-      
+
       // Try location as URL
       URL url = null;
       try
@@ -84,75 +85,50 @@ public class BundleInfo implements Serializable
             // ignore
          }
       }
-      
-      if (url == null)
-         throw new IllegalArgumentException("Invalid bundle location: " + location);
 
-      VirtualFile root;
-      try
-      {
-         root = VFS.getRoot(url);
-      }
-      catch (IOException e)
-      {
-         throw new IllegalArgumentException("Invalid bundle location=" + url, e);
-      }
-      
-      return new BundleInfo(root, location);
+      return new BundleInfo(toVirtualFile(url), location);
    }
 
    public static BundleInfo createBundleInfo(URL url)
    {
-      if (url == null)
-         throw new IllegalArgumentException("URL cannot be null");
-      
-      VirtualFile root;
-      try
-      {
-         root = VFS.getRoot(url);
-      }
-      catch (IOException e)
-      {
-         throw new IllegalArgumentException("Invalid bundle location=" + url, e);
-      }
-      
-      return new BundleInfo(root, url.toExternalForm());
+      return new BundleInfo(toVirtualFile(url), url.toExternalForm());
    }
-   
+
    public static BundleInfo createBundleInfo(VirtualFile root)
    {
       return new BundleInfo(root, null);
    }
-   
+
    public static BundleInfo createBundleInfo(VirtualFile root, String location)
    {
       return new BundleInfo(root, location);
    }
-   
-   private BundleInfo(VirtualFile root, String location)
+
+   private BundleInfo(VirtualFile rootFile, String location)
    {
-      if (root == null)
-         throw new IllegalArgumentException("VirtualFile cannot be null");
-      
-      this.root = root;
-      
+      if (rootFile == null)
+         throw new IllegalArgumentException("Root file cannot be null");
+
+      this.rootFile = rootFile;
+      this.rootURL = toURL(rootFile);
+
       // Derive the location from the root
       if (location == null)
       {
          try
          {
-            location = root.toURL().toExternalForm();
+            location = rootURL.toExternalForm();
          }
          catch (Exception e)
          {
-            throw new IllegalStateException("Cannot obtain URL from: " + root);
+            throw new IllegalStateException("Cannot obtain URL from: " + rootFile);
          }
       }
-      this.location = location;      
+      this.location = location;
 
       symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
       if (symbolicName == null)
-         throw new IllegalArgumentException("Cannot obtain Bundle-SymbolicName for: " + root);
+         throw new IllegalArgumentException("Cannot obtain Bundle-SymbolicName for: " + rootFile);
 
       version = getManifestHeader(Constants.BUNDLE_VERSION);
       version = Version.parseVersion(version).toString();
@@ -175,13 +151,17 @@ public class BundleInfo implements Serializable
    {
       return location;
    }
-   
+
    /**
     * Get the bundle root file
     */
    public VirtualFile getRoot()
    {
-      return root;
+      if (rootFile == null)
+      {
+         rootFile = toVirtualFile(rootURL);
+      }
+      return rootFile;
    }
 
    /**
@@ -206,27 +186,51 @@ public class BundleInfo implements Serializable
       {
          try
          {
-            manifest = VFSUtils.getManifest(root);
+            manifest = VFSUtils.getManifest(toVirtualFile(rootURL));
          }
          catch (Exception ex)
          {
-            throw new IllegalArgumentException("Cannot get manifest from: " + root, ex);
+            throw new IllegalArgumentException("Cannot get manifest from: " + rootURL, ex);
          }
       }
       return manifest;
    }
-   
+
+   private static VirtualFile toVirtualFile(URL url)
+   {
+      try
+      {
+         return VFS.getRoot(url);
+      }
+      catch (IOException e)
+      {
+         throw new IllegalArgumentException("Invalid bundle url=" + url, e);
+      }
+   }
+
+   private static URL toURL(VirtualFile file)
+   {
+      try
+      {
+         return file.toURL();
+      }
+      catch (Exception e)
+      {
+         throw new IllegalArgumentException("Invalid root file: " + file);
+      }
+   }
+
    private String toEqualString()
    {
-      return "[" + symbolicName + "-" + version + ",url=" + location + "]";
+      return "[" + symbolicName + "-" + version + ",url=" + rootURL + "]";
    }
-   
+
    @Override
    public boolean equals(Object obj)
    {
       if (!(obj instanceof BundleInfo))
          return false;
-      
+
       BundleInfo other = (BundleInfo)obj;
       return toEqualString().equals(other.toEqualString());
    }
