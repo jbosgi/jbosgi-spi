@@ -38,7 +38,10 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 
 /**
- * An abstraction of a bundle
+ * Primitive access to bundle meta data and root virtual file.
+ * 
+ * The bundle info can be constructed from various locations.
+ * If that succeeds, there is a valid OSGi Manifest. 
  * 
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
@@ -86,11 +89,17 @@ public class BundleInfo implements Serializable
          }
       }
 
+      if (url == null)
+         throw new IllegalArgumentException("Cannot obtain root url from: " + location);
+      
       return new BundleInfo(toVirtualFile(url), location);
    }
 
    public static BundleInfo createBundleInfo(URL url)
    {
+      if (url == null)
+         throw new IllegalArgumentException("Null root url");
+      
       return new BundleInfo(toVirtualFile(url), url.toExternalForm());
    }
 
@@ -114,16 +123,8 @@ public class BundleInfo implements Serializable
 
       // Derive the location from the root
       if (location == null)
-      {
-         try
-         {
-            location = rootURL.toExternalForm();
-         }
-         catch (Exception e)
-         {
-            throw new IllegalStateException("Cannot obtain URL from: " + rootFile);
-         }
-      }
+         location = rootURL.toExternalForm();
+      
       this.location = location;
 
       symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
@@ -204,7 +205,7 @@ public class BundleInfo implements Serializable
       }
       catch (IOException e)
       {
-         throw new IllegalArgumentException("Invalid bundle url=" + url, e);
+         throw new IllegalArgumentException("Invalid root url: " + url, e);
       }
    }
 
