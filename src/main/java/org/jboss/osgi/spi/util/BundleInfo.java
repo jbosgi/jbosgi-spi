@@ -25,6 +25,7 @@ package org.jboss.osgi.spi.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.jar.Attributes;
@@ -42,13 +43,16 @@ import org.osgi.framework.Version;
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
-public class BundleInfo
+public class BundleInfo implements Serializable
 {
+   private static final long serialVersionUID = 2196462922955338109L;
+   
    private VirtualFile root;
    private String location;
-   private Manifest manifest;
    private String symbolicName;
-   private Version version;
+   private String version;
+   
+   private transient Manifest manifest;
 
    public static BundleInfo createBundleInfo(String location)
    {
@@ -146,30 +150,20 @@ public class BundleInfo
       }
       this.location = location;      
 
-      // Get the Manifest
-      try
-      {
-         manifest = VFSUtils.getManifest(root);
-      }
-      catch (Exception ex)
-      {
-         throw new IllegalArgumentException("Cannot get manifest from: " + root, ex);
-      }
-      
       symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
       if (symbolicName == null)
          throw new IllegalArgumentException("Cannot obtain Bundle-SymbolicName for: " + root);
 
-      String versionStr = getManifestHeader(Constants.BUNDLE_VERSION);
-      version = Version.parseVersion(versionStr);
+      version = getManifestHeader(Constants.BUNDLE_VERSION);
+      version = Version.parseVersion(version).toString();
    }
-   
+
    /**
     * Get the manifest header for the given key.
     */
    public String getManifestHeader(String key)
    {
-      Attributes attribs = manifest.getMainAttributes();
+      Attributes attribs = getManifest().getMainAttributes();
       String value = attribs.getValue(key);
       return value;
    }
@@ -203,9 +197,30 @@ public class BundleInfo
     */
    public Version getVersion()
    {
-      return version;
+      return Version.parseVersion(version);
    }
 
+   private Manifest getManifest()
+   {
+      if (manifest == null)
+      {
+         try
+         {
+            manifest = VFSUtils.getManifest(root);
+         }
+         catch (Exception ex)
+         {
+            throw new IllegalArgumentException("Cannot get manifest from: " + root, ex);
+         }
+      }
+      return manifest;
+   }
+   
+   private String toEqualString()
+   {
+      return "[" + symbolicName + "-" + version + ",url=" + location + "]";
+   }
+   
    @Override
    public boolean equals(Object obj)
    {
@@ -213,18 +228,18 @@ public class BundleInfo
          return false;
       
       BundleInfo other = (BundleInfo)obj;
-      return root.equals(other.root);
+      return toEqualString().equals(other.toEqualString());
    }
 
    @Override
    public int hashCode()
    {
-      return toString().hashCode();
+      return toEqualString().hashCode();
    }
 
    @Override
    public String toString()
    {
-      return "[" + symbolicName + "-" + version + ",url=" + root + "]";
+      return toEqualString();
    }
 }
