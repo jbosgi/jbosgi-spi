@@ -31,7 +31,7 @@ import java.security.AccessController;
  *
  * @author Scott.Stark@jboss.org
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 class SysPropertyActions
 {
    interface SysProps
@@ -45,6 +45,7 @@ class SysPropertyActions
       };
       SysProps PRIVILEDGED = new SysProps()
       {
+         @SuppressWarnings("unchecked")
          public String getProperty(final String name, final String defaultValue)
          {
             PrivilegedAction action = new PrivilegedAction()

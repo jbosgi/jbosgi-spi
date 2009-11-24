@@ -141,13 +141,13 @@ public class BundleContextWrapper implements BundleContext
       return context.installBundle(location);
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public ServiceRegistration registerService(String clazz, Object service, Dictionary properties)
    {
       return context.registerService(clazz, service, properties);
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties)
    {
       return context.registerService(clazzes, service, properties);

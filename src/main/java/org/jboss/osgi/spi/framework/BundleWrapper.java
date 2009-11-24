@@ -59,7 +59,7 @@ public class BundleWrapper implements Bundle
       this.bundle = bundle;
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Enumeration findEntries(String path, String filePattern, boolean recurse)
    {
       return bundle.findEntries(path, filePattern, recurse);
@@ -80,19 +80,19 @@ public class BundleWrapper implements Bundle
       return bundle.getEntry(path);
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Enumeration getEntryPaths(String path)
    {
       return bundle.getEntryPaths(path);
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Dictionary getHeaders()
    {
       return bundle.getHeaders();
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Dictionary getHeaders(String locale)
    {
       return bundle.getHeaders(locale);
@@ -118,7 +118,7 @@ public class BundleWrapper implements Bundle
       return bundle.getResource(name);
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Enumeration getResources(String name) throws IOException
    {
       return bundle.getResources(name);
@@ -129,7 +129,7 @@ public class BundleWrapper implements Bundle
       return bundle.getServicesInUse();
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Map getSignerCertificates(int signersType)
    {
       return bundle.getSignerCertificates(signersType);
@@ -155,7 +155,7 @@ public class BundleWrapper implements Bundle
       return bundle.hasPermission(permission);
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Class loadClass(String name) throws ClassNotFoundException
    {
       return bundle.loadClass(name);

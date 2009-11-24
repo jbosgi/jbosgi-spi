@@ -57,7 +57,7 @@ public class MBeanProxy
     return (T)get(new Class[] { interf }, name, server);
   }
 
-  @SuppressWarnings( { "unchecked" })
+  @SuppressWarnings( { "rawtypes" })
   public static Object get(Class[] interfaces, ObjectName name, MBeanServerConnection server) throws MBeanProxyException
   {
     return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), interfaces, new JMXInvocationHandler(server, name));
@@ -170,7 +170,7 @@ public class MBeanProxy
 
     // InvocationHandler implementation ---------------------------
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public Object invoke(Object proxy, Method method, Object[] args) throws Exception
     {
       Class<?> declaringClass = method.getDeclaringClass();

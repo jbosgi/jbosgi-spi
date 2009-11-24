@@ -61,7 +61,7 @@ public class FrameworkWrapper implements Framework
       this.framework = framework;
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Enumeration findEntries(String arg0, String arg1, boolean arg2)
    {
       return framework.findEntries(arg0, arg1, arg2);
@@ -82,19 +82,19 @@ public class FrameworkWrapper implements Framework
       return framework.getEntry(arg0);
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Enumeration getEntryPaths(String arg0)
    {
       return framework.getEntryPaths(arg0);
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Dictionary getHeaders()
    {
       return framework.getHeaders();
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Dictionary getHeaders(String arg0)
    {
       return framework.getHeaders(arg0);
@@ -120,7 +120,7 @@ public class FrameworkWrapper implements Framework
       return framework.getResource(arg0);
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Enumeration getResources(String arg0) throws IOException
    {
       return framework.getResources(arg0);
@@ -131,7 +131,7 @@ public class FrameworkWrapper implements Framework
       return framework.getServicesInUse();
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Map getSignerCertificates(int arg0)
    {
       return framework.getSignerCertificates(arg0);
@@ -162,7 +162,7 @@ public class FrameworkWrapper implements Framework
       framework.init();
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Class loadClass(String arg0) throws ClassNotFoundException
    {
       return framework.loadClass(arg0);

@@ -95,7 +95,7 @@ public class ManagedBundle implements ManagedBundleMBean
       return bundle.getSymbolicName();
    }
 
-   @SuppressWarnings("unchecked")
+   @SuppressWarnings("rawtypes")
    public Dictionary<String, String> getHeaders()
    {
       Hashtable<String, String> retHeaders = new Hashtable<String, String>();
