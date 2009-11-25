@@ -119,4 +119,9 @@ public class ManagedBundle implements ManagedBundleMBean
    {
       bundle.stop();
    }
+
+   public void update() throws BundleException
+   {
+      bundle.update();
+   }
 }

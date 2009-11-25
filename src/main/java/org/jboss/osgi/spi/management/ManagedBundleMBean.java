@@ -82,4 +82,9 @@ public interface ManagedBundleMBean
     * Stops this bundle with no options.
     */
    void stop() throws BundleException;
+
+   /**
+    * Update this bundle.
+    */
+   void update() throws BundleException;
 }
