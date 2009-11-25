@@ -39,9 +39,32 @@ public class CompendiumCapability extends Capability
    {
       super(null);
       
-      if ("equinox".equals(System.getProperty("framework")))
+      if (isFrameworkEquinox())
+      {
          addBundle("bundles/org.eclipse.osgi.services.jar");
+         addBundle("bundles/org.eclipse.osgi.util.jar");
+      }
       else
+      {
          addBundle("bundles/org.osgi.compendium.jar");
+      }
+   }
+
+   private boolean isFrameworkEquinox()
+   {
+      boolean isEquinox = "equinox".equals(System.getProperty("framework"));
+      if (isEquinox == false)
+      {
+         try
+         {
+            getClass().getClassLoader().loadClass("org.jboss.osgi.equinox.EquinoxBootstrapProvider");
+            isEquinox = true;
+         }
+         catch (ClassNotFoundException e)
+         {
+            // ignore
+         }
+      }
+      return isEquinox;
    }
 }
