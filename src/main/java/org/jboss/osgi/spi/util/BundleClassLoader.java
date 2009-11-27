@@ -27,11 +27,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Dictionary;
 import java.util.Enumeration;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Constants;
 
 /**
  * A BundleClassLoader delegates all classloading concerns to the underlying Bundle.
@@ -108,8 +106,7 @@ public class BundleClassLoader extends ClassLoader
 
    public String toString()
    {
-      Dictionary<?, ?> headers = bundle.getHeaders();
-      String bundleId = bundle.getSymbolicName() + ":" + headers.get(Constants.BUNDLE_VERSION);
-      return "BundleClassLoader for [" + bundleId + "]";
+      String shortName = bundle.getSymbolicName() + "-" + bundle.getVersion();
+      return "BundleClassLoader[id=" + bundle.getBundleId() + "," + shortName + "]";
    }
 }
