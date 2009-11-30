@@ -36,7 +36,7 @@ public interface MicrocontainerService
    /**
     * The name under which the system bundle context is registered: 'jboss.osgi:service=BundleContext'
     */
-   String BEAN_SYSTEM_BUNDLE_CONTEXT = "jboss.osgi:service=BundleContext";
+   String BEAN_BUNDLE_CONTEXT = "jboss.osgi:service=BundleContext";
 
    /**
     * The name under which the MBeanServer is registered: 'jboss.osgi:service=MBeanServer'

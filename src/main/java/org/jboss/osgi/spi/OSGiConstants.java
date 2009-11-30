@@ -43,20 +43,6 @@ public interface OSGiConstants
    String PROPERTY_DEFERRED_START = "org.jboss.osgi.deferred.start";
 
    /**
-    * If set to 'true' bundles are started automatically.
-    * 
-    * The default is 'false' 
-    */
-   String PROPERTY_AUTO_START = "org.jboss.osgi.auto.start";
-
-   /**
-    * Specifies the start level for a bundle.
-    * 
-    * The default is '0' 
-    */
-   String PROPERTY_START_LEVEL = "org.jboss.osgi.start.level";
-
-   /**
     * The JBossOSGi runtime system property that denotes the path to the runtime
     */
    String OSGI_HOME = "osgi.home";
