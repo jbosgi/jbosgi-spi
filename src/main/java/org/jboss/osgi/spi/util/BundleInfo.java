@@ -134,9 +134,8 @@ public class BundleInfo implements Serializable
    public VirtualFile getRoot()
    {
       if (rootFile == null)
-      {
          rootFile = toVirtualFile(rootURL);
-      }
+      
       return rootFile;
    }
 
@@ -170,7 +169,7 @@ public class BundleInfo implements Serializable
       {
          try
          {
-            manifest = VFSUtils.getManifest(toVirtualFile(rootURL));
+            manifest = VFSUtils.getManifest(getRoot());
          }
          catch (Exception ex)
          {
