@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.osgi.spi.util.BundleInfo;
+
 /**
  * An abstract OSGi capability that can be installed in an {@link OSGiRuntime}.
  * 
@@ -46,7 +48,7 @@ public abstract class Capability
    private Map<String, String> systemProperties;
 
    private List<Capability> dependencies;
-   private List<String> bundles;
+   private List<BundleInfo> bundles;
 
    /**
     * Construct a capability that is identified by the given service name. 
@@ -128,21 +130,22 @@ public abstract class Capability
       getDependenciesInternal().add(dependency);
    }
 
-   public List<String> getBundles()
+   public List<BundleInfo> getBundles()
    {
       return Collections.unmodifiableList(getBundlesInternal());
    }
 
-   protected void addBundle(String bundle)
+   protected void addBundle(String location)
    {
-      getBundlesInternal().add(bundle);
+      BundleInfo info = BundleInfo.createBundleInfo(location);
+      getBundlesInternal().add(info);
    }
 
    private Map<String, String> getPropertiesInternal()
    {
       if (systemProperties == null)
          systemProperties = new HashMap<String, String>();
-      
+
       return systemProperties;
    }
 
@@ -154,10 +157,10 @@ public abstract class Capability
       return dependencies;
    }
 
-   private List<String> getBundlesInternal()
+   private List<BundleInfo> getBundlesInternal()
    {
       if (bundles == null)
-         bundles = new ArrayList<String>();
+         bundles = new ArrayList<BundleInfo>();
 
       return bundles;
    }
