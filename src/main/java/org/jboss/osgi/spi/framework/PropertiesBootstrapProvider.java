@@ -75,10 +75,7 @@ import org.slf4j.LoggerFactory;
  *    # Bundles that need to be started automatically 
  *    org.jboss.osgi.spi.framework.autoStart=\
  *       file://${test.archive.directory}/bundles/org.apache.felix.log.jar \
- *       file://${test.archive.directory}/bundles/jboss-osgi-logging.jar \
  *       file://${test.archive.directory}/bundles/jboss-osgi-common.jar \
- *       file://${test.archive.directory}/bundles/jboss-osgi-jmx.jar \
- *       file://${test.archive.directory}/bundles/jboss-osgi-microcontainer.jar
  * </pre>
  * 
  * @author thomas.diesler@jboss.com
