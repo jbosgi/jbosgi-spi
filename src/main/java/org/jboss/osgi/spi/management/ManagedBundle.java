@@ -44,7 +44,7 @@ import org.osgi.framework.Version;
 public class ManagedBundle implements ManagedBundleMBean
 {
    public static final String PROPERTY_ID = "id";
-   public static final String PROPERTY_SYMBOLIC_NAME = "sname";
+   public static final String PROPERTY_SYMBOLIC_NAME = "name";
    public static final String PROPERTY_VERSION = "version";
 
    private Bundle bundle;
@@ -59,14 +59,14 @@ public class ManagedBundle implements ManagedBundleMBean
    public static ObjectName getObjectName(Bundle bundle)
    {
       long id = bundle.getBundleId();
-      String symbolicName = bundle.getSymbolicName();
+      String name = bundle.getSymbolicName();
       Version version = bundle.getVersion();
-      return getObjectName(id, symbolicName, version);
+      return getObjectName(id, name, version);
    }
 
-   public static ObjectName getObjectName(long id, String sname, Version version)
+   public static ObjectName getObjectName(long id, String name, Version version)
    {
-      String oname = DOMAIN_NAME + ":" + PROPERTY_ID + "=" + id + "," + PROPERTY_SYMBOLIC_NAME + "=" + sname + "," + PROPERTY_VERSION + "=" + version;
+      String oname = DOMAIN_NAME + ":" + PROPERTY_ID + "=" + id + "," + PROPERTY_SYMBOLIC_NAME + "=" + name + "," + PROPERTY_VERSION + "=" + version;
       return ObjectNameFactory.create(oname);
    }
 
