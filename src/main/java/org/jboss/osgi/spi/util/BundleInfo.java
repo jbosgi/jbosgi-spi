@@ -211,7 +211,7 @@ public class BundleInfo implements Serializable
       if (url == null)
       {
          String prefix = System.getProperty("test.archive.directory", "target/test-libs");
-         if (new File(prefix).exists())
+         if (location.startsWith(prefix) == false && new File(prefix).exists())
             return getRealLocation(prefix + File.separator + location);
       }
          
