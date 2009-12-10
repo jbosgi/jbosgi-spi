@@ -67,7 +67,7 @@ public class BundleInfo implements Serializable
       if (url == null)
          throw new IllegalArgumentException("Cannot obtain root url from: " + location);
       
-      return new BundleInfo(toVirtualFile(url), location);
+      return new BundleInfo(toVirtualFile(url), url.toExternalForm());
    }
 
    public static BundleInfo createBundleInfo(URL url)
@@ -179,6 +179,18 @@ public class BundleInfo implements Serializable
       return manifest;
    }
 
+   private static VirtualFile toVirtualFile(URL url)
+   {
+      try
+      {
+         return VFS.getRoot(url);
+      }
+      catch (IOException e)
+      {
+         throw new IllegalArgumentException("Invalid root url: " + url, e);
+      }
+   }
+
    private static URL getRealLocation(String location)
    {
       // Try location as URL
@@ -217,19 +229,7 @@ public class BundleInfo implements Serializable
          
       return url;
    }
-
-   private static VirtualFile toVirtualFile(URL url)
-   {
-      try
-      {
-         return VFS.getRoot(url);
-      }
-      catch (IOException e)
-      {
-         throw new IllegalArgumentException("Invalid root url: " + url, e);
-      }
-   }
-
+   
    private static URL toURL(VirtualFile file)
    {
       try
