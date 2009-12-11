@@ -95,6 +95,11 @@ public class ManagedBundle implements ManagedBundleMBean
       return bundle.getSymbolicName();
    }
 
+   public String getLocation()
+   {
+      return bundle.getLocation();
+   }
+
    @SuppressWarnings("rawtypes")
    public Dictionary<String, String> getHeaders()
    {

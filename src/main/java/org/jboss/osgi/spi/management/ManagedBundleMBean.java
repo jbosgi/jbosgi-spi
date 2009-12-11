@@ -64,6 +64,11 @@ public interface ManagedBundleMBean
    String getSymbolicName();
 
    /**
+    * Returns the location of this bundle
+    */
+   String getLocation();
+
+   /**
     * Returns the bundle manifest headers
     */
    Dictionary<String, String> getHeaders();
