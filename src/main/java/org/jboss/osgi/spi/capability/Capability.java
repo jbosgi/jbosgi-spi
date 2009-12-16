@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.osgi.spi.util.BundleInfo;
+import org.osgi.framework.BundleException;
 
 /**
  * An abstract OSGi capability that can be installed in an {@link OSGiRuntime}.
@@ -137,7 +138,19 @@ public abstract class Capability
 
    protected void addBundle(String location)
    {
-      BundleInfo info = BundleInfo.createBundleInfo(location);
+      BundleInfo info;
+      try
+      {
+         info = BundleInfo.createBundleInfo(location);
+      }
+      catch (BundleException ex)
+      {
+         Throwable cause = ex.getCause();
+         if (cause instanceof RuntimeException)
+            throw (RuntimeException)cause;
+         
+         throw new IllegalArgumentException("Cannot create bundle info for: " + location, ex);
+      }
       getBundlesInternal().add(info);
    }
 

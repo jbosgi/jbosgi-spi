@@ -34,6 +34,7 @@ import java.util.jar.Manifest;
 import org.jboss.virtual.VFS;
 import org.jboss.virtual.VFSUtils;
 import org.jboss.virtual.VirtualFile;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 
@@ -58,7 +59,7 @@ public class BundleInfo implements Serializable
    private transient VirtualFile rootFile;
    private transient Manifest manifest;
 
-   public static BundleInfo createBundleInfo(String location)
+   public static BundleInfo createBundleInfo(String location) throws BundleException
    {
       if (location == null)
          throw new IllegalArgumentException("Location cannot be null");
@@ -70,7 +71,7 @@ public class BundleInfo implements Serializable
       return new BundleInfo(toVirtualFile(url), url.toExternalForm());
    }
 
-   public static BundleInfo createBundleInfo(URL url)
+   public static BundleInfo createBundleInfo(URL url) throws BundleException
    {
       if (url == null)
          throw new IllegalArgumentException("Null root url");
@@ -78,17 +79,17 @@ public class BundleInfo implements Serializable
       return new BundleInfo(toVirtualFile(url), url.toExternalForm());
    }
 
-   public static BundleInfo createBundleInfo(VirtualFile root)
+   public static BundleInfo createBundleInfo(VirtualFile root) throws BundleException
    {
       return new BundleInfo(root, null);
    }
 
-   public static BundleInfo createBundleInfo(VirtualFile root, String location)
+   public static BundleInfo createBundleInfo(VirtualFile root, String location) throws BundleException
    {
       return new BundleInfo(root, location);
    }
 
-   private BundleInfo(VirtualFile rootFile, String location)
+   private BundleInfo(VirtualFile rootFile, String location) throws BundleException
    {
       if (rootFile == null)
          throw new IllegalArgumentException("Root file cannot be null");
@@ -101,6 +102,16 @@ public class BundleInfo implements Serializable
          location = rootURL.toExternalForm();
       
       this.location = location;
+      
+      // Initialize the manifest
+      try
+      {
+         manifest = VFSUtils.getManifest(rootFile);
+      }
+      catch (Exception ex)
+      {
+         throw new BundleException("Cannot get manifest from: " + rootURL, ex);
+      }
 
       symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
       if (symbolicName == null)
@@ -163,7 +174,7 @@ public class BundleInfo implements Serializable
       return Version.parseVersion(version);
    }
 
-   private Manifest getManifest()
+   private Manifest getManifest() 
    {
       if (manifest == null)
       {
@@ -173,7 +184,7 @@ public class BundleInfo implements Serializable
          }
          catch (Exception ex)
          {
-            throw new IllegalArgumentException("Cannot get manifest from: " + rootURL, ex);
+            throw new IllegalStateException("Cannot get manifest from: " + rootURL, ex);
          }
       }
       return manifest;
