@@ -54,7 +54,7 @@ public class BundleInfo implements Serializable
    private URL rootURL;
    private String location;
    private String symbolicName;
-   private String version;
+   private String bundleVersion;
 
    private transient VirtualFile rootFile;
    private transient Manifest manifest;
@@ -67,7 +67,7 @@ public class BundleInfo implements Serializable
       URL url = getRealLocation(location);
       if (url == null)
          throw new IllegalArgumentException("Cannot obtain root url from: " + location);
-      
+
       return new BundleInfo(toVirtualFile(url), url.toExternalForm());
    }
 
@@ -75,7 +75,7 @@ public class BundleInfo implements Serializable
    {
       if (url == null)
          throw new IllegalArgumentException("Null root url");
-      
+
       return new BundleInfo(toVirtualFile(url), url.toExternalForm());
    }
 
@@ -100,9 +100,9 @@ public class BundleInfo implements Serializable
       // Derive the location from the root
       if (location == null)
          location = rootURL.toExternalForm();
-      
+
       this.location = location;
-      
+
       // Initialize the manifest
       try
       {
@@ -113,12 +113,58 @@ public class BundleInfo implements Serializable
          throw new BundleException("Cannot get manifest from: " + rootURL, ex);
       }
 
-      symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
-      if (symbolicName == null)
-         throw new IllegalArgumentException("Cannot obtain Bundle-SymbolicName for: " + rootFile);
+      // A bundle manifest must express the version of the OSGi manifest header
+      // syntax in the Bundle-ManifestVersion header. Bundles exploiting this version 
+      // of the Framework specification (or later) must specify this header.
+      // The Framework version 1.3 (or later) bundle manifest version must be ’2’.
+      // Bundle manifests written to previous specifications’ manifest syntax are
+      // taken to have a bundle manifest version of '1', although there is no way to
+      // express this in such manifests. 
+      String manifestVersion = getManifestHeader(Constants.BUNDLE_MANIFESTVERSION);
+      if (manifestVersion == null)
+         manifestVersion = "1";
 
-      version = getManifestHeader(Constants.BUNDLE_VERSION);
-      version = Version.parseVersion(version).toString();
+      symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
+      bundleVersion = getManifestHeader(Constants.BUNDLE_VERSION);
+      
+      // R3 Framework
+      if (manifestVersion.equals("1"))
+      {
+         if (symbolicName != null)
+            throw new IllegalArgumentException("Invalid Bundle-ManifestVersion:=1 for " + symbolicName);
+
+         // Generate default symbolic name
+         String name = getManifestHeader(Constants.BUNDLE_NAME);
+         symbolicName = name.replace(' ', '-');
+         
+         // Parse the Bundle-Version string
+         try
+         {
+            bundleVersion = Version.parseVersion(bundleVersion).toString();
+         }
+         catch (NumberFormatException ex)
+         {
+            // Install expected to succeed on invalid Bundle-Version
+            // https://www.osgi.org/members/bugzilla/show_bug.cgi?id=1503
+            bundleVersion = Version.emptyVersion.toString();
+         }
+      }
+      
+      // R4 Framework
+      else if (manifestVersion.equals("2"))
+      {
+         if (symbolicName == null)
+            throw new IllegalArgumentException("Cannot obtain Bundle-SymbolicName for: " + rootFile);
+         
+         // Parse the Bundle-Version string
+         bundleVersion = Version.parseVersion(bundleVersion).toString();
+      }
+      
+      // Unsupported Bundle-ManifestVersion
+      else
+      {
+         throw new IllegalArgumentException("Unsupported Bundle-ManifestVersion: " + manifestVersion);
+      }
    }
 
    /**
@@ -146,7 +192,7 @@ public class BundleInfo implements Serializable
    {
       if (rootFile == null)
          rootFile = toVirtualFile(rootURL);
-      
+
       return rootFile;
    }
 
@@ -171,10 +217,10 @@ public class BundleInfo implements Serializable
     */
    public Version getVersion()
    {
-      return Version.parseVersion(version);
+      return Version.parseVersion(bundleVersion);
    }
 
-   private Manifest getManifest() 
+   private Manifest getManifest()
    {
       if (manifest == null)
       {
@@ -229,7 +275,7 @@ public class BundleInfo implements Serializable
             // ignore
          }
       }
-      
+
       // Try to prefix the location with the test archive directory
       if (url == null)
       {
@@ -237,10 +283,10 @@ public class BundleInfo implements Serializable
          if (location.startsWith(prefix) == false && new File(prefix).exists())
             return getRealLocation(prefix + File.separator + location);
       }
-         
+
       return url;
    }
-   
+
    private static URL toURL(VirtualFile file)
    {
       try
@@ -255,7 +301,7 @@ public class BundleInfo implements Serializable
 
    private String toEqualString()
    {
-      return "[" + symbolicName + "-" + version + ",url=" + rootURL + "]";
+      return "[" + symbolicName + "-" + bundleVersion + ",url=" + rootURL + "]";
    }
 
    @Override
