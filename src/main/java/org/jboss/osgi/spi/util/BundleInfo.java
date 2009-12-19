@@ -134,8 +134,7 @@ public class BundleInfo implements Serializable
             throw new IllegalArgumentException("Invalid Bundle-ManifestVersion:=1 for " + symbolicName);
 
          // Generate default symbolic name
-         String name = getManifestHeader(Constants.BUNDLE_NAME);
-         symbolicName = name.replace(' ', '-');
+         symbolicName = "anonymous-bundle";
          
          // Parse the Bundle-Version string
          try
