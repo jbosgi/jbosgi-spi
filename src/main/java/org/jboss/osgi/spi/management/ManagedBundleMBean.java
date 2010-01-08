@@ -23,6 +23,7 @@ package org.jboss.osgi.spi.management;
 
 //$Id$
 
+import java.net.URL;
 import java.util.Dictionary;
 
 import javax.management.ObjectName;
@@ -34,7 +35,7 @@ import org.osgi.framework.BundleException;
  * 
  * Bundles are registered under the name
  * 
- * jboss.osgi:bundle=[SymbolicName],id=[BundleId]
+ * jboss.osgi:name=[SymbolicName],id=[BundleId],version=[BundleVersion]
  * 
  * @author thomas.diesler@jboss.com
  * @since 04-Mar-2009
@@ -78,6 +79,30 @@ public interface ManagedBundleMBean
     */
    String getProperty(String key);
 
+   /**
+    * Loads the specified class using this bundle's class loader. 
+    * 
+    * @param name The name of the class to load
+    * @return The object name of the bundle that is wired to this bundle class loader and contains the class.
+    * @throws ClassNotFoundException If no such class can be found or if this bundle is a fragment bundle
+    */
+   ObjectName loadClass(String name) throws ClassNotFoundException;
+   
+   /**
+    * Returns a URL to the entry at the specified path in this bundle.
+    * 
+    * @param name The path name of the entry
+    * @return A URL to the entry, or null if no entry could be found
+    */
+   URL getEntry(String path);
+   
+   /**
+    * Find the specified resource from this bundle's class loader. 
+    * @param name The name of the resource.
+    * @return A URL to the named resource, or null if the resource could not be found
+    */
+   URL getResource(String name);
+   
    /**
     * Starts this bundle with no options
     */

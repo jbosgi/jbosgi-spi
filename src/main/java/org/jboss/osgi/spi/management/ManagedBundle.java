@@ -25,6 +25,7 @@ package org.jboss.osgi.spi.management;
 
 import static org.jboss.osgi.spi.OSGiConstants.DOMAIN_NAME;
 
+import java.net.URL;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -32,8 +33,11 @@ import java.util.Hashtable;
 import javax.management.ObjectName;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
+import org.osgi.service.packageadmin.PackageAdmin;
 
 /**
  * The managed view of an OSGi Bundle
@@ -115,6 +119,26 @@ public class ManagedBundle implements ManagedBundleMBean
       return retHeaders;
    }
 
+   public URL getEntry(String path)
+   {
+      return bundle.getEntry(path);
+   }
+
+   public URL getResource(String name)
+   {
+      return bundle.getResource(name);
+   }
+
+   public ObjectName loadClass(String name) throws ClassNotFoundException
+   {
+      Class<?> clazz = bundle.loadClass(name);
+      BundleContext context = bundle.getBundleContext();
+      ServiceReference sref = context.getServiceReference(PackageAdmin.class.getName());
+      PackageAdmin packageAdmin = (PackageAdmin)context.getService(sref);
+      Bundle providingBundle = packageAdmin.getBundle(clazz);
+      return getObjectName(providingBundle);
+   }
+   
    public void start() throws BundleException
    {
       bundle.start();
