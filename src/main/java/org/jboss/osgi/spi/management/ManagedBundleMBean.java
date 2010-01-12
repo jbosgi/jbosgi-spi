@@ -23,7 +23,6 @@ package org.jboss.osgi.spi.management;
 
 //$Id$
 
-import java.net.URL;
 import java.util.Dictionary;
 
 import javax.management.ObjectName;
@@ -89,19 +88,19 @@ public interface ManagedBundleMBean
    ObjectName loadClass(String name) throws ClassNotFoundException;
    
    /**
-    * Returns a URL to the entry at the specified path in this bundle.
+    * Returns a string encoded URL to the entry at the specified path in this bundle.
     * 
     * @param name The path name of the entry
     * @return A URL to the entry, or null if no entry could be found
     */
-   URL getEntry(String path);
+   String getEntry(String path);
    
    /**
     * Find the specified resource from this bundle's class loader. 
     * @param name The name of the resource.
-    * @return A URL to the named resource, or null if the resource could not be found
+    * @return A string encoded URL to the named resource, or null if the resource could not be found
     */
-   URL getResource(String name);
+   String getResource(String name);
    
    /**
     * Starts this bundle with no options

@@ -68,4 +68,9 @@ public interface ManagedFramework
     * Refresh packages through the PackageAdmin service
     */
    void refreshPackages(ObjectName[] bundles);
+   
+   /**
+    * Resolve bundles through the PackageAdmin service
+    */
+   boolean resolveBundles(ObjectName[] bundles);
 }

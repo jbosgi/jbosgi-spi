@@ -119,14 +119,16 @@ public class ManagedBundle implements ManagedBundleMBean
       return retHeaders;
    }
 
-   public URL getEntry(String path)
+   public String getEntry(String path)
    {
-      return bundle.getEntry(path);
+      URL url = bundle.getEntry(path);
+      return url != null ? url.toExternalForm() : null;
    }
 
-   public URL getResource(String name)
+   public String getResource(String name)
    {
-      return bundle.getResource(name);
+      URL url = bundle.getResource(name);
+      return url != null ? url.toExternalForm() : null;
    }
 
    public ObjectName loadClass(String name) throws ClassNotFoundException
