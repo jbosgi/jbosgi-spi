@@ -38,7 +38,7 @@ import org.osgi.framework.Bundle;
  * @author thomas.Diesler@jboss.org
  * @since 03-Feb-2009
  */
-public class BundleClassLoader extends ClassLoader
+public final class BundleClassLoader extends ClassLoader
 {
    private final Bundle bundle;
 
