@@ -105,11 +105,16 @@ public class ManagedBundle implements ManagedBundleMBean
       return bundle.getLocation();
    }
 
-   @SuppressWarnings("rawtypes")
    public Dictionary<String, String> getHeaders()
    {
+      return getHeaders(null);
+   }
+
+   @SuppressWarnings("rawtypes")
+   public Dictionary<String, String> getHeaders(String locale)
+   {
       Hashtable<String, String> retHeaders = new Hashtable<String, String>();
-      Dictionary bundleHeaders = bundle.getHeaders();
+      Dictionary bundleHeaders = bundle.getHeaders(locale);
       Enumeration keys = bundleHeaders.keys();
       while (keys.hasMoreElements())
       {

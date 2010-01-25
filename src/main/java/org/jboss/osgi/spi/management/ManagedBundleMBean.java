@@ -75,6 +75,11 @@ public interface ManagedBundleMBean
    Dictionary<String, String> getHeaders();
 
    /**
+    * Returns this bundle's Manifest headers and values localized to the specified locale.
+    */
+   Dictionary<String, String> getHeaders(String locale);
+   
+   /**
     * Returns the value of the specified property from the BundleContext.
     */
    String getProperty(String key);
