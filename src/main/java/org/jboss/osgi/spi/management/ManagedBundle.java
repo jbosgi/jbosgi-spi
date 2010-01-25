@@ -25,6 +25,7 @@ package org.jboss.osgi.spi.management;
 
 import static org.jboss.osgi.spi.OSGiConstants.DOMAIN_NAME;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -141,6 +142,12 @@ public class ManagedBundle implements ManagedBundleMBean
       return getObjectName(providingBundle);
    }
    
+   public File getDataFile(String filename)
+   {
+      BundleContext context = bundle.getBundleContext();
+      return context.getDataFile(filename);
+   }
+
    public void start() throws BundleException
    {
       bundle.start();

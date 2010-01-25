@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 
 import javax.management.Attribute;
@@ -301,6 +302,8 @@ public class MBeanProxy
                result = ((RuntimeMBeanException)result).getTargetException();
             else if (result instanceof RuntimeErrorException)
                result = ((RuntimeErrorException)result).getTargetError();
+            else if (result instanceof UndeclaredThrowableException)
+               result = ((UndeclaredThrowableException)result).getUndeclaredThrowable();
             else
                // can't decode
                break;

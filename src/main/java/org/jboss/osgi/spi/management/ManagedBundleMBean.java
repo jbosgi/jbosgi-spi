@@ -23,6 +23,7 @@ package org.jboss.osgi.spi.management;
 
 //$Id$
 
+import java.io.File;
 import java.util.Dictionary;
 
 import javax.management.ObjectName;
@@ -102,6 +103,11 @@ public interface ManagedBundleMBean
     */
    String getResource(String name);
    
+   /**
+    * Creates a File object for a file in the persistent storage area provided for the bundle by the Framework.
+    */
+   File getDataFile(String filename);
+
    /**
     * Starts this bundle with no options
     */
