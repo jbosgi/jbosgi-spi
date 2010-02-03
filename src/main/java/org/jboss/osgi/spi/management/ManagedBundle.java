@@ -63,6 +63,9 @@ public class ManagedBundle implements ManagedBundleMBean
 
    public static ObjectName getObjectName(Bundle bundle)
    {
+      if (bundle == null)
+         throw new IllegalArgumentException("Null bundle");
+      
       long id = bundle.getBundleId();
       String name = bundle.getSymbolicName();
       Version version = bundle.getVersion();
@@ -144,7 +147,7 @@ public class ManagedBundle implements ManagedBundleMBean
       ServiceReference sref = context.getServiceReference(PackageAdmin.class.getName());
       PackageAdmin packageAdmin = (PackageAdmin)context.getService(sref);
       Bundle providingBundle = packageAdmin.getBundle(clazz);
-      return getObjectName(providingBundle);
+      return providingBundle != null ? getObjectName(providingBundle) : null;
    }
    
    public File getDataFile(String filename)

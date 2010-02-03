@@ -31,6 +31,7 @@ import org.osgi.service.http.HttpService;
  * 
  * It is ignored if the {@link HttpService} is already registered.
  * 
+ * Dependent Capability: {@link ConfigAdminCapability}
  * Installed bundles: pax-web-jetty-bundle.jar
  * 
  * Default properties set by this capability
@@ -49,7 +50,7 @@ public class HttpServiceCapability extends Capability
    {
       super(HttpService.class.getName());
       addSystemProperty("org.osgi.service.http.port", "8090");
-
+      addDependency(new ConfigAdminCapability());
       addBundle("bundles/pax-web-jetty-bundle.jar");
    }
 }
