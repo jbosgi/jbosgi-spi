@@ -52,12 +52,14 @@ public class ManagedBundle implements ManagedBundleMBean
    public static final String PROPERTY_SYMBOLIC_NAME = "name";
    public static final String PROPERTY_VERSION = "version";
 
+   private BundleContext systemContext;
    private Bundle bundle;
    private ObjectName oname;
 
-   public ManagedBundle(Bundle bundle)
+   public ManagedBundle(BundleContext context, Bundle bundle)
    {
       this.bundle = bundle;
+      this.systemContext = context;
       this.oname = getObjectName(bundle);
    }
 
@@ -143,10 +145,7 @@ public class ManagedBundle implements ManagedBundleMBean
    public ObjectName loadClass(String name) throws ClassNotFoundException
    {
       Class<?> clazz = bundle.loadClass(name);
-      BundleContext context = bundle.getBundleContext();
-      ServiceReference sref = context.getServiceReference(PackageAdmin.class.getName());
-      PackageAdmin packageAdmin = (PackageAdmin)context.getService(sref);
-      Bundle providingBundle = packageAdmin.getBundle(clazz);
+      Bundle providingBundle = getPackageAdmin().getBundle(clazz);
       return providingBundle != null ? getObjectName(providingBundle) : null;
    }
    
@@ -169,5 +168,11 @@ public class ManagedBundle implements ManagedBundleMBean
    public void update() throws BundleException
    {
       bundle.update();
+   }
+
+   private PackageAdmin getPackageAdmin()
+   {
+      ServiceReference sref = systemContext.getServiceReference(PackageAdmin.class.getName());
+      return (PackageAdmin)systemContext.getService(sref);
    }
 }
