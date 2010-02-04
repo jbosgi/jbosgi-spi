@@ -120,15 +120,15 @@ public class BundleInfo implements Serializable
       // Bundle manifests written to previous specifications’ manifest syntax are
       // taken to have a bundle manifest version of '1', although there is no way to
       // express this in such manifests. 
-      String manifestVersion = getManifestHeader(Constants.BUNDLE_MANIFESTVERSION);
-      if (manifestVersion == null)
-         manifestVersion = "1";
+      int manifestVersion = getBundleManifestVersion(manifest);
+      if (manifestVersion < 0)
+         throw new BundleException("Cannot parse OSGi manifest for: " + rootURL);
 
       symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
       bundleVersion = getManifestHeader(Constants.BUNDLE_VERSION);
       
       // R3 Framework
-      if (manifestVersion.equals("1"))
+      if (manifestVersion == 1)
       {
          if (symbolicName != null)
             throw new IllegalArgumentException("Invalid Bundle-ManifestVersion:=1 for " + symbolicName);
@@ -150,7 +150,7 @@ public class BundleInfo implements Serializable
       }
       
       // R4 Framework
-      else if (manifestVersion.equals("2"))
+      else if (manifestVersion == 2)
       {
          if (symbolicName == null)
             throw new IllegalArgumentException("Cannot obtain Bundle-SymbolicName for: " + rootFile);
@@ -167,12 +167,34 @@ public class BundleInfo implements Serializable
    }
 
    /**
+    * Get the bundle manifest version.
+    * @param manifest The given manifest
+    * @return The value of the Bundle-ManifestVersion header, or -1 for a non OSGi manifest 
+    */
+   public static int getBundleManifestVersion(Manifest manifest)
+   {
+      if (manifest == null)
+         throw new IllegalArgumentException("Null manifest");
+      
+      // At least one of these manifest headers must be there
+      // Note, in R3 and R4 there is no common mandatory header
+      String bundleName = getManifestHeaderInternal(manifest, Constants.BUNDLE_NAME);
+      String bundleSymbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
+      String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
+      
+      if (bundleName == null && bundleSymbolicName == null && bundleVersion == null)
+         return -1;
+      
+      String manifestVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_MANIFESTVERSION);
+      return manifestVersion != null ? Integer.parseInt(manifestVersion) : 1;
+   }
+   
+   /**
     * Get the manifest header for the given key.
     */
    public String getManifestHeader(String key)
    {
-      Attributes attribs = getManifest().getMainAttributes();
-      String value = attribs.getValue(key);
+      String value = getManifestHeaderInternal(getManifest(), key);
       return value;
    }
 
@@ -303,6 +325,13 @@ public class BundleInfo implements Serializable
       return "[" + symbolicName + "-" + bundleVersion + ",url=" + rootURL + "]";
    }
 
+   private static String getManifestHeaderInternal(Manifest manifest, String key)
+   {
+      Attributes attribs = manifest.getMainAttributes();
+      String value = attribs.getValue(key);
+      return value;
+   }
+   
    @Override
    public boolean equals(Object obj)
    {
