@@ -58,6 +58,11 @@ public class ManagedBundle implements ManagedBundleMBean
 
    public ManagedBundle(BundleContext context, Bundle bundle)
    {
+      if (context == null)
+         throw new IllegalArgumentException("Null system context");
+      if (bundle == null)
+         throw new IllegalArgumentException("Null bundle");
+      
       this.bundle = bundle;
       this.systemContext = context;
       this.oname = getObjectName(bundle);
