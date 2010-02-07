@@ -33,12 +33,15 @@ import java.util.Hashtable;
 
 import javax.management.ObjectName;
 
+import org.jboss.osgi.spi.util.ConstantsHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.service.packageadmin.PackageAdmin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The managed view of an OSGi Bundle
@@ -48,6 +51,9 @@ import org.osgi.service.packageadmin.PackageAdmin;
  */
 public class ManagedBundle implements ManagedBundleMBean
 {
+   // Provide logging
+   final Logger log = LoggerFactory.getLogger(ManagedBundle.class);
+   
    public static final String PROPERTY_ID = "id";
    public static final String PROPERTY_SYMBOLIC_NAME = "name";
    public static final String PROPERTY_VERSION = "version";
@@ -56,16 +62,19 @@ public class ManagedBundle implements ManagedBundleMBean
    private Bundle bundle;
    private ObjectName oname;
 
-   public ManagedBundle(BundleContext context, Bundle bundle)
+   public ManagedBundle(BundleContext syscontext, Bundle bundle)
    {
-      if (context == null)
+      if (syscontext == null)
          throw new IllegalArgumentException("Null system context");
       if (bundle == null)
          throw new IllegalArgumentException("Null bundle");
       
       this.bundle = bundle;
-      this.systemContext = context;
+      this.systemContext = syscontext;
       this.oname = getObjectName(bundle);
+      
+      if (log.isTraceEnabled())
+         log.trace("new ManagedBundle[" + oname + "]");
    }
 
    public static ObjectName getObjectName(Bundle bundle)
@@ -92,12 +101,22 @@ public class ManagedBundle implements ManagedBundleMBean
 
    public String getProperty(String key)
    {
-      return bundle.getBundleContext().getProperty(key);
+      String value = bundle.getBundleContext().getProperty(key);
+      
+      if (log.isTraceEnabled())
+         log.trace("getProperty[" + oname + "](" + key + ") => " + value);
+      
+      return value;
    }
 
    public int getState()
    {
-      return bundle.getState();
+      int state = bundle.getState();
+      
+      if (log.isTraceEnabled())
+         log.trace("getState[" + oname + "] => " + ConstantsHelper.bundleState(state));
+      
+      return state;
    }
 
    public long getBundleId()
@@ -112,7 +131,12 @@ public class ManagedBundle implements ManagedBundleMBean
 
    public String getLocation()
    {
-      return bundle.getLocation();
+      String location = bundle.getLocation();
+      
+      if (log.isTraceEnabled())
+         log.trace("getLocation[" + oname + "] => " + location);
+      
+      return location;
    }
 
    public Dictionary<String, String> getHeaders()
@@ -132,46 +156,79 @@ public class ManagedBundle implements ManagedBundleMBean
          String value = (String)bundleHeaders.get(key);
          retHeaders.put(key, value);
       }
+      
+      if (log.isTraceEnabled())
+         log.trace("getHeaders[" + oname + "](" + locale + ") => " + retHeaders);
+      
       return retHeaders;
    }
 
    public String getEntry(String path)
    {
       URL url = bundle.getEntry(path);
-      return url != null ? url.toExternalForm() : null;
+      String entry = url != null ? url.toExternalForm() : null;
+      
+      if (log.isTraceEnabled())
+         log.trace("getEntry[" + oname + "](" + path + ") => " + entry);
+      
+      return entry;
    }
 
    public String getResource(String name)
    {
       URL url = bundle.getResource(name);
-      return url != null ? url.toExternalForm() : null;
+      String resource = url != null ? url.toExternalForm() : null;
+      
+      if (log.isTraceEnabled())
+         log.trace("getResource[" + oname + "](" + name + ") => " + resource);
+      
+      return resource;
    }
 
    public ObjectName loadClass(String name) throws ClassNotFoundException
    {
       Class<?> clazz = bundle.loadClass(name);
       Bundle providingBundle = getPackageAdmin().getBundle(clazz);
-      return providingBundle != null ? getObjectName(providingBundle) : null;
+      ObjectName oname = providingBundle != null ? getObjectName(providingBundle) : null;
+
+      if (log.isTraceEnabled())
+         log.trace("loadClass[" + oname + "](" + name + ") => " + oname);
+      
+      return oname;
    }
    
    public File getDataFile(String filename)
    {
       BundleContext context = bundle.getBundleContext();
-      return context.getDataFile(filename);
+      File dataFile = context.getDataFile(filename);
+
+      if (log.isTraceEnabled())
+         log.trace("getDataFile[" + oname + "](" + filename + ") => " + dataFile);
+      
+      return dataFile;
    }
 
    public void start() throws BundleException
    {
+      if (log.isTraceEnabled())
+         log.trace("start[" + oname + "]");
+      
       bundle.start();
    }
 
    public void stop() throws BundleException
    {
+      if (log.isTraceEnabled())
+         log.trace("stop[" + oname + "]");
+      
       bundle.stop();
    }
 
    public void update() throws BundleException
    {
+      if (log.isTraceEnabled())
+         log.trace("update[" + oname + "]");
+      
       bundle.update();
    }
 
