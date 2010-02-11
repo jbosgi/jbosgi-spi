@@ -35,8 +35,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A generic Bundle wrapper that delegates all method calls to the underlying 
@@ -47,9 +45,6 @@ import org.slf4j.LoggerFactory;
  */
 public class BundleWrapper implements Bundle
 {
-   // Provide logging
-   final Logger log = LoggerFactory.getLogger(BundleWrapper.class);
-
    protected Bundle bundle;
 
    public BundleWrapper(Bundle bundle)

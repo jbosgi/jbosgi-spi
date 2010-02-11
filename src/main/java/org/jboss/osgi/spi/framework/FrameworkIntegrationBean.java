@@ -29,13 +29,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.util.ExportedPackageHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An abstraction of an OSGi Framework.
@@ -49,7 +48,7 @@ import org.slf4j.LoggerFactory;
 public abstract class FrameworkIntegrationBean
 {
    // Provide logging
-   final Logger log = LoggerFactory.getLogger(FrameworkIntegrationBean.class);
+   private static final Logger log = Logger.getLogger(FrameworkIntegrationBean.class);
 
    private Map<String, Object> properties = new HashMap<String, Object>();
    private List<URL> autoInstall = new ArrayList<URL>();

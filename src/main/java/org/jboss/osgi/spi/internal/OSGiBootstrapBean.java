@@ -37,6 +37,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
+import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.framework.PropertiesBootstrapProvider;
@@ -44,8 +45,6 @@ import org.jboss.osgi.spi.util.ServiceLoader;
 import org.kohsuke.args4j.Option;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An internal bean that collabrates with {@link OSGiBootstrap}.
@@ -103,7 +102,7 @@ public class OSGiBootstrapBean
 
       // This property must be set before the logger is obtained
       System.setProperty(OSGI_SERVER_HOME, osgiServerHome);
-      log = LoggerFactory.getLogger(OSGiBootstrapBean.class);
+      log = Logger.getLogger(OSGiBootstrapBean.class);
 
       Properties defaults = new Properties();
       defaults.setProperty(OSGI_SERVER_NAME, serverName);
@@ -131,7 +130,7 @@ public class OSGiBootstrapBean
    public static OSGiBootstrapProvider getBootstrapProvider()
    {
       if (log == null)
-         log = LoggerFactory.getLogger(OSGiBootstrap.class);
+         log = Logger.getLogger(OSGiBootstrap.class);
       
       OSGiBootstrapProvider provider = null;
 

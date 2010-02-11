@@ -33,6 +33,7 @@ import java.util.Hashtable;
 
 import javax.management.ObjectName;
 
+import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.util.ConstantsHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -40,8 +41,6 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.service.packageadmin.PackageAdmin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The managed view of an OSGi Bundle
@@ -52,7 +51,7 @@ import org.slf4j.LoggerFactory;
 public class ManagedBundle implements ManagedBundleMBean
 {
    // Provide logging
-   final Logger log = LoggerFactory.getLogger(ManagedBundle.class);
+   private static final Logger log = Logger.getLogger(ManagedBundle.class);
    
    public static final String PROPERTY_ID = "id";
    public static final String PROPERTY_SYMBOLIC_NAME = "name";

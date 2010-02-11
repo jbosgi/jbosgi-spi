@@ -36,8 +36,6 @@ import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A generic Framework wrapper that delegates all method calls to the underlying 
@@ -48,9 +46,6 @@ import org.slf4j.LoggerFactory;
  */
 public class FrameworkWrapper implements Framework
 {
-   // Provide logging
-   final Logger log = LoggerFactory.getLogger(FrameworkWrapper.class);
-
    protected Framework framework;
 
    public FrameworkWrapper(Framework framework)

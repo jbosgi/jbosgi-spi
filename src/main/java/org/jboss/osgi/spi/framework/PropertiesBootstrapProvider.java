@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.internal.StringPropertyReplacer;
 import org.jboss.osgi.spi.util.ExportedPackageHelper;
 import org.jboss.osgi.spi.util.ServiceLoader;
@@ -45,8 +46,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A simple properties based bootstrap provider
@@ -84,7 +83,7 @@ import org.slf4j.LoggerFactory;
 public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
 {
    // Provide logging
-   final Logger log = LoggerFactory.getLogger(PropertiesBootstrapProvider.class);
+   private static final Logger log = Logger.getLogger(PropertiesBootstrapProvider.class);
 
    /** The default framework property: jboss.osgi.framework.properties */
    public static final String OSGI_FRAMEWORK_CONFIG = "jboss.osgi.framework.properties";

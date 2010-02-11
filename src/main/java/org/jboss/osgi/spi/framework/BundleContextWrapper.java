@@ -37,8 +37,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A generic BundleContext wrapper that delegates all method calls to the underlying 
@@ -49,9 +47,6 @@ import org.slf4j.LoggerFactory;
  */
 public class BundleContextWrapper implements BundleContext
 {
-   // Provide logging
-   final Logger log = LoggerFactory.getLogger(BundleContextWrapper.class);
-
    protected BundleContext context;
 
    public BundleContextWrapper(BundleContext context)
