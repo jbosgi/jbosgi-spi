@@ -25,6 +25,7 @@ package org.jboss.osgi.spi.management;
 
 import javax.management.ObjectName;
 
+
 /**
  * The managed view of an OSGi Framework
  * 

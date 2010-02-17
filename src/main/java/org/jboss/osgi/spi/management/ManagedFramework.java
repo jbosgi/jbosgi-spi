@@ -21,35 +21,20 @@
  */
 package org.jboss.osgi.spi.management;
 
+
 //$Id$
 
-import java.util.Set;
-
-import javax.management.ObjectName;
 
 /**
  * The managed view of an OSGi Framework
+ * 
+ * Deprecated: Use FrameworkMBean
  * 
  * @author thomas.diesler@jboss.com
  * @since 04-Mar-2009
  */
 public interface ManagedFramework
 {
-   /**
-    * Get the list of all installed bundles
-    */
-   Set<ObjectName> getBundles();
-   
-   /**
-    * Get the installed bundle 
-    */
-   ObjectName getBundle(String symbolicName, String version);
-   
-   /**
-    * Get the installed bundle 
-    */
-   ObjectName getBundle(long bundleId);
-   
    /**
     * Returns a ServiceReference object for a service that implements and was registered 
     * under the specified class.
@@ -66,11 +51,17 @@ public interface ManagedFramework
    
    /**
     * Refresh packages through the PackageAdmin service
+    * 
+    * JMX FrameworkMBean does not allow to resolve/refresh all bundles
+    * https://www.osgi.org/members/bugzilla/show_bug.cgi?id=1586
     */
-   void refreshPackages(ObjectName[] bundles);
+   void refreshAllPackages();
    
    /**
     * Resolve bundles through the PackageAdmin service
+    * 
+    * JMX FrameworkMBean does not allow to resolve/refresh all bundles
+    * https://www.osgi.org/members/bugzilla/show_bug.cgi?id=1586
     */
-   boolean resolveBundles(ObjectName[] bundles);
+   boolean resolveAllBundles();
 }

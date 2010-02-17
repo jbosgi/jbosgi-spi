@@ -33,7 +33,7 @@ import org.jboss.osgi.spi.util.BundleInfo;
 import org.osgi.framework.BundleException;
 
 /**
- * An abstract OSGi capability that can be installed in an {@link OSGiRuntime}.
+ * An abstract OSGi capability that can be installed in an OSGiRuntime.
  * 
  * The capability is only installed if the service name given in the constructor is not already registered with the OSGi framework.
  * 
@@ -54,7 +54,7 @@ public abstract class Capability
    /**
     * Construct a capability that is identified by the given service name. 
     * 
-    * If the service name is already registered with the {@link OSGiRuntime} adding this capability
+    * If the service name is already registered with the OSGiRuntime adding this capability
     * does nothing.
     * 
     * If the service name is null the capability will install each associated bundle unless a bundle with the 
@@ -70,7 +70,7 @@ public abstract class Capability
    /**
     * Construct a capability that is identified by the given service name and filter string.
     * 
-    * If the service is already registered with the {@link OSGiRuntime} adding this capability
+    * If the service is already registered with the OSGiRuntime adding this capability
     * does nothing.
     */
    public Capability(String serviceName, String filter)

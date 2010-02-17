@@ -24,7 +24,7 @@ package org.jboss.osgi.spi.capability;
 import org.osgi.service.log.LogService;
 
 /**
- * Adds the OSGi compedium LogService capability to the {@link OSGiRuntime}
+ * Adds the OSGi compedium LogService capability to the OSGiRuntime
  * under test. 
  * 
  * It is ignored if the {@link LogService} is already registered.

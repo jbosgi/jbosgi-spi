@@ -26,7 +26,7 @@ package org.jboss.osgi.spi.capability;
 import org.osgi.service.cm.ConfigurationAdmin;
 
 /**
- * Adds the OSGi compedium ConfigAdmin capability to the {@link OSGiRuntime}
+ * Adds the OSGi compedium ConfigAdmin capability to the OSGiRuntime
  * under test. 
  * 
  * It is ignored if the {@link ConfigurationAdmin} is already registered.

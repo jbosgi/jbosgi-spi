@@ -34,7 +34,6 @@ import java.util.Hashtable;
 import javax.management.ObjectName;
 
 import org.jboss.logging.Logger;
-import org.jboss.osgi.spi.util.ConstantsHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -93,11 +92,13 @@ public class ManagedBundle implements ManagedBundleMBean
       return ObjectNameFactory.create(oname);
    }
 
+   @Override
    public ObjectName getObjectName()
    {
       return oname;
    }
 
+   @Override
    public String getProperty(String key)
    {
       String value = bundle.getBundleContext().getProperty(key);
@@ -108,41 +109,13 @@ public class ManagedBundle implements ManagedBundleMBean
       return value;
    }
 
-   public int getState()
-   {
-      int state = bundle.getState();
-      
-      if (log.isTraceEnabled())
-         log.trace("getState[" + oname + "] => " + ConstantsHelper.bundleState(state));
-      
-      return state;
-   }
-
-   public long getBundleId()
-   {
-      return bundle.getBundleId();
-   }
-
-   public String getSymbolicName()
-   {
-      return bundle.getSymbolicName();
-   }
-
-   public String getLocation()
-   {
-      String location = bundle.getLocation();
-      
-      if (log.isTraceEnabled())
-         log.trace("getLocation[" + oname + "] => " + location);
-      
-      return location;
-   }
-
+   @Override
    public Dictionary<String, String> getHeaders()
    {
       return getHeaders(null);
    }
 
+   @Override
    @SuppressWarnings("rawtypes")
    public Dictionary<String, String> getHeaders(String locale)
    {
@@ -162,6 +135,7 @@ public class ManagedBundle implements ManagedBundleMBean
       return retHeaders;
    }
 
+   @Override
    public String getEntry(String path)
    {
       URL url = bundle.getEntry(path);
@@ -173,6 +147,7 @@ public class ManagedBundle implements ManagedBundleMBean
       return entry;
    }
 
+   @Override
    public String getResource(String name)
    {
       URL url = bundle.getResource(name);
@@ -184,6 +159,7 @@ public class ManagedBundle implements ManagedBundleMBean
       return resource;
    }
 
+   @Override
    public ObjectName loadClass(String name) throws ClassNotFoundException
    {
       Class<?> clazz = bundle.loadClass(name);
@@ -196,6 +172,7 @@ public class ManagedBundle implements ManagedBundleMBean
       return oname;
    }
    
+   @Override
    public File getDataFile(String filename)
    {
       BundleContext context = bundle.getBundleContext();
@@ -207,22 +184,7 @@ public class ManagedBundle implements ManagedBundleMBean
       return dataFile;
    }
 
-   public void start() throws BundleException
-   {
-      if (log.isTraceEnabled())
-         log.trace("start[" + oname + "]");
-      
-      bundle.start();
-   }
-
-   public void stop() throws BundleException
-   {
-      if (log.isTraceEnabled())
-         log.trace("stop[" + oname + "]");
-      
-      bundle.stop();
-   }
-
+   @Override
    public void update() throws BundleException
    {
       if (log.isTraceEnabled())

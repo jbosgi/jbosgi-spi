@@ -26,7 +26,7 @@ package org.jboss.osgi.spi.capability;
 import org.osgi.service.http.HttpService;
 
 /**
- * Adds the {@link HttpService} capability to the {@link OSGiRuntime}
+ * Adds the {@link HttpService} capability to the OSGiRuntime
  * under test. 
  * 
  * It is ignored if the {@link HttpService} is already registered.

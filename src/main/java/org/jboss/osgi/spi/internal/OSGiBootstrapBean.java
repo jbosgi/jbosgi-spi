@@ -162,7 +162,7 @@ public class OSGiBootstrapBean
    {
       try
       {
-         return file.toURL();
+         return file.toURI().toURL();
       }
       catch (MalformedURLException e)
       {

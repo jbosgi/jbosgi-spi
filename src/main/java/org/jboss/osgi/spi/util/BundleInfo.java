@@ -66,7 +66,7 @@ public class BundleInfo implements Serializable
 
       URL url = getRealLocation(location);
       if (url == null)
-         throw new IllegalArgumentException("Cannot obtain root url from: " + location);
+         throw new IllegalArgumentException("Cannot obtain real location for: " + location);
 
       return new BundleInfo(toVirtualFile(url), url.toExternalForm());
    }

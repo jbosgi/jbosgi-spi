@@ -48,28 +48,6 @@ public interface ManagedBundleMBean
    ObjectName getObjectName();
 
    /**
-    * Returns this bundle's current state. A bundle can be in only one state at any time.
-    * 
-    * @return An element of UNINSTALLED,INSTALLED, RESOLVED,STARTING, STOPPING,ACTIVE.
-    */
-   int getState();
-
-   /**
-    * Returns this bundle's unique identifier.
-    */
-   long getBundleId();
-
-   /**
-    * Returns the symbolic name of this bundle as specified by its Bundle-SymbolicName manifest header
-    */
-   String getSymbolicName();
-
-   /**
-    * Returns the location of this bundle
-    */
-   String getLocation();
-
-   /**
     * Returns the bundle manifest headers
     */
    Dictionary<String, String> getHeaders();
@@ -96,7 +74,7 @@ public interface ManagedBundleMBean
    /**
     * Returns a string encoded URL to the entry at the specified path in this bundle.
     * 
-    * @param name The path name of the entry
+    * @param path The path name of the entry
     * @return A URL to the entry, or null if no entry could be found
     */
    String getEntry(String path);
@@ -112,16 +90,6 @@ public interface ManagedBundleMBean
     * Creates a File object for a file in the persistent storage area provided for the bundle by the Framework.
     */
    File getDataFile(String filename);
-
-   /**
-    * Starts this bundle with no options
-    */
-   void start() throws BundleException;
-
-   /**
-    * Stops this bundle with no options.
-    */
-   void stop() throws BundleException;
 
    /**
     * Update this bundle.

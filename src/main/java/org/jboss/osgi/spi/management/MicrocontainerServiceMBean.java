@@ -28,6 +28,7 @@ import java.util.List;
 import javax.management.ObjectName;
 
 
+
 /**
  * An OSGi Service the gives access to the Kernel and MBeanServer.
  * 
@@ -44,5 +45,5 @@ public interface MicrocontainerServiceMBean
    /**
     * Get the list of registered beans.
     */
-   List<String> getRegisteredBeans();
+   List<String> listRegisteredBeans();
 }

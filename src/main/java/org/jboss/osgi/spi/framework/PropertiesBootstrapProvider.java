@@ -368,7 +368,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
                File propsFile = new File(extraPropsValue);
                try
                {
-                  extraPropsURL = propsFile.toURL();
+                  extraPropsURL = propsFile.toURI().toURL();
                }
                catch (MalformedURLException e)
                {

@@ -35,8 +35,7 @@ import javax.management.ObjectName;
  */
 public class MBeanProxy
 {
-   @SuppressWarnings({ "unchecked" })
-   public static <T> T get(MBeanServerConnection server, ObjectName name, Class<T> interf) throws MBeanProxyException
+   public static <T> T get(MBeanServerConnection server, ObjectName name, Class<T> interf)
    {
       return (T)MBeanServerInvocationHandler.newProxyInstance(server, name, interf, false);
    }

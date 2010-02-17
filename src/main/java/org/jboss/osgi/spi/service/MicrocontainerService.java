@@ -56,7 +56,7 @@ public interface MicrocontainerService
    /**
     * Get the list of registered beans.
     */
-   List<String> getRegisteredBeans();
+   List<String> listRegisteredBeans();
 
    /**
     * Get a registered bean from the Kernel.
