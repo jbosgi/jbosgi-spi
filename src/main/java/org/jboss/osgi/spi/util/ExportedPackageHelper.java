@@ -49,6 +49,9 @@ public final class ExportedPackageHelper
 
    public ExportedPackageHelper(BundleContext context)
    {
+      if (context == null)
+         throw new IllegalArgumentException("Null context");
+      
       ServiceReference sref = context.getServiceReference(PackageAdmin.class.getName());
       if (sref != null)
          packageAdmin = (PackageAdmin)context.getService(sref);
