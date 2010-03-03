@@ -39,7 +39,7 @@
   <!-- Properties -->
   <properties>
     <version.args4j>2.0.12</version.args4j>
-    <version.jboss.vfs>2.1.3.SP1</version.jboss.vfs>
+    <version.jboss.osgi.vfs>1.0.0-SNAPSHOT</version.jboss.osgi.vfs>
     <version.osgi>4.2.0</version.osgi>
   </properties>
   
@@ -57,9 +57,9 @@
       <artifactId>jboss-logging-spi</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jboss</groupId>
-      <artifactId>jboss-vfs</artifactId>
-      <version>${version.jboss.vfs}</version>
+      <groupId>org.jboss.osgi.vfs</groupId>
+      <artifactId>jboss-osgi-vfs</artifactId>
+      <version>${version.jboss.osgi.vfs}</version>
     </dependency>
 
     <!-- Provided Dependencies -->

@@ -31,9 +31,9 @@ import java.net.URL;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import org.jboss.virtual.VFS;
-import org.jboss.virtual.VFSUtils;
-import org.jboss.virtual.VirtualFile;
+import org.jboss.osgi.vfs.AbstractVFS;
+import org.jboss.osgi.vfs.VFSUtils;
+import org.jboss.osgi.vfs.VirtualFile;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
@@ -261,7 +261,7 @@ public class BundleInfo implements Serializable
    {
       try
       {
-         return VFS.getRoot(url);
+         return AbstractVFS.getChild(url);
       }
       catch (IOException e)
       {
