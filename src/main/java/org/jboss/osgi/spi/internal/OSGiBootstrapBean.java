@@ -199,7 +199,7 @@ public class OSGiBootstrapBean
          try
          {
             int inByte = br.read();
-            while (inByte != 0)
+            while (inByte != -1)
             {
                inByte = br.read();
             }
