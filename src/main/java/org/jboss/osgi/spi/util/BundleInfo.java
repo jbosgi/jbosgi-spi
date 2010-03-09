@@ -107,8 +107,10 @@ public class BundleInfo implements Serializable
       try
       {
          manifest = VFSUtils.getManifest(rootFile);
+         if (manifest == null)
+            throw new BundleException("Cannot get manifest from: " + rootURL);
       }
-      catch (Exception ex)
+      catch (IOException ex)
       {
          throw new BundleException("Cannot get manifest from: " + rootURL, ex);
       }
