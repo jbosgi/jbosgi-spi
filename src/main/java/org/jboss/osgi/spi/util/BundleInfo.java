@@ -263,7 +263,7 @@ public class BundleInfo implements Serializable
    {
       try
       {
-         return AbstractVFS.getChild(url);
+         return AbstractVFS.getRoot(url);
       }
       catch (IOException e)
       {
