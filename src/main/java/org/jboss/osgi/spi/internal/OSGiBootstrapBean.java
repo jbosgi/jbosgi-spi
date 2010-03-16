@@ -57,6 +57,7 @@ public class OSGiBootstrapBean
    private static Logger log;
 
    private static final String JAVA_PROTOCOL_HANDLERS = "java.protocol.handler.pkgs";
+   private static final String DEFAULT_JAVA_PROTOCOL_HANDLERS = "org.jboss.net.protocol|org.jboss.virtual.protocol|org.jboss.vfs.protocol";
    private static final String JBOSS_BIND_ADDRESS = "jboss.bind.address";
    private static final String OSGI_SERVER_NAME = "osgi.server.name";
 
@@ -108,7 +109,7 @@ public class OSGiBootstrapBean
       defaults.setProperty(OSGI_SERVER_NAME, serverName);
       defaults.setProperty(OSGI_SERVER_HOME, osgiServerHome);
       defaults.setProperty(JBOSS_BIND_ADDRESS, bindAddress);
-      defaults.setProperty(JAVA_PROTOCOL_HANDLERS, "org.jboss.net.protocol|org.jboss.virtual.protocol");
+      defaults.setProperty(JAVA_PROTOCOL_HANDLERS, DEFAULT_JAVA_PROTOCOL_HANDLERS);
 
       log.debug("JBoss OSGi System Properties");
       log.debug("   " + OSGI_SERVER_HOME + "=" + osgiServerHome);
