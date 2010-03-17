@@ -34,6 +34,7 @@ import org.jboss.osgi.spi.util.BundleInfo;
 import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.jboss.osgi.testing.OSGiRuntimeHelper;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
 
@@ -229,7 +230,8 @@ public abstract class Capability
 
       for (OSGiBundle bundle : installedReverse)
       {
-         OSGiRuntimeHelper.failsafeStop(bundle);
+         if (bundle.getState() != Bundle.UNINSTALLED)
+            OSGiRuntimeHelper.failsafeStop(bundle);
       }
    }
 
@@ -241,7 +243,8 @@ public abstract class Capability
 
       for (OSGiBundle bundle : installedReverse)
       {
-         OSGiRuntimeHelper.failsafeUninstall(bundle);
+         if (bundle.getState() != Bundle.UNINSTALLED)
+            OSGiRuntimeHelper.failsafeUninstall(bundle);
          installed.remove(bundle);
       }
    }
