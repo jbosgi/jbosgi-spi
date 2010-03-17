@@ -29,8 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.util.BundleInfo;
+import org.jboss.osgi.testing.OSGiBundle;
+import org.jboss.osgi.testing.OSGiRuntime;
+import org.jboss.osgi.testing.OSGiRuntimeHelper;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Version;
 
 /**
  * An abstract OSGi capability that can be installed in an OSGiRuntime.
@@ -44,12 +49,16 @@ import org.osgi.framework.BundleException;
  */
 public abstract class Capability
 {
+   // Provide logging
+   private static final Logger log = Logger.getLogger(Capability.class);
+
    private String serviceName;
    private String filter;
    private Map<String, String> systemProperties;
 
    private List<Capability> dependencies;
    private List<BundleInfo> bundles;
+   private List<OSGiBundle> installed = new ArrayList<OSGiBundle>();
 
    /**
     * Construct a capability that is identified by the given service name. 
@@ -148,7 +157,7 @@ public abstract class Capability
          Throwable cause = ex.getCause();
          if (cause instanceof RuntimeException)
             throw (RuntimeException)cause;
-         
+
          throw new IllegalArgumentException("Cannot create bundle info for: " + location, ex);
       }
       getBundlesInternal().add(info);
@@ -176,5 +185,60 @@ public abstract class Capability
          bundles = new ArrayList<BundleInfo>();
 
       return bundles;
+   }
+
+   public List<OSGiBundle> getInstalledBundles()
+   {
+      return Collections.unmodifiableList(installed);
+   }
+
+   public void install(OSGiRuntime runtime) throws BundleException
+   {
+      for (BundleInfo info : getBundles())
+      {
+         String location = info.getLocation();
+         String symName = info.getSymbolicName();
+         Version version = info.getVersion();
+         if (runtime.getBundle(symName, version) == null)
+         {
+            OSGiBundle bundle = runtime.installBundle(location);
+            installed.add(bundle);
+         }
+         else
+         {
+            log.debug("Skip bundle: " + location);
+         }
+      }
+   }
+
+   public void start(OSGiRuntime runtime) throws BundleException
+   {
+      for (OSGiBundle bundle : getInstalledBundles())
+      {
+         bundle.start();
+      }
+   }
+
+   public void stop(OSGiRuntime runtime)
+   {
+      List<OSGiBundle> installedReverse = new ArrayList<OSGiBundle>(getInstalledBundles());
+      Collections.reverse(installedReverse);
+
+      for (OSGiBundle bundle : installedReverse)
+      {
+         OSGiRuntimeHelper.failsafeStop(bundle);
+      }
+   }
+
+   public void uninstall(OSGiRuntime runtime)
+   {
+      List<OSGiBundle> installedReverse = new ArrayList<OSGiBundle>(getInstalledBundles());
+      Collections.reverse(installedReverse);
+
+      for (OSGiBundle bundle : installedReverse)
+      {
+         OSGiRuntimeHelper.failsafeUninstall(bundle);
+         installed.remove(bundle);
+      }
    }
 }

@@ -58,7 +58,6 @@ import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
 import org.osgi.jmx.framework.BundleStateMBean;
@@ -112,30 +111,13 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       if (srefs == null || srefs.length == 0)
       {
          log.debug("Add capability: " + capability);
-
+         
          // Install the capability bundles 
-         List<OSGiBundle> installed = new ArrayList<OSGiBundle>();
-         for (BundleInfo info : capability.getBundles())
-         {
-            String location = info.getLocation();
-            String symName = info.getSymbolicName();
-            Version version = info.getVersion();
-            if (bundles.get(location) == null && getBundle(symName, version) == null)
-            {
-               OSGiBundle bundle = installBundle(location);
-               installed.add(bundle);
-            }
-            else
-            {
-               log.debug("Skip bundle: " + location);
-            }
-         }
-
-         // Start the capability bundles
-         for (OSGiBundle bundle : installed)
-         {
-            bundle.start();
-         }
+         capability.install(this);
+         
+         // Start the capability bundles 
+         capability.start(this);
+         
          capabilities.add(capability);
       }
       else
@@ -150,20 +132,12 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       {
          log.debug("Remove capability : " + capability);
 
-         List<BundleInfo> bundleInfos = new ArrayList<BundleInfo>(capability.getBundles());
-         Collections.reverse(bundleInfos);
-
-         for (BundleInfo info : bundleInfos)
-         {
-            OSGiBundle bundle = bundles.get(info.getLocation());
-            failsafeStop(bundle);
-         }
+         // Install the capability bundles 
+         capability.stop(this);
          
-         for (BundleInfo info : bundleInfos)
-         {
-            OSGiBundle bundle = bundles.remove(info.getLocation());
-            failsafeUninstall(bundle);
-         }
+         // Start the capability bundles 
+         capability.uninstall(this);
+         
       }
 
       List<Capability> dependencies = new ArrayList<Capability>(capability.getDependencies());
@@ -205,7 +179,8 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       while (locations.size() > 0)
       {
          String location = locations.remove(0);
-         failsafeUninstall(bundles.remove(location));
+         OSGiBundle bundle = bundles.remove(location);
+         OSGiRuntimeHelper.failsafeUninstall(bundle);
       }
 
       // Uninstall the capabilities
@@ -416,36 +391,5 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       target.deleteOnExit();
       
       return AbstractVFS.getRoot(target.toURI().toURL());
-   }
-   
-   private void failsafeStop(OSGiBundle bundle)
-   {
-      if (bundle != null)
-      {
-         try
-         {
-            bundle.stop();
-         }
-         catch (Exception ex)
-         {
-            log.warn("Cannot stop bundle: " + bundle, ex);
-         }
-      }
-   }
-   
-   private void failsafeUninstall(OSGiBundle bundle)
-   {
-      if (bundle != null)
-      {
-         try
-         {
-            if (bundle.getState() != Bundle.UNINSTALLED)
-               bundle.uninstall();
-         }
-         catch (Exception ex)
-         {
-            log.warn("Cannot uninstall bundle: " + bundle, ex);
-         }
-      }
    }
 }

@@ -21,10 +21,12 @@
  */
 package org.jboss.osgi.testing;
 
+import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.testing.internal.EmbeddedRuntime;
 import org.jboss.osgi.testing.internal.RemoteRuntime;
+import org.osgi.framework.Bundle;
 
 /**
  * A helper for the OSGi runtime abstraction. 
@@ -34,6 +36,9 @@ import org.jboss.osgi.testing.internal.RemoteRuntime;
  */
 public class OSGiRuntimeHelper extends OSGiTestHelper
 {
+   // Provide logging
+   private static final Logger log = Logger.getLogger(OSGiRuntimeHelper.class);
+   
    // The OSGiBootstrapProvider is a lazy property of the helper
    private OSGiBootstrapProvider bootProvider;
    private boolean skipBootstrap;
@@ -84,5 +89,36 @@ public class OSGiRuntimeHelper extends OSGiTestHelper
    public OSGiRuntime getRemoteRuntime()
    {
       return new RemoteRuntime(this);
+   }
+   
+   public static void failsafeStop(OSGiBundle bundle)
+   {
+      if (bundle != null)
+      {
+         try
+         {
+            bundle.stop();
+         }
+         catch (Exception ex)
+         {
+            log.warn("Cannot stop bundle: " + bundle, ex);
+         }
+      }
+   }
+   
+   public static void failsafeUninstall(OSGiBundle bundle)
+   {
+      if (bundle != null)
+      {
+         try
+         {
+            if (bundle.getState() != Bundle.UNINSTALLED)
+               bundle.uninstall();
+         }
+         catch (Exception ex)
+         {
+            log.warn("Cannot uninstall bundle: " + bundle, ex);
+         }
+      }
    }
 }
