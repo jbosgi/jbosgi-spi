@@ -194,6 +194,7 @@ public abstract class Capability
 
    public void install(OSGiRuntime runtime) throws BundleException
    {
+      log.debug("Install capability: " + this);
       for (BundleInfo info : getBundles())
       {
          String location = info.getLocation();
@@ -213,6 +214,7 @@ public abstract class Capability
 
    public void start(OSGiRuntime runtime) throws BundleException
    {
+      log.debug("Start capability: " + this);
       for (OSGiBundle bundle : getInstalledBundles())
       {
          bundle.start();
@@ -221,6 +223,7 @@ public abstract class Capability
 
    public void stop(OSGiRuntime runtime)
    {
+      log.debug("Stop capability: " + this);
       List<OSGiBundle> installedReverse = new ArrayList<OSGiBundle>(getInstalledBundles());
       Collections.reverse(installedReverse);
 
@@ -232,6 +235,7 @@ public abstract class Capability
 
    public void uninstall(OSGiRuntime runtime)
    {
+      log.debug("Uninstall capability: " + this);
       List<OSGiBundle> installedReverse = new ArrayList<OSGiBundle>(getInstalledBundles());
       Collections.reverse(installedReverse);
 

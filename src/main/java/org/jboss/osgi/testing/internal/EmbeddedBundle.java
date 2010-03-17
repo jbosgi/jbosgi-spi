@@ -135,7 +135,7 @@ public class EmbeddedBundle extends OSGiBundleImpl
    }
 
    @Override
-   public void start() throws BundleException
+   protected void startInternal() throws BundleException
    {
       bundle.start();
       
@@ -144,13 +144,13 @@ public class EmbeddedBundle extends OSGiBundleImpl
    }
 
    @Override
-   public void stop() throws BundleException
+   protected void stopInternal() throws BundleException
    {
       bundle.stop();
    }
 
    @Override
-   public void uninstall() throws BundleException
+   protected void uninstallInternal() throws BundleException
    {
       assertNotUninstalled();
       

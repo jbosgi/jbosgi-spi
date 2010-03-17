@@ -272,7 +272,7 @@ class RemoteBundle extends OSGiBundleImpl
    }
 
    @Override
-   public void start() throws BundleException
+   protected void startInternal() throws BundleException
    {
       assertNotUninstalled();
       try
@@ -286,7 +286,7 @@ class RemoteBundle extends OSGiBundleImpl
    }
 
    @Override
-   public void stop() throws BundleException
+   protected void stopInternal() throws BundleException
    {
       assertNotUninstalled();
       try
@@ -300,7 +300,7 @@ class RemoteBundle extends OSGiBundleImpl
    }
 
    @Override
-   public void uninstall() throws BundleException
+   protected void uninstallInternal() throws BundleException
    {
       assertNotUninstalled();
       try

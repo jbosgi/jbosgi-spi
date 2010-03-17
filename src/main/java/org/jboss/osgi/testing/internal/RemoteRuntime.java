@@ -70,7 +70,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       super(helper);
    }
 
-   OSGiBundle installBundle(BundleInfo info) throws BundleException
+   OSGiBundle installBundleInternal(BundleInfo info) throws BundleException
    {
       try
       {

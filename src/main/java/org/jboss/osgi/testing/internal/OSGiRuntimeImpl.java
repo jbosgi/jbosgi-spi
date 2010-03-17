@@ -32,9 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -156,8 +153,9 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
 
    public OSGiBundle installBundle(Archive<?> archive) throws BundleException, IOException
    {
-      VirtualFile file = toVirtualFile(archive);
-      return installBundle(file);
+      VirtualFile virtualFile = toVirtualFile(archive);
+      BundleInfo info = BundleInfo.createBundleInfo(virtualFile);
+      return installBundle(info);
    }
 
    public OSGiBundle installBundle(VirtualFile virtualFile) throws BundleException
@@ -166,7 +164,13 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       return installBundle(info);
    }
 
-   abstract OSGiBundle installBundle(BundleInfo info) throws BundleException;
+   private OSGiBundle installBundle(BundleInfo info) throws BundleException
+   {
+      log.debug("Install bundle: " + info);
+      return installBundleInternal(info);
+   }
+   
+   abstract OSGiBundle installBundleInternal(BundleInfo info) throws BundleException;
    
    public void shutdown()
    {
@@ -288,14 +292,14 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
 
    public OSGiServiceReference getServiceReference(String clazz, long timeout)
    {
-      int fraktion = 200;
-      timeout = timeout / fraktion;
+      int fraction = 200;
+      timeout = timeout / fraction;
       OSGiServiceReference sref = getServiceReference(clazz);
       while (sref == null && 0 < timeout--)
       {
          try
          {
-            Thread.sleep(fraktion);
+            Thread.sleep(fraction);
          }
          catch (InterruptedException e)
          {
@@ -306,7 +310,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       return sref;
    }
 
-   OSGiBundle getBundle(String symbolicName, Version version, boolean mustExist)
+   private OSGiBundle getBundle(String symbolicName, Version version, boolean mustExist)
    {
       OSGiBundle bundle = null;
       List<OSGiBundle> bundles = Arrays.asList(getBundles());
@@ -326,32 +330,6 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
          throw new IllegalStateException("Cannot obtain bundle: " + symbolicName + "-" + version + ". We have " + bundles);
 
       return bundle;
-   }
-
-   String getManifestEntry(String location, String key)
-   {
-      Manifest manifest = getManifest(location);
-      Attributes attribs = manifest.getMainAttributes();
-      String value = attribs.getValue(key);
-      return value;
-   }
-
-   Manifest getManifest(String location)
-   {
-      Manifest manifest;
-      try
-      {
-         File archiveFile = getTestHelper().getTestArchiveFile(location);
-         JarFile jarFile = new JarFile(archiveFile);
-         manifest = jarFile.getManifest();
-         jarFile.close();
-      }
-      catch (IOException ex)
-      {
-         throw new IllegalStateException("Cannot get manifest from: " + location);
-
-      }
-      return manifest;
    }
 
    OSGiBundle registerBundle(String location, OSGiBundle bundle)
@@ -383,7 +361,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       }
    }
 
-   VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
+   private VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
    {
       ZipExporter exporter = archive.as(ZipExporter.class);
       File target = File.createTempFile("archive_", ".jar");

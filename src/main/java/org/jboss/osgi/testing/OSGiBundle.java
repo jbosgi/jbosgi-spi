@@ -25,6 +25,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Dictionary;
 
+import org.jboss.logging.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
@@ -37,6 +38,8 @@ import org.osgi.framework.Version;
  */
 public abstract class OSGiBundle
 {
+   // Provide logging
+   private static final Logger log = Logger.getLogger(OSGiBundle.class);
    /**
     * Get the runtime associated with this bundle.
     */
@@ -114,17 +117,35 @@ public abstract class OSGiBundle
    /**
     * Starts this bundle.
     */
-   public abstract void start() throws BundleException;
+   public void start() throws BundleException
+   {
+      log.debug("Start bundle: " + this);
+      startInternal();
+   }
+   
+   protected abstract void startInternal() throws BundleException;
    
    /**
     * Stops this bundle.
     */
-   public abstract void stop() throws BundleException;
+   public void stop() throws BundleException
+   {
+      log.debug("Stop bundle: " + this);
+      stopInternal();
+   }
+   
+   protected abstract void stopInternal() throws BundleException;
    
    /**
     * Uninstalls this bundle.
     */
-   public abstract void uninstall() throws BundleException;
+   public void uninstall() throws BundleException
+   {
+      log.debug("Uninstall bundle: " + this);
+      uninstallInternal();
+   }
+   
+   protected abstract void uninstallInternal() throws BundleException;
    
    /**
     * Return true if symbolic name and version are equal
@@ -154,6 +175,6 @@ public abstract class OSGiBundle
     */
    public String toString()
    {
-      return "[" + getSymbolicName() + "," + getVersion() + "]";
+      return "[" + getSymbolicName() + ":" + getVersion() + "]";
    }
 }
