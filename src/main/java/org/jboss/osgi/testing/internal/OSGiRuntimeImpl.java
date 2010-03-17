@@ -30,8 +30,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -74,7 +72,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    private static final Logger log = Logger.getLogger(OSGiRuntimeImpl.class);
 
    private OSGiRuntimeHelper helper;
-   private Map<String, OSGiBundle> bundles = new LinkedHashMap<String, OSGiBundle>();
+   private Map<String, BundleTuple> bundles = new LinkedHashMap<String, BundleTuple>();
    private List<Capability> capabilities = new ArrayList<Capability>();
    
    private FrameworkMBean frameworkState;
@@ -167,7 +165,9 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    private OSGiBundle installBundle(BundleInfo info) throws BundleException
    {
       log.debug("Install bundle: " + info);
-      return installBundleInternal(info);
+      OSGiBundle bundle = installBundleInternal(info);
+      bundles.put(info.getLocation(), new BundleTuple(info, bundle));
+      return bundle;
    }
    
    abstract OSGiBundle installBundleInternal(BundleInfo info) throws BundleException;
@@ -183,8 +183,8 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       while (locations.size() > 0)
       {
          String location = locations.remove(0);
-         OSGiBundle bundle = bundles.remove(location);
-         OSGiRuntimeHelper.failsafeUninstall(bundle);
+         BundleTuple tuple = bundles.remove(location);
+         tuple.uninstall();
       }
 
       // Uninstall the capabilities
@@ -332,33 +332,14 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       return bundle;
    }
 
-   OSGiBundle registerBundle(String location, OSGiBundle bundle)
-   {
-      if (bundle == null)
-         throw new IllegalArgumentException("Cannot register null bundle for: " + location);
-
-      bundles.put(location, bundle);
-      return bundle;
-   }
-
-   void unregisterBundle(OSGiBundle bundle)
+   void uninstallBundle(OSGiBundle bundle)
    {
       if (bundle == null)
          throw new IllegalArgumentException("Cannot unregister null bundle");
 
-      if (bundles.containsValue(bundle))
-      {
-         Set<Entry<String, OSGiBundle>> entrySet = bundles.entrySet();
-         for (Entry<String, OSGiBundle> entry : entrySet)
-         {
-            if (bundle.equals(entry.getValue()))
-            {
-               String key = entry.getKey();
-               bundles.remove(key);
-               break;
-            }
-         }
-      }
+      String location = bundle.getLocation();
+      BundleTuple tuple = bundles.get(location);
+      tuple.uninstall();
    }
 
    private VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
@@ -369,5 +350,23 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       target.deleteOnExit();
       
       return AbstractVFS.getRoot(target.toURI().toURL());
+   }
+   
+   class BundleTuple
+   {
+      BundleInfo info;
+      OSGiBundle bundle;
+      
+      BundleTuple(BundleInfo info, OSGiBundle bundle)
+      {
+         this.info = info;
+         this.bundle = bundle;
+      }
+
+      public void uninstall()
+      {
+         OSGiRuntimeHelper.failsafeUninstall(bundle);
+         info.close();
+      }
    }
 }

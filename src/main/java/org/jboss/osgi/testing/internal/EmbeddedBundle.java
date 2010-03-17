@@ -153,11 +153,9 @@ public class EmbeddedBundle extends OSGiBundleImpl
    protected void uninstallInternal() throws BundleException
    {
       assertNotUninstalled();
-      
       bundle.uninstall();
-      
       OSGiRuntimeImpl runtimeImpl = (OSGiRuntimeImpl)getRuntime();
-      runtimeImpl.unregisterBundle(this);
+      runtimeImpl.uninstallBundle(this);
    }
 
    private PackageAdmin getPackageAdmin()

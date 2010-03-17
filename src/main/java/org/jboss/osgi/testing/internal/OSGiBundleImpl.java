@@ -23,9 +23,11 @@ package org.jboss.osgi.testing.internal;
 
 // $Id$
 
+import org.jboss.logging.Logger;
 import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
 
 /**
  * An abstract implementation of a {@link OSGiBundle}
@@ -33,8 +35,11 @@ import org.osgi.framework.Bundle;
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public abstract class OSGiBundleImpl extends OSGiBundle
+public abstract class OSGiBundleImpl implements OSGiBundle
 {
+   // Provide logging
+   private static final Logger log = Logger.getLogger(OSGiBundleImpl.class);
+
    private OSGiRuntime runtime;
    
    OSGiBundleImpl(OSGiRuntime runtime)
@@ -47,6 +52,70 @@ public abstract class OSGiBundleImpl extends OSGiBundle
       return runtime;
    }
 
+   /**
+    * Starts this bundle.
+    */
+   public void start() throws BundleException
+   {
+      log.debug("Start bundle: " + this);
+      startInternal();
+   }
+   
+   protected abstract void startInternal() throws BundleException;
+   
+   /**
+    * Stops this bundle.
+    */
+   public void stop() throws BundleException
+   {
+      log.debug("Stop bundle: " + this);
+      stopInternal();
+   }
+   
+   protected abstract void stopInternal() throws BundleException;
+   
+   /**
+    * Uninstalls this bundle.
+    */
+   public void uninstall() throws BundleException
+   {
+      log.debug("Uninstall bundle: " + this);
+      uninstallInternal();
+   }
+   
+   protected abstract void uninstallInternal() throws BundleException;
+   
+   /**
+    * Return true if symbolic name and version are equal
+    */
+   public boolean equals(Object obj)
+   {
+      if ((obj instanceof OSGiBundle) == false)
+         return false;
+      
+      OSGiBundle other = (OSGiBundle)obj;
+      
+      boolean isEqual =  getSymbolicName().equals(other.getSymbolicName());
+      isEqual = isEqual && getVersion().equals(other.getVersion());
+      return isEqual;
+   }
+
+   /**
+    * Returns the hash code for this bundle. 
+    */
+   public int hashCode()
+   {
+      return toString().hashCode();
+   }
+
+   /**
+    * Returns the string representation of this bundle 
+    */
+   public String toString()
+   {
+      return "[" + getSymbolicName() + ":" + getVersion() + "]";
+   }
+   
    void assertNotUninstalled()
    {
       if (getState() == Bundle.UNINSTALLED)

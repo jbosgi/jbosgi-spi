@@ -74,9 +74,8 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
          VirtualFile rootFile = info.getRoot();
          BundleContext context = getSystemContext();
          Bundle auxBundle = context.installBundle(info.getLocation(), rootFile.openStream());
-         OSGiBundle bundle = new EmbeddedBundle(this, auxBundle);
-         return registerBundle(bundle.getLocation(), bundle);
-      }
+         return new EmbeddedBundle(this, auxBundle);
+     }
       catch (IOException ex)
       {
          throw new BundleException("Cannot install bundle: " + info, ex);

@@ -243,6 +243,15 @@ public class BundleInfo implements Serializable
       return Version.parseVersion(bundleVersion);
    }
 
+   /**
+    * Closes the accociated resources.
+    */
+   public void close()
+   {
+      if (rootFile != null)
+         rootFile.close();
+   }
+   
    private Manifest getManifest()
    {
       if (manifest == null)
@@ -324,7 +333,7 @@ public class BundleInfo implements Serializable
 
    private String toEqualString()
    {
-      return "[" + symbolicName + "-" + bundleVersion + ",url=" + rootURL + "]";
+      return "[" + symbolicName + ":" + bundleVersion + ",url=" + rootURL + "]";
    }
 
    private static String getManifestHeaderInternal(Manifest manifest, String key)

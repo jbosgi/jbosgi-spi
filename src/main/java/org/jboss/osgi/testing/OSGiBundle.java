@@ -25,7 +25,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.Dictionary;
 
-import org.jboss.logging.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
@@ -36,59 +35,57 @@ import org.osgi.framework.Version;
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public abstract class OSGiBundle
+public interface OSGiBundle
 {
-   // Provide logging
-   private static final Logger log = Logger.getLogger(OSGiBundle.class);
    /**
     * Get the runtime associated with this bundle.
     */
-   public abstract OSGiRuntime getRuntime();
+   OSGiRuntime getRuntime();
    
    /**
     * Returns this bundle's unique identifier.
     */
-   public abstract long getBundleId();
+   long getBundleId();
    
    /**
     * Returns the symbolic name of this bundle as specified by its Bundle-SymbolicName manifest header.
     */
-   public abstract String getSymbolicName();
+   String getSymbolicName();
 
    /**
     * Returns the version of this bundle.
     */
-   public abstract Version getVersion();
+   Version getVersion();
    
    /**
     * Returns this bundle's location.
     */
-   public abstract String getLocation();
+   String getLocation();
    
    /**
     * Returns this bundle's Manifest headers and values.
     */
-   public abstract Dictionary<String, String> getHeaders();
+   Dictionary<String, String> getHeaders();
    
    /**
     * Returns this bundle's Manifest headers and values localized to the specified locale.
     */
-   public abstract Dictionary<String, String> getHeaders(String locale);
+   Dictionary<String, String> getHeaders(String locale);
    
    /**
     * Returns this bundle's current state.
     */
-   public abstract int getState();
+   int getState();
 
    /**
     * Returns the value of the specified property.
     */
-   public abstract String getProperty(String key);
+   String getProperty(String key);
    
    /**
     * Creates a File object for a file in the persistent storage area provided for the bundle by the Framework.
     */
-   public abstract File getDataFile(String filename);
+   File getDataFile(String filename);
 
    /**
     * Loads the specified class using this bundle's class loader. 
@@ -97,7 +94,7 @@ public abstract class OSGiBundle
     * @return The OSGiBundle that is wired to this bundle class loader and contains the class.
     * @throws ClassNotFoundException If no such class can be found or if this bundle is a fragment bundle
     */
-   public abstract OSGiBundle loadClass(String name) throws ClassNotFoundException;
+   OSGiBundle loadClass(String name) throws ClassNotFoundException;
    
    /**
     * Returns a URL to the entry at the specified path in this bundle.
@@ -105,76 +102,27 @@ public abstract class OSGiBundle
     * @param path The path name of the entry
     * @return A URL to the entry, or null if no entry could be found
     */
-   public abstract URL getEntry(String path);
+   URL getEntry(String path);
    
    /**
     * Find the specified resource from this bundle's class loader. 
     * @param name The name of the resource.
     * @return A URL to the named resource, or null if the resource could not be found
     */
-   public abstract URL getResource(String name);
+   URL getResource(String name);
    
    /**
     * Starts this bundle.
     */
-   public void start() throws BundleException
-   {
-      log.debug("Start bundle: " + this);
-      startInternal();
-   }
-   
-   protected abstract void startInternal() throws BundleException;
+   void start() throws BundleException;
    
    /**
     * Stops this bundle.
     */
-   public void stop() throws BundleException
-   {
-      log.debug("Stop bundle: " + this);
-      stopInternal();
-   }
-   
-   protected abstract void stopInternal() throws BundleException;
+   void stop() throws BundleException;
    
    /**
     * Uninstalls this bundle.
     */
-   public void uninstall() throws BundleException
-   {
-      log.debug("Uninstall bundle: " + this);
-      uninstallInternal();
-   }
-   
-   protected abstract void uninstallInternal() throws BundleException;
-   
-   /**
-    * Return true if symbolic name and version are equal
-    */
-   public boolean equals(Object obj)
-   {
-      if ((obj instanceof OSGiBundle) == false)
-         return false;
-      
-      OSGiBundle other = (OSGiBundle)obj;
-      
-      boolean isEqual =  getSymbolicName().equals(other.getSymbolicName());
-      isEqual = isEqual && getVersion().equals(other.getVersion());
-      return isEqual;
-   }
-
-   /**
-    * Returns the hash code for this bundle. 
-    */
-   public int hashCode()
-   {
-      return toString().hashCode();
-   }
-
-   /**
-    * Returns the string representation of this bundle 
-    */
-   public String toString()
-   {
-      return "[" + getSymbolicName() + ":" + getVersion() + "]";
-   }
+   void uninstall() throws BundleException;
 }
