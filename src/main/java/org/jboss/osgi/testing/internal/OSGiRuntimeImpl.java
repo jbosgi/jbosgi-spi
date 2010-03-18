@@ -339,7 +339,8 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
 
       String location = bundle.getLocation();
       BundleTuple tuple = bundles.get(location);
-      tuple.uninstall();
+      if (tuple != null)
+         tuple.uninstall();
    }
 
    private VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
