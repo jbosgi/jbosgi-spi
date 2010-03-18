@@ -60,13 +60,12 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
    // Provide logging
    private static final Logger log = Logger.getLogger(EmbeddedRuntime.class);
    
-   private MBeanServer server;
-
    public EmbeddedRuntime(OSGiRuntimeHelper helper)
    {
       super(helper);
    }
 
+   @Override
    OSGiBundle installBundleInternal(BundleInfo info) throws BundleException
    {
       try
@@ -82,6 +81,7 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
       }
    }
 
+   @Override
    public OSGiBundle[] getBundles()
    {
       List<OSGiBundle> absBundles = new ArrayList<OSGiBundle>();
@@ -94,18 +94,21 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
       return bundleArr;
    }
 
+   @Override
    public OSGiBundle getBundle(long bundleId)
    {
       Bundle bundle = getSystemContext().getBundle(bundleId);
       return bundle != null ? new EmbeddedBundle(this, bundle) : null;
    }
 
+   @Override
    public OSGiServiceReference getServiceReference(String clazz)
    {
       ServiceReference sref = getSystemContext().getServiceReference(clazz);
       return (sref != null ? new EmbeddedServiceReference(sref) : null);
    }
 
+   @Override
    public OSGiServiceReference[] getServiceReferences(String clazz, String filter)
    {
       OSGiServiceReference[] retRefs = null;
@@ -140,7 +143,6 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
          if (value == null)
             System.setProperty(entry.getKey(), entry.getValue());
       }
-
       super.addCapability(capability);
    }
 
@@ -169,23 +171,32 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
       }
    }
 
+   @Override
    public MBeanServerConnection getMBeanServer()
    {
-      if (server == null)
+      MBeanServer mbeanServer = null;
+      
+      ArrayList<MBeanServer> serverArr = MBeanServerFactory.findMBeanServer(null);
+      if (serverArr.size() > 1)
+         log.warn("Multiple MBeanServer instances: " + serverArr);
+   
+      if (serverArr.size() > 0)
       {
-         ArrayList<MBeanServer> serverArr = MBeanServerFactory.findMBeanServer(null);
-         if (serverArr.size() > 1)
-            throw new IllegalStateException("Multiple MBeanServer instances not supported");
-
-         if (serverArr.size() == 1)
-            server = serverArr.get(0);
-
-         if (server == null)
-            server = MBeanServerFactory.createMBeanServer();
+         mbeanServer = serverArr.get(0);
+         log.debug("Found MBeanServer: " + mbeanServer);
       }
-      return server;
+   
+      if (mbeanServer == null)
+      {
+         log.debug("No MBeanServer, create one ...");
+         mbeanServer = MBeanServerFactory.createMBeanServer();
+         log.debug("Created MBeanServer: " + mbeanServer);
+      }
+      
+      return mbeanServer;
    }
 
+   @Override
    public boolean isRemoteRuntime()
    {
       return false;

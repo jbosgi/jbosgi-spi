@@ -70,6 +70,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       super(helper);
    }
 
+   @Override
    OSGiBundle installBundleInternal(BundleInfo info) throws BundleException
    {
       try
@@ -103,6 +104,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       deployer.undeploy(archiveURL);
    }
 
+   @Override
    public OSGiBundle[] getBundles()
    {
       Set<OSGiBundle> bundles = new HashSet<OSGiBundle>();
@@ -137,6 +139,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       }
    }
 
+   @Override
    public OSGiBundle getBundle(long bundleId)
    {
       for (OSGiBundle bundle : getBundles())
@@ -147,6 +150,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       return null;
    }
 
+   @Override
    public OSGiServiceReference getServiceReference(String clazz)
    {
       CompositeData serviceData;
@@ -168,6 +172,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       return new RemoteServiceReference(serviceData, propertiesData);
    }
 
+   @Override
    @SuppressWarnings("unchecked")
    public OSGiServiceReference[] getServiceReferences(String clazz, String filter)
    {
@@ -201,6 +206,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       return MBeanProxy.get(getMBeanServer(), objectName, ServiceStateMBeanExt.class);
    }
 
+   @Override
    public MBeanServerConnection getMBeanServer()
    {
       if (mbeanServer == null)
@@ -218,6 +224,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       return mbeanServer;
    }
 
+   @Override
    public boolean isRemoteRuntime()
    {
       return true;
