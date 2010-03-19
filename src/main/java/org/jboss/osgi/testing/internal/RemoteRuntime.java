@@ -77,7 +77,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       {
          String location = info.getLocation();
          String streamURL = info.getRoot().getStreamURL().toExternalForm();
-         long bundleId = getFrameworkMBean().installBundle(location, streamURL);
+         long bundleId = getFrameworkMBean().installBundleFromURL(location, streamURL);
          return new RemoteBundle(this, bundleId);
       }
       catch (RuntimeException rte)
