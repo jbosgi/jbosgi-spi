@@ -66,7 +66,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    private static final Logger log = Logger.getLogger(OSGiFrameworkTest.class);
 
    protected static Framework framework;
-   protected static BundleContext context;
+   protected static BundleContext systemContext;
 
    private final List<FrameworkEvent> frameworkEvents = new CopyOnWriteArrayList<FrameworkEvent>();
    private final List<BundleEvent> bundleEvents = new CopyOnWriteArrayList<BundleEvent>();
@@ -80,7 +80,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       framework.start();
 
       // Get the system context
-      context = framework.getBundleContext();
+      systemContext = framework.getBundleContext();
    }
 
    @AfterClass
@@ -96,21 +96,21 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
 
    protected PackageAdmin getPackageAdmin()
    {
-      ServiceReference sref = context.getServiceReference(PackageAdmin.class.getName());
-      return (PackageAdmin)context.getService(sref);
+      ServiceReference sref = systemContext.getServiceReference(PackageAdmin.class.getName());
+      return (PackageAdmin)systemContext.getService(sref);
    }
    
    protected Bundle installBundle(VirtualFile archive) throws Exception
    {
-      String location = archive.toURL().toExternalForm();
-      return context.installBundle(location, archive.openStream());
+      String location = archive.getPathName();
+      return systemContext.installBundle(location, archive.openStream());
    }
    
    protected void assertLoadClass(Bundle bundle, String className, Bundle exporter)
    {
       Class<?> clazz = assertLoadClass(bundle, className);
       Bundle actual = getPackageAdmin().getBundle(clazz);
-      assertEquals(exporter, actual);
+      assertEquals("Loaded from ClassLoader", exporter, actual);
    }
 
    @Override
