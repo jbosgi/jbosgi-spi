@@ -41,44 +41,44 @@ import org.osgi.framework.Constants;
  * @author thomas.diesler@jboss.com
  * @since 08-Mar-2010
  */
-public final class ManifestBuilder implements Asset
+public final class OSGiManifestBuilder implements Asset
 {
    private StringWriter sw;
    private PrintWriter pw;
    private List<String> importPackages = new ArrayList<String>();
    private List<String> exportPackages = new ArrayList<String>();
 
-   public static ManifestBuilder newInstance()
+   public static OSGiManifestBuilder newInstance()
    {
-      return new ManifestBuilder();
+      return new OSGiManifestBuilder();
    }
 
-   private ManifestBuilder()
+   private OSGiManifestBuilder()
    {
       sw = new StringWriter();
       pw = new PrintWriter(sw);
       pw.println(Attributes.Name.MANIFEST_VERSION + ": 1.0");
    }
 
-   public ManifestBuilder addBundleManifestVersion(int version)
+   public OSGiManifestBuilder addBundleManifestVersion(int version)
    {
       pw.println(Constants.BUNDLE_MANIFESTVERSION + ": " + version);
       return this;
    }
 
-   public ManifestBuilder addBundleSymbolicName(String symbolicName)
+   public OSGiManifestBuilder addBundleSymbolicName(String symbolicName)
    {
       pw.println(Constants.BUNDLE_SYMBOLICNAME + ": " + symbolicName);
       return this;
    }
 
-   public ManifestBuilder addBundleActivator(String bundleActivator)
+   public OSGiManifestBuilder addBundleActivator(String bundleActivator)
    {
       pw.println(Constants.BUNDLE_ACTIVATOR + ": " + bundleActivator);
       return this;
    }
 
-   public ManifestBuilder addImportPackages(String... packages)
+   public OSGiManifestBuilder addImportPackages(String... packages)
    {
       for (String aux : packages)
          importPackages.add(aux);
@@ -86,7 +86,7 @@ public final class ManifestBuilder implements Asset
       return this;
    }
 
-   public ManifestBuilder addExportPackages(String... packages)
+   public OSGiManifestBuilder addExportPackages(String... packages)
    {
       for (String aux : packages)
          exportPackages.add(aux);
@@ -94,7 +94,7 @@ public final class ManifestBuilder implements Asset
       return this;
    }
 
-   public ManifestBuilder addManifestHeader(String key, String value)
+   public OSGiManifestBuilder addManifestHeader(String key, String value)
    {
       pw.println(key + ": " + value);
       return this;

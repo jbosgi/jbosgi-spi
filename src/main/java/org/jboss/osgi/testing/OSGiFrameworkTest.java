@@ -29,6 +29,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +40,10 @@ import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.util.ConstantsHelper;
+import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.osgi.framework.Bundle;
@@ -98,6 +102,17 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    {
       ServiceReference sref = systemContext.getServiceReference(PackageAdmin.class.getName());
       return (PackageAdmin)systemContext.getService(sref);
+   }
+   
+   protected Bundle installBundle(Archive<?> archive) throws Exception
+   {
+      ZipExporter exporter = archive.as(ZipExporter.class);
+      File target = File.createTempFile("archive_", ".jar");
+      exporter.exportZip(target, true);
+      target.deleteOnExit();
+      
+      VirtualFile virtualFile = AbstractVFS.getRoot(target.toURI().toURL());
+      return installBundle(virtualFile);
    }
    
    protected Bundle installBundle(VirtualFile archive) throws Exception
