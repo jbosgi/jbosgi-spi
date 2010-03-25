@@ -29,7 +29,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -43,12 +44,12 @@ import org.jboss.osgi.spi.util.ConstantsHelper;
 import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceEvent;
@@ -104,21 +105,22 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       return (PackageAdmin)systemContext.getService(sref);
    }
    
-   protected Bundle installBundle(Archive<?> archive) throws Exception
+   protected Bundle installBundle(String location) throws BundleException, IOException
    {
-      ZipExporter exporter = archive.as(ZipExporter.class);
-      File target = File.createTempFile("archive_", ".jar");
-      exporter.exportZip(target, true);
-      target.deleteOnExit();
-      
-      VirtualFile virtualFile = AbstractVFS.getRoot(target.toURI().toURL());
+      URL bundleURL = getTestHelper().getTestArchiveURL(location);
+      return installBundle(AbstractVFS.getRoot(bundleURL));
+   }
+   
+   protected Bundle installBundle(Archive<?> archive) throws BundleException, IOException
+   {
+      VirtualFile virtualFile = OSGiTestHelper.toVirtualFile(archive);
       return installBundle(virtualFile);
    }
    
-   protected Bundle installBundle(VirtualFile archive) throws Exception
+   protected Bundle installBundle(VirtualFile virtualFile) throws BundleException, IOException
    {
-      String location = archive.getPathName();
-      return systemContext.installBundle(location, archive.openStream());
+      String location = virtualFile.getPathName();
+      return systemContext.installBundle(location, virtualFile.openStream());
    }
    
    protected void assertLoadClass(Bundle bundle, String className, Bundle exporter)

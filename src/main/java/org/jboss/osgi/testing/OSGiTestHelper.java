@@ -37,6 +37,7 @@ import javax.naming.NamingException;
 import org.jboss.osgi.spi.util.ConstantsHelper;
 import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.Archives;
 import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
@@ -98,7 +99,17 @@ public class OSGiTestHelper
    {
       try
       {
-         return getTestArchiveFile(archive).toURI().toURL();
+         URL archiveURL = new URL(archive);
+         return archiveURL;
+      }
+      catch (MalformedURLException ex)
+      {
+         // ignore
+      }
+      try
+      {
+         File file = getTestArchiveFile(archive);
+         return file.toURI().toURL();
       }
       catch (MalformedURLException ex)
       {
@@ -109,7 +120,8 @@ public class OSGiTestHelper
    /** Try to discover the absolute path for the deployment archive */
    public String getTestArchivePath(String archive)
    {
-      return getTestArchiveFile(archive).getAbsolutePath();
+      File archiveFile = getTestArchiveFile(archive);
+      return archiveFile.getAbsolutePath();
    }
 
    /** Try to discover the File for the deployment archive */
@@ -203,11 +215,17 @@ public class OSGiTestHelper
       }
 
       // Convert archive to file URL 
+      VirtualFile virtualFile = toVirtualFile(archive);
+      return virtualFile;
+   }
+
+   @SuppressWarnings("rawtypes")
+   public static VirtualFile toVirtualFile(Archive archive) throws IOException, MalformedURLException
+   {
       ZipExporter exporter = archive.as(ZipExporter.class);
       File target = File.createTempFile("archive_", ".jar");
       exporter.exportZip(target, true);
       target.deleteOnExit();
-
       return AbstractVFS.getRoot(target.toURI().toURL());
    }
 

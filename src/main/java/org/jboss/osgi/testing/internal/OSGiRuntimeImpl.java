@@ -21,9 +21,7 @@
  */
 package org.jboss.osgi.testing.internal;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,10 +47,9 @@ import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.jboss.osgi.testing.OSGiRuntimeHelper;
 import org.jboss.osgi.testing.OSGiServiceReference;
-import org.jboss.osgi.vfs.AbstractVFS;
+import org.jboss.osgi.testing.OSGiTestHelper;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
 import org.osgi.jmx.framework.BundleStateMBean;
@@ -151,7 +148,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
 
    public OSGiBundle installBundle(Archive<?> archive) throws BundleException, IOException
    {
-      VirtualFile virtualFile = toVirtualFile(archive);
+      VirtualFile virtualFile = OSGiTestHelper.toVirtualFile(archive);
       BundleInfo info = BundleInfo.createBundleInfo(virtualFile);
       return installBundle(info);
    }
@@ -343,16 +340,6 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
          tuple.uninstall();
    }
 
-   private VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
-   {
-      ZipExporter exporter = archive.as(ZipExporter.class);
-      File target = File.createTempFile("archive_", ".jar");
-      exporter.exportZip(target, true);
-      target.deleteOnExit();
-      
-      return AbstractVFS.getRoot(target.toURI().toURL());
-   }
-   
    class BundleTuple
    {
       BundleInfo info;
