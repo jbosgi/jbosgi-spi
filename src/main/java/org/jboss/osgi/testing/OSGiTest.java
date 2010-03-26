@@ -22,6 +22,8 @@
 package org.jboss.osgi.testing;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.naming.InitialContext;
@@ -29,6 +31,7 @@ import javax.naming.NamingException;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.vfs.VirtualFile;
+import org.jboss.shrinkwrap.api.Archive;
 import org.junit.After;
 import org.junit.Before;
 import org.osgi.framework.Bundle;
@@ -173,15 +176,20 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#assembleArchive(String, String, Class...)}
     */
-   public VirtualFile assembleArchive(String name, String resource, Class<?>... packages) throws Exception
+   public Archive<?> assembleArchive(String name, String resource, Class<?>... packages) throws Exception
    {
       return getTestHelper().assembleArchive(name, resource, packages);
    }
 
+   public VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
+   {
+      return OSGiTestHelper.toVirtualFile(archive);
+   }
+   
    /**
     * Delegates to {@link OSGiTestHelper#assembleArchive(String, String[], Class...)}
     */
-   public VirtualFile assembleArchive(String name, String[] resources, Class<?>... packages) throws Exception
+   public Archive<?> assembleArchive(String name, String[] resources, Class<?>... packages) throws Exception
    {
       return getTestHelper().assembleArchive(name, resources, packages);
    }

@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -105,22 +106,28 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       return (PackageAdmin)systemContext.getService(sref);
    }
    
-   protected Bundle installBundle(String location) throws BundleException, IOException
-   {
-      URL bundleURL = getTestHelper().getTestArchiveURL(location);
-      return installBundle(AbstractVFS.getRoot(bundleURL));
-   }
-   
    protected Bundle installBundle(Archive<?> archive) throws BundleException, IOException
    {
       VirtualFile virtualFile = OSGiTestHelper.toVirtualFile(archive);
-      return installBundle(virtualFile);
+      return installBundle(archive.getName(), virtualFile.openStream());
    }
    
    protected Bundle installBundle(VirtualFile virtualFile) throws BundleException, IOException
    {
       String location = virtualFile.getPathName();
-      return systemContext.installBundle(location, virtualFile.openStream());
+      return installBundle(location, virtualFile.openStream());
+   }
+   
+   protected Bundle installBundle(String location) throws BundleException, IOException
+   {
+      URL bundleURL = getTestHelper().getTestArchiveURL(location);
+      VirtualFile virtualFile = AbstractVFS.getRoot(bundleURL);
+      return installBundle(location, virtualFile.openStream());
+   }
+   
+   protected Bundle installBundle(String location, InputStream inputStream) throws BundleException
+   {
+      return systemContext.installBundle(location, inputStream);
    }
    
    protected void assertLoadClass(Bundle bundle, String className, Bundle exporter)

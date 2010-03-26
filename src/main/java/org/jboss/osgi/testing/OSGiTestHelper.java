@@ -172,12 +172,12 @@ public class OSGiTestHelper
       return framework;
    }
 
-   public VirtualFile assembleArchive(String name, String resource, Class<?>... packages) throws Exception
+   public Archive<?> assembleArchive(String name, String resource, Class<?>... packages) throws Exception
    {
       return assembleArchive(name, new String[] { resource }, packages);
    }
 
-   public VirtualFile assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException
+   public Archive<?> assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException
    {
       JavaArchive archive = Archives.create(name + ".jar", JavaArchive.class);
       if (resources != null)
@@ -213,17 +213,14 @@ public class OSGiTestHelper
             addResources(archive, base, classes);
          }
       }
-
-      // Convert archive to file URL 
-      VirtualFile virtualFile = toVirtualFile(archive);
-      return virtualFile;
+      return archive;
    }
 
    @SuppressWarnings("rawtypes")
    public static VirtualFile toVirtualFile(Archive archive) throws IOException, MalformedURLException
    {
       ZipExporter exporter = archive.as(ZipExporter.class);
-      File target = File.createTempFile("archive_", ".jar");
+      File target = File.createTempFile("osgi-bundle_", ".jar");
       exporter.exportZip(target, true);
       target.deleteOnExit();
       return AbstractVFS.getRoot(target.toURI().toURL());
