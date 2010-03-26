@@ -144,7 +144,7 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#getInitialContext()}
     */
-   public InitialContext getInitialContext() throws NamingException
+   protected InitialContext getInitialContext() throws NamingException
    {
       return getTestHelper().getInitialContext();
    }
@@ -152,7 +152,7 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#getServerHost()}
     */
-   public String getServerHost()
+   protected String getServerHost()
    {
       return getTestHelper().getServerHost();
    }
@@ -160,7 +160,7 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#getTargetContainer()}
     */
-   public String getTargetContainer()
+   protected String getTargetContainer()
    {
       return getTestHelper().getTargetContainer();
    }
@@ -168,7 +168,7 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#getFrameworkName()}
     */
-   public String getFrameworkName()
+   protected String getFrameworkName()
    {
       return getTestHelper().getFrameworkName();
    }
@@ -176,28 +176,31 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#assembleArchive(String, String, Class...)}
     */
-   public Archive<?> assembleArchive(String name, String resource, Class<?>... packages) throws Exception
+   protected Archive<?> assembleArchive(String name, String resource, Class<?>... packages) throws Exception
    {
       return getTestHelper().assembleArchive(name, resource, packages);
    }
 
-   public VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
-   {
-      return OSGiTestHelper.toVirtualFile(archive);
-   }
-   
    /**
     * Delegates to {@link OSGiTestHelper#assembleArchive(String, String[], Class...)}
     */
-   public Archive<?> assembleArchive(String name, String[] resources, Class<?>... packages) throws Exception
+   protected Archive<?> assembleArchive(String name, String[] resources, Class<?>... packages) throws Exception
    {
       return getTestHelper().assembleArchive(name, resources, packages);
    }
 
    /**
+    * Delegates to {@link OSGiTestHelper#toVirtualFile(Archive)}
+    */
+   protected VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
+   {
+      return OSGiTestHelper.toVirtualFile(archive);
+   }
+   
+   /**
     * Delegates to {@link OSGiTestHelper#assertBundleState(int, int)}
     */
-   public void assertBundleState(int expState, int wasState)
+   protected void assertBundleState(int expState, int wasState)
    {
       getTestHelper().assertBundleState(expState, wasState);
    }
@@ -205,7 +208,7 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#assertLoadClass(Bundle, String)}
     */
-   public Class<?> assertLoadClass(Bundle bundle, String className)
+   protected Class<?> assertLoadClass(Bundle bundle, String className)
    {
       return getTestHelper().assertLoadClass(bundle, className);
    }
@@ -213,7 +216,7 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#assertLoadClassFail(Bundle, String)}
     */
-   public void assertLoadClassFail(Bundle bundle, String className)
+   protected void assertLoadClassFail(Bundle bundle, String className)
    {
       getTestHelper().assertLoadClassFail(bundle, className);
    }
