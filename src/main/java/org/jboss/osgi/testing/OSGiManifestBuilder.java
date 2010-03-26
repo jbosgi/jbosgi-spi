@@ -47,6 +47,7 @@ public final class OSGiManifestBuilder implements Asset
    private PrintWriter pw;
    private List<String> importPackages = new ArrayList<String>();
    private List<String> exportPackages = new ArrayList<String>();
+   private List<String> dynamicImportPackages = new ArrayList<String>();
 
    public static OSGiManifestBuilder newInstance()
    {
@@ -86,6 +87,14 @@ public final class OSGiManifestBuilder implements Asset
       return this;
    }
 
+   public OSGiManifestBuilder addDynamicImportPackages(String... packages)
+   {
+      for (String aux : packages)
+         dynamicImportPackages.add(aux);
+
+      return this;
+   }
+
    public OSGiManifestBuilder addExportPackages(String... packages)
    {
       for (String aux : packages)
@@ -102,6 +111,7 @@ public final class OSGiManifestBuilder implements Asset
 
    public Manifest getManifest()
    {
+      // Export-Package
       if (exportPackages.size() > 0)
       {
          pw.print(Constants.EXPORT_PACKAGE + ": ");
@@ -115,6 +125,7 @@ public final class OSGiManifestBuilder implements Asset
          pw.println();
       }
       
+      // Import-Package
       if (importPackages.size() > 0)
       {
          pw.print(Constants.IMPORT_PACKAGE + ": ");
@@ -124,6 +135,20 @@ public final class OSGiManifestBuilder implements Asset
                pw.print(",");
             
             pw.print(importPackages.get(i));
+         }
+         pw.println();
+      }
+      
+      // DynamicImport-Package
+      if (dynamicImportPackages.size() > 0)
+      {
+         pw.print(Constants.DYNAMICIMPORT_PACKAGE + ": ");
+         for (int i = 0; i < dynamicImportPackages.size(); i++)
+         {
+            if (i > 0)
+               pw.print(",");
+            
+            pw.print(dynamicImportPackages.get(i));
          }
          pw.println();
       }
