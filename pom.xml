@@ -20,7 +20,7 @@
   <artifactId>jboss-osgi-spi</artifactId>
   <packaging>jar</packaging>
 
-  <version>1.0.5</version>
+  <version>1.0.6-SNAPSHOT</version>
   
   <!-- Parent -->
   <parent>
@@ -140,9 +140,9 @@
 
   <!-- Subversion -->
   <scm>
-    <connection>scm:svn:http://anonsvn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/tags/jboss-osgi-spi-1.0.5</connection>
-    <developerConnection>scm:svn:https://svn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/tags/jboss-osgi-spi-1.0.5</developerConnection>
-    <url>http://fisheye.jboss.com/qsearch/JBossOSGi/tags/jboss-osgi-spi-1.0.5</url>
+    <connection>scm:svn:http://anonsvn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/trunk</connection>
+    <developerConnection>scm:svn:https://svn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/trunk</developerConnection>
+    <url>http://fisheye.jboss.com/qsearch/JBossOSGi</url>
   </scm>
   
 </project>
