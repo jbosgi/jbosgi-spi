@@ -20,21 +20,21 @@
   <artifactId>jboss-osgi-spi</artifactId>
   <packaging>jar</packaging>
 
-  <version>1.0.5-SNAPSHOT</version>
+  <version>1.0.5</version>
   
   <!-- Parent -->
   <parent>
     <groupId>org.jboss.osgi</groupId>
     <artifactId>jboss-osgi-parent</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.5</version>
   </parent>
 
   <!-- Properties -->
   <properties>
     <version.args4j>2.0.12</version.args4j>
-    <version.jboss.osgi.jmx>1.0.4-SNAPSHOT</version.jboss.osgi.jmx>
-    <version.jboss.osgi.vfs>1.0.0-SNAPSHOT</version.jboss.osgi.vfs>
-    <version.jboss.shrinkwrap>1.0.0-SNAPSHOT</version.jboss.shrinkwrap>
+    <version.jboss.osgi.jmx>1.0.4</version.jboss.osgi.jmx>
+    <version.jboss.osgi.vfs>1.0.0</version.jboss.osgi.vfs>
+    <version.jboss.shrinkwrap>1.0.0-alpha-6</version.jboss.shrinkwrap>
     <version.osgi>4.2.0</version.osgi>
   </properties>
   
@@ -140,9 +140,9 @@
 
   <!-- Subversion -->
   <scm>
-    <connection>scm:svn:http://anonsvn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/trunk</connection>
-    <developerConnection>scm:svn:https://svn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/trunk</developerConnection>
-    <url>http://fisheye.jboss.com/qsearch/JBossOSGi</url>
+    <connection>scm:svn:http://anonsvn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/tags/jboss-osgi-spi-1.0.5</connection>
+    <developerConnection>scm:svn:https://svn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/tags/jboss-osgi-spi-1.0.5</developerConnection>
+    <url>http://fisheye.jboss.com/qsearch/JBossOSGi/tags/jboss-osgi-spi-1.0.5</url>
   </scm>
   
 </project>
