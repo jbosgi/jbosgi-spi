@@ -79,7 +79,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    private final List<ServiceEvent> serviceEvents = new CopyOnWriteArrayList<ServiceEvent>();
 
    @BeforeClass
-   public static void beforeClass() throws Exception
+   public static void beforeFrameworkTestClass() throws Exception
    {
       OSGiBootstrapProvider bootProvider = OSGiBootstrap.getBootstrapProvider();
       framework = bootProvider.getFramework();
@@ -90,7 +90,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    }
 
    @AfterClass
-   public static void afterClass() throws Exception
+   public static void afterFrameworkTestClass() throws Exception
    {
       if (framework != null)
       {
