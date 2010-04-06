@@ -30,24 +30,29 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.jboss.logging.Logger;
+import org.jboss.osgi.jmx.JMXConstantsExt;
 import org.jboss.osgi.jmx.MBeanProxy;
 import org.jboss.osgi.jmx.ObjectNameFactory;
 import org.jboss.osgi.jmx.ServiceStateMBeanExt;
 import org.jboss.osgi.spi.util.BundleInfo;
 import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
-import org.jboss.osgi.testing.OSGiServiceReference;
 import org.jboss.osgi.testing.OSGiRuntimeHelper;
+import org.jboss.osgi.testing.OSGiServiceReference;
 import org.osgi.framework.BundleException;
 import org.osgi.jmx.framework.BundleStateMBean;
 import org.osgi.jmx.framework.ServiceStateMBean;
@@ -62,8 +67,6 @@ public class RemoteRuntime extends OSGiRuntimeImpl
 {
    // Provide logging
    private static final Logger log = Logger.getLogger(RemoteRuntime.class);
-   
-   private MBeanServerConnection mbeanServer;
 
    public RemoteRuntime(OSGiRuntimeHelper helper)
    {
@@ -209,6 +212,30 @@ public class RemoteRuntime extends OSGiRuntimeImpl
    @Override
    public MBeanServerConnection getMBeanServer()
    {
+      MBeanServerConnection mbeanServer = null;
+      try
+      {
+         String host = getServerHost();
+         String rmiPort = System.getProperty(JMXConstantsExt.REMOTE_JMX_RMI_PORT, "1098");
+
+         // Construct the JSR160 remote address  
+         JMXServiceURL address = new JMXServiceURL("service:jmx:rmi://" + host + "/jndi/rmi://" + host + ":" + rmiPort + "/jmxconnector");
+
+         // The environment map, null in this case
+         Map<String, ?> env = null;
+
+         // Create the JMXCconnectorServer
+         JMXConnector cntor = JMXConnectorFactory.connect(address, env);
+
+         // Obtain a "stub" for the remote MBeanServer
+         mbeanServer = cntor.getMBeanServerConnection();
+      }
+      catch (Exception ex)
+      {
+         log.warn("Cannot obtain MBeanServerConnection", ex);
+      }
+
+      // Fall back to the legacy JNDI name
       if (mbeanServer == null)
       {
          try
@@ -218,9 +245,10 @@ public class RemoteRuntime extends OSGiRuntimeImpl
          }
          catch (NamingException ex)
          {
-            throw new IllegalStateException("Cannot obtain MBeanServerConnection", ex);
+            log.warn("Cannot obtain MBeanServerConnection", ex);
          }
       }
+      
       return mbeanServer;
    }
 
