@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.management.MBeanServerConnection;
@@ -38,13 +37,10 @@ import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.jboss.logging.Logger;
-import org.jboss.osgi.jmx.JMXConstantsExt;
 import org.jboss.osgi.jmx.MBeanProxy;
 import org.jboss.osgi.jmx.ObjectNameFactory;
 import org.jboss.osgi.jmx.ServiceStateMBeanExt;
@@ -231,55 +227,10 @@ public class RemoteRuntime extends OSGiRuntimeImpl
          }
          catch (NamingException ex)
          {
-            log.debug("Cannot obtain MBeanServerConnection through the RMIAdaptor", ex);
+            throw new IllegalStateException("Cannot obtain MBeanServerConnection");
          }
       }
-      
-      // Fall back to the JMXConnector
-      if (mbeanServer == null)
-      {
-         jmxConnector = getJMXConnector();
-         if (jmxConnector != null)
-         {
-            try
-            {
-               mbeanServer = jmxConnector.getMBeanServerConnection();
-            }
-            catch (IOException ex)
-            {
-               log.debug("Cannot obtain MBeanServerConnection through JMXConnector", ex);
-            }
-         }
-      }
-      
-      if (mbeanServer == null)
-         throw new IllegalStateException("Cannot obtain MBeanServerConnection");
-      
       return mbeanServer;
-   }
-
-   private JMXConnector getJMXConnector()
-   {
-      JMXConnector connector = null;
-      try
-      {
-         String host = getServerHost();
-         String rmiPort = System.getProperty(JMXConstantsExt.REMOTE_JMX_RMI_PORT, "1098");
-
-         // Construct the JSR160 remote address  
-         JMXServiceURL address = new JMXServiceURL("service:jmx:rmi://" + host + "/jndi/rmi://" + host + ":" + rmiPort + "/jmxconnector");
-
-         // The environment map, null in this case
-         Map<String, ?> env = null;
-
-         // Create the JMXCconnectorServer
-         connector = JMXConnectorFactory.connect(address, env);
-      }
-      catch (Exception ex)
-      {
-         log.debug("Cannot obtain JMXConnector", ex);
-      }
-      return connector;
    }
 
    @Override
