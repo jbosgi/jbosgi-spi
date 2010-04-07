@@ -134,7 +134,7 @@ class RemoteBundle extends OSGiBundleImpl
       {
          Throwable cause = rte.getCause() != null ? rte.getCause() : rte;
          if (cause instanceof InstanceNotFoundException == false)
-            log.warn("Cannot get state for bundle: " + bundleId, cause);
+            log.warn("Cannot get state for bundle: " + this, cause);
 
          return Bundle.UNINSTALLED;
       }
@@ -281,7 +281,7 @@ class RemoteBundle extends OSGiBundleImpl
       }
       catch (IOException ex)
       {
-         throw new BundleException("Cannot start bundle: " + bundleId, ex);
+         throw new BundleException("Cannot start bundle: " + this, ex);
       }
    }
 
@@ -295,7 +295,7 @@ class RemoteBundle extends OSGiBundleImpl
       }
       catch (IOException ex)
       {
-         throw new BundleException("Cannot stop bundle: " + bundleId, ex);
+         throw new BundleException("Cannot stop bundle: " + this, ex);
       }
    }
 

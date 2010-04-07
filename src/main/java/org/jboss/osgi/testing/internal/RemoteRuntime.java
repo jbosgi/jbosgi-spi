@@ -67,12 +67,21 @@ public class RemoteRuntime extends OSGiRuntimeImpl
 {
    // Provide logging
    private static final Logger log = Logger.getLogger(RemoteRuntime.class);
+   
+   private MBeanServerConnection mbeanServer;
+   private JMXConnector jmxConnector;
 
    public RemoteRuntime(OSGiRuntimeHelper helper)
    {
       super(helper);
    }
 
+   @Override
+   public boolean isRemoteRuntime()
+   {
+      return true;
+   }
+   
    @Override
    OSGiBundle installBundleInternal(BundleInfo info) throws BundleException
    {
@@ -212,7 +221,46 @@ public class RemoteRuntime extends OSGiRuntimeImpl
    @Override
    public MBeanServerConnection getMBeanServer()
    {
-      MBeanServerConnection mbeanServer = null;
+      // Get the MBeanServerConnection through the RMIAdaptor
+      if (mbeanServer == null)
+      {
+         try
+         {
+            InitialContext iniCtx = getInitialContext();
+            mbeanServer = (MBeanServerConnection)iniCtx.lookup("osgi/jmx/RMIAdaptor");
+         }
+         catch (NamingException ex)
+         {
+            log.debug("Cannot obtain MBeanServerConnection through the RMIAdaptor", ex);
+         }
+      }
+      
+      // Fall back to the JMXConnector
+      if (mbeanServer == null)
+      {
+         jmxConnector = getJMXConnector();
+         if (jmxConnector != null)
+         {
+            try
+            {
+               mbeanServer = jmxConnector.getMBeanServerConnection();
+            }
+            catch (IOException ex)
+            {
+               log.debug("Cannot obtain MBeanServerConnection through JMXConnector", ex);
+            }
+         }
+      }
+      
+      if (mbeanServer == null)
+         throw new IllegalStateException("Cannot obtain MBeanServerConnection");
+      
+      return mbeanServer;
+   }
+
+   private JMXConnector getJMXConnector()
+   {
+      JMXConnector connector = null;
       try
       {
          String host = getServerHost();
@@ -225,36 +273,31 @@ public class RemoteRuntime extends OSGiRuntimeImpl
          Map<String, ?> env = null;
 
          // Create the JMXCconnectorServer
-         JMXConnector cntor = JMXConnectorFactory.connect(address, env);
-
-         // Obtain a "stub" for the remote MBeanServer
-         mbeanServer = cntor.getMBeanServerConnection();
+         connector = JMXConnectorFactory.connect(address, env);
       }
       catch (Exception ex)
       {
-         log.warn("Cannot obtain MBeanServerConnection", ex);
+         log.debug("Cannot obtain JMXConnector", ex);
       }
-
-      // Fall back to the legacy JNDI name
-      if (mbeanServer == null)
-      {
-         try
-         {
-            InitialContext iniCtx = getInitialContext();
-            mbeanServer = (MBeanServerConnection)iniCtx.lookup("jmx/invoker/RMIAdaptor");
-         }
-         catch (NamingException ex)
-         {
-            log.warn("Cannot obtain MBeanServerConnection", ex);
-         }
-      }
-      
-      return mbeanServer;
+      return connector;
    }
 
    @Override
-   public boolean isRemoteRuntime()
+   public void shutdown()
    {
-      return true;
+      super.shutdown();
+      
+      // Close the JMXConnector
+      if (jmxConnector != null)
+      {
+         try
+         {
+            jmxConnector.close();
+         }
+         catch (IOException ex)
+         {
+            log.warn("Cannot close JMXConnector", ex);
+         }
+      }
    }
 }
