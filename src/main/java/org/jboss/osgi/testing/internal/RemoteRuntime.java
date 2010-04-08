@@ -37,10 +37,11 @@ import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 import javax.management.remote.JMXConnector;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.jboss.logging.Logger;
+import org.jboss.osgi.jmx.JMXServiceURLFactory;
 import org.jboss.osgi.jmx.MBeanProxy;
 import org.jboss.osgi.jmx.ObjectNameFactory;
 import org.jboss.osgi.jmx.ServiceStateMBeanExt;
@@ -63,7 +64,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
 {
    // Provide logging
    private static final Logger log = Logger.getLogger(RemoteRuntime.class);
-   
+
    private MBeanServerConnection mbeanServer;
    private JMXConnector jmxConnector;
 
@@ -77,7 +78,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
    {
       return true;
    }
-   
+
    @Override
    OSGiBundle installBundleInternal(BundleInfo info) throws BundleException
    {
@@ -217,15 +218,16 @@ public class RemoteRuntime extends OSGiRuntimeImpl
    @Override
    public MBeanServerConnection getMBeanServer()
    {
-      // Get the MBeanServerConnection through the RMIAdaptor
+      // Get the MBeanServerConnection through the JMXConnector
       if (mbeanServer == null)
       {
          try
          {
-            InitialContext iniCtx = getInitialContext();
-            mbeanServer = (MBeanServerConnection)iniCtx.lookup("osgi/jmx/RMIAdaptor");
+            JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(getServerHost(), null, null);
+            jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
+            mbeanServer = jmxConnector.getMBeanServerConnection();
          }
-         catch (NamingException ex)
+         catch (IOException ex)
          {
             throw new IllegalStateException("Cannot obtain MBeanServerConnection");
          }
@@ -237,7 +239,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
    public void shutdown()
    {
       super.shutdown();
-      
+
       // Close the JMXConnector
       if (jmxConnector != null)
       {
