@@ -384,8 +384,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    }
    
    /**
-    * Get the JMXSupport for this test
-    * @return
+    * Get the JMXSupport for this framework test.
     */
    protected JMXSupport getJMXSupport()
    {
@@ -395,6 +394,29 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
          jmxSupport = new JMXSupport(mbeanServer);
       }
       return jmxSupport;
+   }
+   
+   /**
+    * Get a ServiceReference within the given timeout.
+    */
+   protected ServiceReference getServiceReference(String clazz, long timeout)
+   {
+      int fraction = 200;
+      timeout = timeout / fraction;
+      ServiceReference sref = systemContext.getServiceReference(clazz);
+      while (sref == null && 0 < timeout--)
+      {
+         try
+         {
+            Thread.sleep(fraction);
+         }
+         catch (InterruptedException e)
+         {
+            // ignore
+         }
+         sref = systemContext.getServiceReference(clazz);
+      }
+      return sref;
    }
    
    @SuppressWarnings("rawtypes")
