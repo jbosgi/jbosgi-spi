@@ -235,6 +235,9 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
    protected Framework createFramework(Map<String, Object> properties)
    {
       FrameworkFactory factory = ServiceLoader.loadService(FrameworkFactory.class);
+      if (factory == null)
+         throw new IllegalStateException("Cannot load: META-INF/services/org.osgi.framework.launch.FrameworkFactory");
+      
       Framework framework = factory.newFramework(properties);
       return framework;
    }

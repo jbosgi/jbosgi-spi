@@ -29,20 +29,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.jboss.logging.Logger;
-import org.jboss.osgi.jmx.BundleStateMBeanExt;
-import org.jboss.osgi.jmx.FrameworkMBeanExt;
-import org.jboss.osgi.jmx.MBeanProxy;
-import org.jboss.osgi.jmx.ObjectNameFactory;
-import org.jboss.osgi.jmx.PackageStateMBeanExt;
-import org.jboss.osgi.jmx.ServiceStateMBeanExt;
 import org.jboss.osgi.spi.capability.Capability;
 import org.jboss.osgi.spi.util.BundleInfo;
+import org.jboss.osgi.testing.JMXSupport;
 import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.jboss.osgi.testing.OSGiRuntimeHelper;
@@ -52,10 +45,6 @@ import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
-import org.osgi.jmx.framework.BundleStateMBean;
-import org.osgi.jmx.framework.FrameworkMBean;
-import org.osgi.jmx.framework.PackageStateMBean;
-import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
  * An abstract implementation of the {@link OSGiRuntime}
@@ -68,15 +57,11 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiRuntimeImpl.class);
 
+   private JMXSupport jmxSupport;
    private OSGiRuntimeHelper helper;
    private Map<String, BundleTuple> bundles = new LinkedHashMap<String, BundleTuple>();
    private List<Capability> capabilities = new ArrayList<Capability>();
    
-   private FrameworkMBean frameworkState;
-   private BundleStateMBean bundleState;
-   private ServiceStateMBean serviceState;
-   private PackageStateMBean packageState;
-
    public OSGiRuntimeImpl(OSGiRuntimeHelper helper)
    {
       this.helper = helper;
@@ -195,82 +180,14 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       log.debug("End Shutdown");
    }
 
-   public FrameworkMBean getFrameworkMBean() throws IOException
+   public JMXSupport getJMXSupport()
    {
-      if (frameworkState == null)
-      {
-         ObjectName objectName = ObjectNameFactory.create(FrameworkMBeanExt.OBJECTNAME);
-         MBeanServerConnection server = getMBeanServer();
-         if (server.isRegistered(objectName))
-         {
-            frameworkState = MBeanProxy.get(server, objectName, FrameworkMBeanExt.class);
-         }
-         else
-         {
-            objectName = ObjectNameFactory.create(FrameworkMBean.OBJECTNAME);
-            frameworkState = MBeanProxy.get(server, objectName, FrameworkMBean.class);
-         }
-      }
-      return frameworkState;
+      if (jmxSupport == null)
+         jmxSupport = new JMXSupport(getMBeanServer());
+      
+      return jmxSupport;
    }
-
-   public BundleStateMBean getBundleStateMBean() throws IOException
-   {
-      if (bundleState == null)
-      {
-         MBeanServerConnection server = getMBeanServer();
-         ObjectName objectName = ObjectNameFactory.create(BundleStateMBeanExt.OBJECTNAME);
-         if (server.isRegistered(objectName))
-         {
-            bundleState = MBeanProxy.get(server, objectName, BundleStateMBeanExt.class);
-         }
-         else
-         {
-            objectName = ObjectNameFactory.create(BundleStateMBean.OBJECTNAME);
-            bundleState = MBeanProxy.get(server, objectName, BundleStateMBean.class);
-         }
-      }
-      return bundleState;
-   }
-
-   public PackageStateMBean getPackageStateMBean() throws IOException
-   {
-      if (packageState == null)
-      {
-         MBeanServerConnection server = getMBeanServer();
-         ObjectName objectName = ObjectNameFactory.create(PackageStateMBeanExt.OBJECTNAME);
-         if (server.isRegistered(objectName))
-         {
-            packageState = MBeanProxy.get(server, objectName, PackageStateMBeanExt.class);
-         }
-         else
-         {
-            objectName = ObjectNameFactory.create(PackageStateMBean.OBJECTNAME);
-            packageState = MBeanProxy.get(server, objectName, PackageStateMBean.class);
-         }
-      }
-      return packageState;
-   }
-
-   public ServiceStateMBean getServiceStateMBean() throws IOException
-   {
-      if (serviceState == null)
-      {
-         MBeanServerConnection server = getMBeanServer();
-         ObjectName objectName = ObjectNameFactory.create(ServiceStateMBeanExt.OBJECTNAME);
-         if (server.isRegistered(objectName))
-         {
-            serviceState = MBeanProxy.get(server, objectName, ServiceStateMBeanExt.class);
-         }
-         else
-         {
-            objectName = ObjectNameFactory.create(ServiceStateMBean.OBJECTNAME);
-            serviceState = MBeanProxy.get(server, objectName, ServiceStateMBean.class);
-         }
-      }
-      return serviceState;
-   }
-
+   
    public InitialContext getInitialContext() throws NamingException
    {
       return helper.getInitialContext();

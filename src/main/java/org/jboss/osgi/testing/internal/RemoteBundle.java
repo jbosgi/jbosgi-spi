@@ -34,15 +34,13 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import javax.management.InstanceNotFoundException;
-import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.jmx.BundleStateMBeanExt;
-import org.jboss.osgi.jmx.MBeanProxy;
-import org.jboss.osgi.jmx.ObjectNameFactory;
 import org.jboss.osgi.spi.util.UnmodifiableDictionary;
+import org.jboss.osgi.testing.JMXSupport;
 import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.osgi.framework.Bundle;
@@ -76,8 +74,8 @@ class RemoteBundle extends OSGiBundleImpl
       super(runtime);
       this.bundleId = bundleId;
 
-      ObjectName objectName = ObjectNameFactory.create(BundleStateMBeanExt.OBJECTNAME);
-      bundleState = MBeanProxy.get(runtime.getMBeanServer(), objectName, BundleStateMBeanExt.class);
+      JMXSupport jmxSupport = runtime.getJMXSupport();
+      bundleState = (BundleStateMBeanExt)jmxSupport.getBundleStateMBean();
       
       symbolicName = bundleState.getSymbolicName(bundleId);
       location = bundleState.getLocation(bundleId);
@@ -113,7 +111,8 @@ class RemoteBundle extends OSGiBundleImpl
 
       try
       {
-         BundleStateMBean bundleState = getRuntime().getBundleStateMBean();
+         JMXSupport jmxSupport = getRuntime().getJMXSupport();
+         BundleStateMBean bundleState = jmxSupport.getBundleStateMBean();
          String state = bundleState.getState(bundleId);
          if ("INSTALLED".equals(state))
             return Bundle.INSTALLED;
@@ -277,7 +276,8 @@ class RemoteBundle extends OSGiBundleImpl
       assertNotUninstalled();
       try
       {
-         getRuntime().getFrameworkMBean().startBundle(bundleId);
+         JMXSupport jmxSupport = getRuntime().getJMXSupport();
+         jmxSupport.getFrameworkMBean().startBundle(bundleId);
       }
       catch (IOException ex)
       {
@@ -291,7 +291,8 @@ class RemoteBundle extends OSGiBundleImpl
       assertNotUninstalled();
       try
       {
-         getRuntime().getFrameworkMBean().stopBundle(bundleId);
+         JMXSupport jmxSupport = getRuntime().getJMXSupport();
+         jmxSupport.getFrameworkMBean().stopBundle(bundleId);
       }
       catch (IOException ex)
       {
@@ -305,8 +306,9 @@ class RemoteBundle extends OSGiBundleImpl
       assertNotUninstalled();
       try
       {
+         JMXSupport jmxSupport = getRuntime().getJMXSupport();
+         jmxSupport.getFrameworkMBean().uninstallBundle(bundleId);
          OSGiRuntimeImpl runtimeImpl = (OSGiRuntimeImpl)getRuntime();
-         runtimeImpl.getFrameworkMBean().uninstallBundle(bundleId);
          runtimeImpl.uninstallBundle(this);
          uninstalled = true;
       }

@@ -32,10 +32,6 @@ import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
-import org.osgi.jmx.framework.BundleStateMBean;
-import org.osgi.jmx.framework.FrameworkMBean;
-import org.osgi.jmx.framework.PackageStateMBean;
-import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
  * An abstraction of an OSGi Runtime.
@@ -76,24 +72,14 @@ public interface OSGiRuntime
    OSGiBundle installBundle(String location) throws BundleException;
 
    /**
-    * Get the FrameworkMBean
+    * Get the MBeanServerConnection for this {@link OSGiRuntime}
     */
-   FrameworkMBean getFrameworkMBean() throws IOException;
+   MBeanServerConnection getMBeanServer();
 
    /**
-    * Get the BundleStateMBean
+    * Get the JMXSupport for this {@link OSGiRuntime}
     */
-   BundleStateMBean getBundleStateMBean() throws IOException;
-
-   /**
-    * Get the ServiceStateMBean
-    */
-   ServiceStateMBean getServiceStateMBean() throws IOException;
-
-   /**
-    * Get the PackageStateMBean
-    */
-   PackageStateMBean getPackageStateMBean() throws IOException;
+   JMXSupport getJMXSupport();
 
    /**
     * Get the array of installed {@link OSGiBundle}s
@@ -146,11 +132,6 @@ public interface OSGiRuntime
     * Get the initial naming context for this {@link OSGiRuntime}
     */
    InitialContext getInitialContext() throws NamingException;
-
-   /**
-    * Get the MBeanServerConnection for this {@link OSGiRuntime}
-    */
-   MBeanServerConnection getMBeanServer();
 
    /**
     * Get the host name that this {@link OSGiRuntime} is running on.

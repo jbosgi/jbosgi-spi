@@ -52,6 +52,7 @@ import org.jboss.osgi.testing.OSGiRuntimeHelper;
 import org.jboss.osgi.testing.OSGiServiceReference;
 import org.osgi.framework.BundleException;
 import org.osgi.jmx.framework.BundleStateMBean;
+import org.osgi.jmx.framework.FrameworkMBean;
 import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
@@ -65,7 +66,6 @@ public class RemoteRuntime extends OSGiRuntimeImpl
    // Provide logging
    private static final Logger log = Logger.getLogger(RemoteRuntime.class);
 
-   private MBeanServerConnection mbeanServer;
    private JMXConnector jmxConnector;
 
    public RemoteRuntime(OSGiRuntimeHelper helper)
@@ -86,7 +86,8 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       {
          String location = info.getLocation();
          String streamURL = info.getRoot().getStreamURL().toExternalForm();
-         long bundleId = getFrameworkMBean().installBundleFromURL(location, streamURL);
+         FrameworkMBean frameworkMBean = getJMXSupport().getFrameworkMBean();
+         long bundleId = frameworkMBean.installBundleFromURL(location, streamURL);
          return new RemoteBundle(this, bundleId);
       }
       catch (RuntimeException rte)
@@ -119,7 +120,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       Set<OSGiBundle> bundles = new HashSet<OSGiBundle>();
       try
       {
-         TabularData listBundles = getBundleStateMBean().listBundles();
+         TabularData listBundles = getJMXSupport().getBundleStateMBean().listBundles();
          Iterator<?> iterator = listBundles.values().iterator();
          while (iterator.hasNext())
          {
@@ -218,21 +219,17 @@ public class RemoteRuntime extends OSGiRuntimeImpl
    @Override
    public MBeanServerConnection getMBeanServer()
    {
-      // Get the MBeanServerConnection through the JMXConnector
-      if (mbeanServer == null)
+      try
       {
-         try
-         {
-            JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(getServerHost(), null, null);
-            jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
-            mbeanServer = jmxConnector.getMBeanServerConnection();
-         }
-         catch (IOException ex)
-         {
-            throw new IllegalStateException("Cannot obtain MBeanServerConnection");
-         }
+         // Get the MBeanServerConnection through the JMXConnector
+         JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(getServerHost(), null, null);
+         jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
+         return jmxConnector.getMBeanServerConnection();
       }
-      return mbeanServer;
+      catch (IOException ex)
+      {
+         throw new IllegalStateException("Cannot obtain MBeanServerConnection");
+      }
    }
 
    @Override

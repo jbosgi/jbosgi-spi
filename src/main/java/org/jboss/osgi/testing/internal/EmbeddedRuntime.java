@@ -29,14 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
-import javax.management.MBeanServerFactory;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.capability.Capability;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.util.BundleInfo;
+import org.jboss.osgi.testing.JMXSupport;
 import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.jboss.osgi.testing.OSGiRuntimeHelper;
@@ -174,26 +173,7 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
    @Override
    public MBeanServerConnection getMBeanServer()
    {
-      MBeanServer mbeanServer = null;
-      
-      ArrayList<MBeanServer> serverArr = MBeanServerFactory.findMBeanServer(null);
-      if (serverArr.size() > 1)
-         log.warn("Multiple MBeanServer instances: " + serverArr);
-   
-      if (serverArr.size() > 0)
-      {
-         mbeanServer = serverArr.get(0);
-         log.debug("Found MBeanServer: " + mbeanServer);
-      }
-   
-      if (mbeanServer == null)
-      {
-         log.debug("No MBeanServer, create one ...");
-         mbeanServer = MBeanServerFactory.createMBeanServer();
-         log.debug("Created MBeanServer: " + mbeanServer);
-      }
-      
-      return mbeanServer;
+      return JMXSupport.getLocalMBeanServer();
    }
 
    @Override

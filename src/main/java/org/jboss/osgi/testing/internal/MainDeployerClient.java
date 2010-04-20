@@ -26,6 +26,7 @@ package org.jboss.osgi.testing.internal;
 import java.net.URL;
 
 import javax.management.MBeanException;
+import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
 import org.jboss.osgi.jmx.ObjectNameFactory;
@@ -61,8 +62,9 @@ class MainDeployerClient
    {
       try
       {
+         MBeanServerConnection mbeanServer = runtime.getJMXSupport().getMBeanServer();
          ObjectName objectName = ObjectNameFactory.create("jboss.system:service=MainDeployer");
-         runtime.getMBeanServer().invoke(objectName, method, new Object[] { url }, new String[] { URL.class.getName() });
+         mbeanServer.invoke(objectName, method, new Object[] { url }, new String[] { URL.class.getName() });
       }
       catch (RuntimeException rte)
       {

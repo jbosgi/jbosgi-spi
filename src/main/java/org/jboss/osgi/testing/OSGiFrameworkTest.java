@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.management.MBeanServer;
+
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
@@ -77,6 +79,8 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    private final List<FrameworkEvent> frameworkEvents = new CopyOnWriteArrayList<FrameworkEvent>();
    private final List<BundleEvent> bundleEvents = new CopyOnWriteArrayList<BundleEvent>();
    private final List<ServiceEvent> serviceEvents = new CopyOnWriteArrayList<ServiceEvent>();
+   
+   private JMXSupport jmxSupport;
 
    @BeforeClass
    public static void beforeFrameworkTestClass() throws Exception
@@ -377,6 +381,20 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
          // should not reach this
          return null;
       }
+   }
+   
+   /**
+    * Get the JMXSupport for this test
+    * @return
+    */
+   protected JMXSupport getJMXSupport()
+   {
+      if (jmxSupport == null)
+      {
+         MBeanServer mbeanServer = JMXSupport.getLocalMBeanServer();
+         jmxSupport = new JMXSupport(mbeanServer);
+      }
+      return jmxSupport;
    }
    
    @SuppressWarnings("rawtypes")
