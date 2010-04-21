@@ -29,13 +29,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.capability.Capability;
 import org.jboss.osgi.spi.util.BundleInfo;
-import org.jboss.osgi.testing.JMXSupport;
+import org.jboss.osgi.testing.ClipboardMBean;
 import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.jboss.osgi.testing.OSGiRuntimeHelper;
@@ -45,6 +46,10 @@ import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
+import org.osgi.jmx.framework.BundleStateMBean;
+import org.osgi.jmx.framework.FrameworkMBean;
+import org.osgi.jmx.framework.PackageStateMBean;
+import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
  * An abstract implementation of the {@link OSGiRuntime}
@@ -57,7 +62,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiRuntimeImpl.class);
 
-   private JMXSupport jmxSupport;
+   private ManagementSupport jmxSupport;
    private OSGiRuntimeHelper helper;
    private Map<String, BundleTuple> bundles = new LinkedHashMap<String, BundleTuple>();
    private List<Capability> capabilities = new ArrayList<Capability>();
@@ -72,6 +77,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       return helper;
    }
 
+   @Override
    public void addCapability(Capability capability) throws BundleException
    {
       // Add dependent capabilies
@@ -103,6 +109,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       }
    }
 
+   @Override
    public void removeCapability(Capability capability)
    {
       if (capabilities.remove(capability))
@@ -125,12 +132,14 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
          removeCapability(dependency);
    }
 
+   @Override
    public OSGiBundle installBundle(String location) throws BundleException
    {
       BundleInfo info = BundleInfo.createBundleInfo(location);
       return installBundle(info);
    }
 
+   @Override
    public OSGiBundle installBundle(Archive<?> archive) throws BundleException, IOException
    {
       VirtualFile virtualFile = OSGiTestHelper.toVirtualFile(archive);
@@ -138,6 +147,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       return installBundle(info);
    }
 
+   @Override
    public OSGiBundle installBundle(VirtualFile virtualFile) throws BundleException
    {
       BundleInfo info = BundleInfo.createBundleInfo(virtualFile);
@@ -154,6 +164,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    
    abstract OSGiBundle installBundleInternal(BundleInfo info) throws BundleException;
    
+   @Override
    public void shutdown()
    {
       log.debug("Start Shutdown");
@@ -180,30 +191,70 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       log.debug("End Shutdown");
    }
 
-   public JMXSupport getJMXSupport()
+   @Override
+   public <T> T getMBeanProxy(ObjectName name, Class<T> interf)
+   {
+      return getJMXSupport().getMBeanProxy(name, interf);
+   }
+
+   @Override
+   public FrameworkMBean getFrameworkMBean() throws IOException
+   {
+      return getJMXSupport().getFrameworkMBean();
+   }
+
+   @Override
+   public BundleStateMBean getBundleStateMBean() throws IOException
+   {
+      return getJMXSupport().getBundleStateMBean();
+   }
+
+   @Override
+   public PackageStateMBean getPackageStateMBean() throws IOException
+   {
+      return getJMXSupport().getPackageStateMBean();
+   }
+
+   @Override
+   public ServiceStateMBean getServiceStateMBean() throws IOException
+   {
+      return getJMXSupport().getServiceStateMBean();
+   }
+
+   @Override
+   public ClipboardMBean getClipboardMBean() throws IOException
+   {
+      return getJMXSupport().getClipboardMBean();
+   }
+   
+   private ManagementSupport getJMXSupport()
    {
       if (jmxSupport == null)
-         jmxSupport = new JMXSupport(getMBeanServer());
+         jmxSupport = new ManagementSupport(getMBeanServer());
       
       return jmxSupport;
    }
    
+   @Override
    public InitialContext getInitialContext() throws NamingException
    {
       return helper.getInitialContext();
    }
 
+   @Override
    public String getServerHost()
    {
       return helper.getServerHost();
    }
 
+   @Override
    public OSGiBundle getBundle(String symbolicName, Version version)
    {
       OSGiBundle bundle = getBundle(symbolicName, version, false);
       return bundle;
    }
 
+   @Override
    public OSGiServiceReference getServiceReference(String clazz, long timeout)
    {
       int fraction = 200;

@@ -52,7 +52,6 @@ import org.jboss.osgi.testing.OSGiRuntimeHelper;
 import org.jboss.osgi.testing.OSGiServiceReference;
 import org.osgi.framework.BundleException;
 import org.osgi.jmx.framework.BundleStateMBean;
-import org.osgi.jmx.framework.FrameworkMBean;
 import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
@@ -86,8 +85,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       {
          String location = info.getLocation();
          String streamURL = info.getRoot().getStreamURL().toExternalForm();
-         FrameworkMBean frameworkMBean = getJMXSupport().getFrameworkMBean();
-         long bundleId = frameworkMBean.installBundleFromURL(location, streamURL);
+         long bundleId = getFrameworkMBean().installBundleFromURL(location, streamURL);
          return new RemoteBundle(this, bundleId);
       }
       catch (RuntimeException rte)
@@ -120,7 +118,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       Set<OSGiBundle> bundles = new HashSet<OSGiBundle>();
       try
       {
-         TabularData listBundles = getJMXSupport().getBundleStateMBean().listBundles();
+         TabularData listBundles = getBundleStateMBean().listBundles();
          Iterator<?> iterator = listBundles.values().iterator();
          while (iterator.hasNext())
          {

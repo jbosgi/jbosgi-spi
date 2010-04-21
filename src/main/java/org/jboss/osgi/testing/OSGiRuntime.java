@@ -24,6 +24,7 @@ package org.jboss.osgi.testing;
 import java.io.IOException;
 
 import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -32,6 +33,10 @@ import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Version;
+import org.osgi.jmx.framework.BundleStateMBean;
+import org.osgi.jmx.framework.FrameworkMBean;
+import org.osgi.jmx.framework.PackageStateMBean;
+import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
  * An abstraction of an OSGi Runtime.
@@ -77,10 +82,35 @@ public interface OSGiRuntime
    MBeanServerConnection getMBeanServer();
 
    /**
-    * Get the JMXSupport for this {@link OSGiRuntime}
+    * Get an MBeanProxy for the given interface.
     */
-   JMXSupport getJMXSupport();
+   <T> T getMBeanProxy(ObjectName name, Class<T> interf);
+   
+   /**
+   * Get the FrameworkMBean
+   */
+   FrameworkMBean getFrameworkMBean() throws IOException;
 
+   /**
+   * Get the BundleStateMBean
+   */
+   BundleStateMBean getBundleStateMBean() throws IOException;
+
+   /**
+   * Get the ServiceStateMBean
+   */
+   ServiceStateMBean getServiceStateMBean() throws IOException;
+
+   /**
+   * Get the PackageStateMBean
+   */
+   PackageStateMBean getPackageStateMBean() throws IOException;
+
+   /**
+    * Get the ClipboardMBean
+    */
+   ClipboardMBean getClipboardMBean() throws IOException;
+   
    /**
     * Get the array of installed {@link OSGiBundle}s
     */

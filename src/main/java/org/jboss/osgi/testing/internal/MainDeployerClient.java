@@ -62,7 +62,7 @@ class MainDeployerClient
    {
       try
       {
-         MBeanServerConnection mbeanServer = runtime.getJMXSupport().getMBeanServer();
+         MBeanServerConnection mbeanServer = runtime.getMBeanServer();
          ObjectName objectName = ObjectNameFactory.create("jboss.system:service=MainDeployer");
          mbeanServer.invoke(objectName, method, new Object[] { url }, new String[] { URL.class.getName() });
       }

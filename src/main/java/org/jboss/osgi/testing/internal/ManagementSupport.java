@@ -19,73 +19,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.testing;
+package org.jboss.osgi.testing.internal;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
-import javax.management.MBeanServerFactory;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
 
-import org.jboss.logging.Logger;
 import org.jboss.osgi.jmx.BundleStateMBeanExt;
 import org.jboss.osgi.jmx.FrameworkMBeanExt;
 import org.jboss.osgi.jmx.ObjectNameFactory;
 import org.jboss.osgi.jmx.PackageStateMBeanExt;
 import org.jboss.osgi.jmx.ServiceStateMBeanExt;
-import org.jboss.osgi.testing.internal.ClipboardImpl;
+import org.jboss.osgi.testing.ClipboardMBean;
 import org.osgi.jmx.framework.BundleStateMBean;
 import org.osgi.jmx.framework.FrameworkMBean;
 import org.osgi.jmx.framework.PackageStateMBean;
 import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
- * An OSGi Test Helper
+ * A helper for bundle management.
  * 
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class JMXSupport
+public class ManagementSupport
 {
-   // Provide logging
-   private static final Logger log = Logger.getLogger(JMXSupport.class);
-
    private MBeanServerConnection mbeanServer;
 
-   public JMXSupport(MBeanServerConnection mbeanServer)
+   public ManagementSupport(MBeanServerConnection mbeanServer)
    {
       if (mbeanServer == null)
          throw new IllegalArgumentException("Null mbeanServer");
       this.mbeanServer = mbeanServer;
    }
 
-   public static MBeanServer getLocalMBeanServer()
-   {
-      MBeanServer mbeanServer = null;
-
-      ArrayList<MBeanServer> serverArr = MBeanServerFactory.findMBeanServer(null);
-      if (serverArr.size() > 1)
-         log.warn("Multiple MBeanServer instances: " + serverArr);
-
-      if (serverArr.size() > 0)
-      {
-         mbeanServer = serverArr.get(0);
-         log.debug("Found MBeanServer: " + mbeanServer);
-      }
-
-      if (mbeanServer == null)
-      {
-         log.debug("No MBeanServer, create one ...");
-         mbeanServer = MBeanServerFactory.createMBeanServer();
-         log.debug("Created MBeanServer: " + mbeanServer);
-      }
-      return mbeanServer;
-   }
-
-   public <T> T getProxy(ObjectName name, Class<T> interf)
+   public <T> T getMBeanProxy(ObjectName name, Class<T> interf)
    {
       return (T)MBeanServerInvocationHandler.newProxyInstance(mbeanServer, name, interf, false);
    }
@@ -102,12 +72,12 @@ public class JMXSupport
       ObjectName objectName = ObjectNameFactory.create(FrameworkMBeanExt.OBJECTNAME);
       if (mbeanServer.isRegistered(objectName))
       {
-         frameworkState = getProxy(objectName, FrameworkMBeanExt.class);
+         frameworkState = getMBeanProxy(objectName, FrameworkMBeanExt.class);
       }
       else
       {
          objectName = ObjectNameFactory.create(FrameworkMBean.OBJECTNAME);
-         frameworkState = getProxy(objectName, FrameworkMBean.class);
+         frameworkState = getMBeanProxy(objectName, FrameworkMBean.class);
       }
 
       return frameworkState;
@@ -119,12 +89,12 @@ public class JMXSupport
       ObjectName objectName = ObjectNameFactory.create(BundleStateMBeanExt.OBJECTNAME);
       if (mbeanServer.isRegistered(objectName))
       {
-         bundleState = getProxy(objectName, BundleStateMBeanExt.class);
+         bundleState = getMBeanProxy(objectName, BundleStateMBeanExt.class);
       }
       else
       {
          objectName = ObjectNameFactory.create(BundleStateMBean.OBJECTNAME);
-         bundleState = getProxy(objectName, BundleStateMBean.class);
+         bundleState = getMBeanProxy(objectName, BundleStateMBean.class);
       }
       return bundleState;
    }
@@ -135,12 +105,12 @@ public class JMXSupport
       ObjectName objectName = ObjectNameFactory.create(PackageStateMBeanExt.OBJECTNAME);
       if (mbeanServer.isRegistered(objectName))
       {
-         packageState = getProxy(objectName, PackageStateMBeanExt.class);
+         packageState = getMBeanProxy(objectName, PackageStateMBeanExt.class);
       }
       else
       {
          objectName = ObjectNameFactory.create(PackageStateMBean.OBJECTNAME);
-         packageState = getProxy(objectName, PackageStateMBean.class);
+         packageState = getMBeanProxy(objectName, PackageStateMBean.class);
       }
       return packageState;
    }
@@ -151,12 +121,12 @@ public class JMXSupport
       ObjectName objectName = ObjectNameFactory.create(ServiceStateMBeanExt.OBJECTNAME);
       if (mbeanServer.isRegistered(objectName))
       {
-         serviceState = getProxy(objectName, ServiceStateMBeanExt.class);
+         serviceState = getMBeanProxy(objectName, ServiceStateMBeanExt.class);
       }
       else
       {
          objectName = ObjectNameFactory.create(ServiceStateMBean.OBJECTNAME);
-         serviceState = getProxy(objectName, ServiceStateMBean.class);
+         serviceState = getMBeanProxy(objectName, ServiceStateMBean.class);
       }
       return serviceState;
    }
@@ -175,7 +145,7 @@ public class JMXSupport
             throw new IllegalStateException("Cannot create ClipboardMBean", ex);
          }
       }
-      ClipboardMBean clipboard = getProxy(objectName, ClipboardMBean.class);
+      ClipboardMBean clipboard = getMBeanProxy(objectName, ClipboardMBean.class);
       return clipboard;
    }
 }

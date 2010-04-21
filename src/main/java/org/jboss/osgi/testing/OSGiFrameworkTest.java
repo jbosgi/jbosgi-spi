@@ -39,11 +39,14 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.util.ConstantsHelper;
+import org.jboss.osgi.testing.internal.EmbeddedRuntime;
+import org.jboss.osgi.testing.internal.ManagementSupport;
 import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
@@ -60,6 +63,10 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.launch.Framework;
+import org.osgi.jmx.framework.BundleStateMBean;
+import org.osgi.jmx.framework.FrameworkMBean;
+import org.osgi.jmx.framework.PackageStateMBean;
+import org.osgi.jmx.framework.ServiceStateMBean;
 import org.osgi.service.packageadmin.PackageAdmin;
 
 /**
@@ -80,7 +87,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    private final List<BundleEvent> bundleEvents = new CopyOnWriteArrayList<BundleEvent>();
    private final List<ServiceEvent> serviceEvents = new CopyOnWriteArrayList<ServiceEvent>();
    
-   private JMXSupport jmxSupport;
+   private ManagementSupport jmxSupport;
 
    @BeforeClass
    public static void beforeFrameworkTestClass() throws Exception
@@ -383,16 +390,47 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       }
    }
    
-   /**
-    * Get the JMXSupport for this framework test.
-    */
-   protected JMXSupport getJMXSupport()
+   protected MBeanServer getMBeanServer()
+   {
+      MBeanServer mbeanServer = EmbeddedRuntime.getLocalMBeanServer();
+      return mbeanServer;
+   }
+   
+   protected <T> T getMBeanProxy(ObjectName name, Class<T> interf)
+   {
+      return getJMXSupport().getMBeanProxy(name, interf);
+   }
+
+   protected FrameworkMBean getFrameworkMBean() throws IOException
+   {
+      return getJMXSupport().getFrameworkMBean();
+   }
+
+   protected BundleStateMBean getBundleStateMBean() throws IOException
+   {
+      return getJMXSupport().getBundleStateMBean();
+   }
+
+   protected PackageStateMBean getPackageStateMBean() throws IOException
+   {
+      return getJMXSupport().getPackageStateMBean();
+   }
+
+   protected ServiceStateMBean getServiceStateMBean() throws IOException
+   {
+      return getJMXSupport().getServiceStateMBean();
+   }
+
+   protected ClipboardMBean getClipboardMBean() throws IOException
+   {
+      return getJMXSupport().getClipboardMBean();
+   }
+   
+   private ManagementSupport getJMXSupport()
    {
       if (jmxSupport == null)
-      {
-         MBeanServer mbeanServer = JMXSupport.getLocalMBeanServer();
-         jmxSupport = new JMXSupport(mbeanServer);
-      }
+         jmxSupport = new ManagementSupport(getMBeanServer());
+      
       return jmxSupport;
    }
    

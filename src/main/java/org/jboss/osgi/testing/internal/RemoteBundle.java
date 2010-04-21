@@ -40,7 +40,6 @@ import javax.management.openmbean.TabularData;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.jmx.BundleStateMBeanExt;
 import org.jboss.osgi.spi.util.UnmodifiableDictionary;
-import org.jboss.osgi.testing.JMXSupport;
 import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.osgi.framework.Bundle;
@@ -74,8 +73,7 @@ class RemoteBundle extends OSGiBundleImpl
       super(runtime);
       this.bundleId = bundleId;
 
-      JMXSupport jmxSupport = runtime.getJMXSupport();
-      bundleState = (BundleStateMBeanExt)jmxSupport.getBundleStateMBean();
+      bundleState = (BundleStateMBeanExt)runtime.getBundleStateMBean();
       
       symbolicName = bundleState.getSymbolicName(bundleId);
       location = bundleState.getLocation(bundleId);
@@ -111,8 +109,7 @@ class RemoteBundle extends OSGiBundleImpl
 
       try
       {
-         JMXSupport jmxSupport = getRuntime().getJMXSupport();
-         BundleStateMBean bundleState = jmxSupport.getBundleStateMBean();
+         BundleStateMBean bundleState = getRuntime().getBundleStateMBean();
          String state = bundleState.getState(bundleId);
          if ("INSTALLED".equals(state))
             return Bundle.INSTALLED;
@@ -276,8 +273,7 @@ class RemoteBundle extends OSGiBundleImpl
       assertNotUninstalled();
       try
       {
-         JMXSupport jmxSupport = getRuntime().getJMXSupport();
-         jmxSupport.getFrameworkMBean().startBundle(bundleId);
+         getRuntime().getFrameworkMBean().startBundle(bundleId);
       }
       catch (IOException ex)
       {
@@ -291,8 +287,7 @@ class RemoteBundle extends OSGiBundleImpl
       assertNotUninstalled();
       try
       {
-         JMXSupport jmxSupport = getRuntime().getJMXSupport();
-         jmxSupport.getFrameworkMBean().stopBundle(bundleId);
+         getRuntime().getFrameworkMBean().stopBundle(bundleId);
       }
       catch (IOException ex)
       {
@@ -306,8 +301,7 @@ class RemoteBundle extends OSGiBundleImpl
       assertNotUninstalled();
       try
       {
-         JMXSupport jmxSupport = getRuntime().getJMXSupport();
-         jmxSupport.getFrameworkMBean().uninstallBundle(bundleId);
+         getRuntime().getFrameworkMBean().uninstallBundle(bundleId);
          OSGiRuntimeImpl runtimeImpl = (OSGiRuntimeImpl)getRuntime();
          runtimeImpl.uninstallBundle(this);
          uninstalled = true;
