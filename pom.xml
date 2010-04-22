@@ -26,7 +26,7 @@
   <parent>
     <groupId>org.jboss.osgi</groupId>
     <artifactId>jboss-osgi-parent</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6-SNAPSHOT</version>
   </parent>
 
   <!-- Properties -->
@@ -89,60 +89,7 @@
   <!-- Build -->
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-artifacts</id>
-            <phase>package</phase>
-            <goals>
-              <goal>attach-artifact</goal>
-            </goals>
-            <configuration>
-              <artifacts>
-                <artifact>
-                  <!-- For some reason the distribution javadoc module needs this -->
-                  <file>target/${artifactId}-${version}-sources.jar</file>
-                  <classifier>sources</classifier>
-                  <type>jar</type>
-                </artifact>
-              </artifacts>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
-  <!-- Repositories -->
-  <repositories>
-    <repository>
-      <id>repository.jboss.org</id>
-      <name>JBoss Repository</name>
-      <url>http://repository.jboss.org/maven2/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>snapshots.jboss.org</id>
-      <name>JBoss Snapshots Repository</name>
-      <url>http://snapshots.jboss.org/maven2/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
-  <!-- Subversion -->
-  <scm>
-    <connection>scm:svn:http://anonsvn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/trunk</connection>
-    <developerConnection>scm:svn:https://svn.jboss.org/repos/jbossas/projects/jboss-osgi/projects/spi/trunk</developerConnection>
-    <url>http://fisheye.jboss.com/qsearch/JBossOSGi</url>
-  </scm>
-  
 </project>
