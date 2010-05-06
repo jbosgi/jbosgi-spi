@@ -51,6 +51,7 @@ import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -80,68 +81,86 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiFrameworkTest.class);
 
-   protected static Framework framework;
-   protected static BundleContext systemContext;
+   private static Framework framework;
 
    private final List<FrameworkEvent> frameworkEvents = new CopyOnWriteArrayList<FrameworkEvent>();
    private final List<BundleEvent> bundleEvents = new CopyOnWriteArrayList<BundleEvent>();
    private final List<ServiceEvent> serviceEvents = new CopyOnWriteArrayList<ServiceEvent>();
-   
+
    private ManagementSupport jmxSupport;
 
-   @BeforeClass
-   public static void beforeFrameworkTestClass() throws Exception
+   @Before
+   public void setUp() throws Exception
    {
-      OSGiBootstrapProvider bootProvider = OSGiBootstrap.getBootstrapProvider();
-      framework = bootProvider.getFramework();
-      framework.start();
-
-      // Get the system context
-      systemContext = framework.getBundleContext();
+      if (getClass().isAnnotationPresent(BeforeClass.class) == false)
+      {
+         getFramework().start();
+      }
    }
 
    @AfterClass
-   public static void afterFrameworkTestClass() throws Exception
+   public static void afterClass() throws Exception
+   {
+      if (framework != null)
+      {
+         shutdownFramework(framework);
+         framework = null;
+      }
+   }
+
+   public static Framework getFramework() throws BundleException
+   {
+      if (framework == null)
+      {
+         OSGiBootstrapProvider bootProvider = OSGiBootstrap.getBootstrapProvider();
+         framework = bootProvider.getFramework();
+         framework.start();
+      }
+      return framework;
+   }
+
+   public static void shutdownFramework(Framework framework) throws BundleException, InterruptedException
    {
       if (framework != null)
       {
          framework.stop();
          framework.waitForStop(2000);
-         framework = null;
       }
    }
 
-   protected PackageAdmin getPackageAdmin()
+   protected PackageAdmin getPackageAdmin() throws BundleException
    {
+      BundleContext systemContext = getFramework().getBundleContext();
       ServiceReference sref = systemContext.getServiceReference(PackageAdmin.class.getName());
       return (PackageAdmin)systemContext.getService(sref);
    }
-   
+
    protected Bundle installBundle(Archive<?> archive) throws BundleException, IOException
    {
       VirtualFile virtualFile = OSGiTestHelper.toVirtualFile(archive);
       return installBundle(archive.getName(), virtualFile.openStream());
    }
-   
+
    protected Bundle installBundle(VirtualFile virtualFile) throws BundleException, IOException
    {
       String location = virtualFile.getPathName();
       return installBundle(location, virtualFile.openStream());
    }
-   
+
    protected Bundle installBundle(String location) throws BundleException, IOException
    {
       URL bundleURL = getTestHelper().getTestArchiveURL(location);
       VirtualFile virtualFile = AbstractVFS.getRoot(bundleURL);
       return installBundle(location, virtualFile.openStream());
    }
-   
+
    protected Bundle installBundle(String location, InputStream inputStream) throws BundleException
    {
+      BundleContext systemContext = getFramework().getBundleContext();
       return systemContext.installBundle(location, inputStream);
    }
-   
-   protected void assertLoadClass(Bundle bundle, String className, Bundle exporter)
+
+   protected void assertLoadClass(Bundle bundle, String className, Bundle exporter) throws BundleException
    {
       Class<?> clazz = assertLoadClass(bundle, className);
       Bundle actual = getPackageAdmin().getBundle(clazz);
@@ -359,7 +378,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       // switch - check expected on actual, since actual might be proxy
       assertEquals(actual, expected);
    }
-   
+
    protected <T> T assertInstanceOf(Object o, Class<T> expectedType)
    {
       return assertInstanceOf(o, expectedType, false);
@@ -389,13 +408,13 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
          return null;
       }
    }
-   
+
    protected MBeanServer getMBeanServer()
    {
       MBeanServer mbeanServer = EmbeddedRuntime.getLocalMBeanServer();
       return mbeanServer;
    }
-   
+
    protected <T> T getMBeanProxy(ObjectName name, Class<T> interf)
    {
       return getJMXSupport().getMBeanProxy(name, interf);
@@ -425,22 +444,23 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    {
       return getJMXSupport().getClipboardMBean();
    }
-   
+
    private ManagementSupport getJMXSupport()
    {
       if (jmxSupport == null)
          jmxSupport = new ManagementSupport(getMBeanServer());
-      
+
       return jmxSupport;
    }
-   
+
    /**
     * Get a ServiceReference within the given timeout.
     */
-   protected ServiceReference getServiceReference(String clazz, long timeout)
+   protected ServiceReference getServiceReference(String clazz, long timeout) throws BundleException
    {
       int fraction = 200;
       timeout = timeout / fraction;
+      BundleContext systemContext = getFramework().getBundleContext();
       ServiceReference sref = systemContext.getServiceReference(clazz);
       while (sref == null && 0 < timeout--)
       {
@@ -456,7 +476,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       }
       return sref;
    }
-   
+
    @SuppressWarnings("rawtypes")
    private void waitForEvent(List events, int type) throws InterruptedException
    {
