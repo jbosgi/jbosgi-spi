@@ -31,6 +31,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -92,45 +93,72 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    @Before
    public void setUp() throws Exception
    {
-      if (getClass().isAnnotationPresent(BeforeClass.class) == false)
+      super.setUp();
+
+      if (framework == null && isBeforeClassPresent() == false)
       {
-         getFramework().start();
+         createFramework();
+         framework.start();
       }
+   }
+
+   private boolean isBeforeClassPresent()
+   {
+      boolean isPresent = false;
+      for (Method method : getClass().getDeclaredMethods())
+      {
+         if (method.isAnnotationPresent(BeforeClass.class))
+         {
+            isPresent = true;
+            break;
+         }
+      }
+      return isPresent;
    }
 
    @AfterClass
    public static void afterClass() throws Exception
    {
-      if (framework != null)
-      {
-         shutdownFramework(framework);
-         framework = null;
-      }
+      shutdownFramework();
+   }
+
+   public static Framework createFramework() throws BundleException
+   {
+      OSGiBootstrapProvider bootProvider = OSGiBootstrap.getBootstrapProvider();
+      framework = bootProvider.getFramework();
+      return framework;
    }
 
    public static Framework getFramework() throws BundleException
    {
       if (framework == null)
-      {
-         OSGiBootstrapProvider bootProvider = OSGiBootstrap.getBootstrapProvider();
-         framework = bootProvider.getFramework();
-         framework.start();
-      }
+         throw new IllegalStateException("Framework not available. Use createFramework()");
+
       return framework;
    }
 
-   public static void shutdownFramework(Framework framework) throws BundleException, InterruptedException
+   public static void shutdownFramework() throws BundleException, InterruptedException
    {
       if (framework != null)
       {
          framework.stop();
          framework.waitForStop(2000);
+         framework = null;
       }
+   }
+
+   public static BundleContext getSystemContext() throws BundleException
+   {
+      Framework framework = getFramework();
+      if (framework.getState() != Bundle.ACTIVE)
+         throw new IllegalStateException("Framework not ACTIVE. Did you start() the framework?");
+
+      return framework.getBundleContext();
    }
 
    protected PackageAdmin getPackageAdmin() throws BundleException
    {
-      BundleContext systemContext = getFramework().getBundleContext();
+      BundleContext systemContext = getSystemContext();
       ServiceReference sref = systemContext.getServiceReference(PackageAdmin.class.getName());
       return (PackageAdmin)systemContext.getService(sref);
    }
@@ -156,7 +184,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
 
    protected Bundle installBundle(String location, InputStream inputStream) throws BundleException
    {
-      BundleContext systemContext = getFramework().getBundleContext();
+      BundleContext systemContext = getSystemContext();
       return systemContext.installBundle(location, inputStream);
    }
 
@@ -460,7 +488,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    {
       int fraction = 200;
       timeout = timeout / fraction;
-      BundleContext systemContext = getFramework().getBundleContext();
+      BundleContext systemContext = getSystemContext();
       ServiceReference sref = systemContext.getServiceReference(clazz);
       while (sref == null && 0 < timeout--)
       {
