@@ -34,6 +34,7 @@ import java.util.Hashtable;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.util.ConstantsHelper;
 import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
@@ -52,6 +53,9 @@ import org.osgi.framework.Bundle;
  */
 public class OSGiTestHelper
 {
+   // Provide logging
+   private static final Logger log = Logger.getLogger(OSGiTestHelper.class);
+   
    private static final String SYSPROP_TEST_RESOURCES_DIRECTORY = "test.resources.directory";
    private static final String SYSPROP_TEST_ARCHIVE_DIRECTORY = "test.archive.directory";
 
@@ -275,8 +279,9 @@ public class OSGiTestHelper
       }
       catch (ClassNotFoundException ex)
       {
-         String message = bundle.getSymbolicName() + " loads " + className;
-         fail("Unexpected ClassNotFoundException for: " + message);
+         String message = "Unexpected ClassNotFoundException for: " + bundle.getSymbolicName() + " loads " + className;
+         log.error(message, ex);
+         fail(message);
          return null;
       }
    }
