@@ -79,6 +79,14 @@ public final class OSGiManifestBuilder implements Asset
       return this;
    }
 
+   public OSGiManifestBuilder addImportPackages(Class<?>... packages)
+   {
+      for (Class<?> aux : packages)
+         importPackages.add(aux.getPackage().getName());
+
+      return this;
+   }
+
    public OSGiManifestBuilder addImportPackages(String... packages)
    {
       for (String aux : packages)
@@ -91,6 +99,14 @@ public final class OSGiManifestBuilder implements Asset
    {
       for (String aux : packages)
          dynamicImportPackages.add(aux);
+
+      return this;
+   }
+
+   public OSGiManifestBuilder addExportPackages(Class<?>... packages)
+   {
+      for (Class<?> aux : packages)
+         exportPackages.add(aux.getPackage().getName());
 
       return this;
    }
