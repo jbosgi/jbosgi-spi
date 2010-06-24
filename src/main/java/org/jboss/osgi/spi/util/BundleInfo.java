@@ -115,29 +115,19 @@ public class BundleInfo implements Serializable
          throw new BundleException("Cannot get manifest from: " + rootURL, ex);
       }
 
-      // A bundle manifest must express the version of the OSGi manifest header
-      // syntax in the Bundle-ManifestVersion header. Bundles exploiting this version 
-      // of the Framework specification (or later) must specify this header.
-      // The Framework version 1.3 (or later) bundle manifest version must be ’2’.
-      // Bundle manifests written to previous specifications’ manifest syntax are
-      // taken to have a bundle manifest version of '1', although there is no way to
-      // express this in such manifests. 
-      int manifestVersion = getBundleManifestVersion(manifest);
-      if (manifestVersion < 0)
-         throw new BundleException("Cannot parse OSGi manifest for: " + rootURL);
+      // Validate the manifest
+      validateBundleManifest(manifest);
 
+      int manifestVersion = getBundleManifestVersion(manifest);
       symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
       bundleVersion = getManifestHeader(Constants.BUNDLE_VERSION);
-      
+
       // R3 Framework
       if (manifestVersion == 1)
       {
-         if (symbolicName != null)
-            throw new IllegalArgumentException("Invalid Bundle-ManifestVersion:=1 for " + symbolicName);
-
          // Generate default symbolic name
          symbolicName = "anonymous-bundle";
-         
+
          // Parse the Bundle-Version string
          try
          {
@@ -150,21 +140,43 @@ public class BundleInfo implements Serializable
             bundleVersion = Version.emptyVersion.toString();
          }
       }
-      
+   }
+
+   /**
+    * Validate a given bundle manifest.
+    * @param manifest The given manifest
+    * @throws BundleException if this is not a valid bundle manifest
+    */
+   public static void validateBundleManifest(Manifest manifest) throws BundleException
+   {
+      // A bundle manifest must express the version of the OSGi manifest header
+      // syntax in the Bundle-ManifestVersion header. Bundles exploiting this version 
+      // of the Framework specification (or later) must specify this header.
+      // The Framework version 1.3 (or later) bundle manifest version must be ’2’.
+      // Bundle manifests written to previous specifications’ manifest syntax are
+      // taken to have a bundle manifest version of '1', although there is no way to
+      // express this in such manifests. 
+      int manifestVersion = getBundleManifestVersion(manifest);
+      if (manifestVersion < 0)
+         throw new BundleException("Cannot determine Bundle-ManifestVersion");
+      if (manifestVersion > 2)
+         throw new BundleException("Unsupported Bundle-ManifestVersion: " + manifestVersion);
+
+      String symbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
+      String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
+
+      // R3 Framework
+      if (manifestVersion == 1 && symbolicName != null)
+         throw new BundleException("Invalid Bundle-ManifestVersion:=1 for " + symbolicName);
+
       // R4 Framework
-      else if (manifestVersion == 2)
+      if (manifestVersion == 2)
       {
          if (symbolicName == null)
-            throw new IllegalArgumentException("Cannot obtain Bundle-SymbolicName for: " + rootFile);
+            throw new BundleException("Cannot obtain Bundle-SymbolicName");
          
          // Parse the Bundle-Version string
-         bundleVersion = Version.parseVersion(bundleVersion).toString();
-      }
-      
-      // Unsupported Bundle-ManifestVersion
-      else
-      {
-         throw new IllegalArgumentException("Unsupported Bundle-ManifestVersion: " + manifestVersion);
+         Version.parseVersion(bundleVersion).toString();
       }
    }
 
@@ -177,20 +189,20 @@ public class BundleInfo implements Serializable
    {
       if (manifest == null)
          throw new IllegalArgumentException("Null manifest");
-      
+
       // At least one of these manifest headers must be there
       // Note, in R3 and R4 there is no common mandatory header
       String bundleName = getManifestHeaderInternal(manifest, Constants.BUNDLE_NAME);
       String bundleSymbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
       String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
-      
+
       if (bundleName == null && bundleSymbolicName == null && bundleVersion == null)
          return -1;
-      
+
       String manifestVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_MANIFESTVERSION);
       return manifestVersion != null ? Integer.parseInt(manifestVersion) : 1;
    }
-   
+
    /**
     * Get the manifest header for the given key.
     */
@@ -251,7 +263,7 @@ public class BundleInfo implements Serializable
       if (rootFile != null)
          rootFile.close();
    }
-   
+
    private Manifest getManifest()
    {
       if (manifest == null)
@@ -342,7 +354,7 @@ public class BundleInfo implements Serializable
       String value = attribs.getValue(key);
       return value;
    }
-   
+
    @Override
    public boolean equals(Object obj)
    {
