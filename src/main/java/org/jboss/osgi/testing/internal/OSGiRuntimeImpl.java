@@ -176,8 +176,16 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       while (locations.size() > 0)
       {
          String location = locations.remove(0);
-         BundleTuple tuple = bundles.remove(location);
-         tuple.uninstall();
+         BundleTuple tuple = bundles.get(location);
+         OSGiBundle bundle = tuple.bundle;
+         try
+         {
+            bundle.uninstall();
+         }
+         catch (BundleException e)
+         {
+            log.error("Cannot unintall bundle: " + bundle);
+         }
       }
 
       // Uninstall the capabilities
@@ -297,15 +305,15 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       return bundle;
    }
 
-   void uninstallBundle(OSGiBundle bundle)
+   void unregisterBundle(OSGiBundle bundle)
    {
       if (bundle == null)
          throw new IllegalArgumentException("Cannot unregister null bundle");
 
       String location = bundle.getLocation();
-      BundleTuple tuple = bundles.get(location);
+      BundleTuple tuple = bundles.remove(location);
       if (tuple != null)
-         tuple.uninstall();
+         tuple.close();
    }
 
    class BundleTuple
@@ -319,9 +327,8 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
          this.bundle = bundle;
       }
 
-      public void uninstall()
+      public void close()
       {
-         OSGiRuntimeHelper.failsafeUninstall(bundle);
          info.close();
       }
    }

@@ -303,7 +303,7 @@ class RemoteBundle extends OSGiBundleImpl
       {
          getRuntime().getFrameworkMBean().uninstallBundle(bundleId);
          OSGiRuntimeImpl runtimeImpl = (OSGiRuntimeImpl)getRuntime();
-         runtimeImpl.uninstallBundle(this);
+         runtimeImpl.unregisterBundle(this);
          uninstalled = true;
       }
       catch (RuntimeException rte)

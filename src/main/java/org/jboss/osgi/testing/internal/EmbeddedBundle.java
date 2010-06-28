@@ -155,7 +155,7 @@ public class EmbeddedBundle extends OSGiBundleImpl
       assertNotUninstalled();
       bundle.uninstall();
       OSGiRuntimeImpl runtimeImpl = (OSGiRuntimeImpl)getRuntime();
-      runtimeImpl.uninstallBundle(this);
+      runtimeImpl.unregisterBundle(this);
    }
 
    private PackageAdmin getPackageAdmin()
