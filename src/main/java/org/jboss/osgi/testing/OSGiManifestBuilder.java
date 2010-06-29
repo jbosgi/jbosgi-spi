@@ -34,6 +34,7 @@ import java.util.jar.Manifest;
 
 import org.jboss.shrinkwrap.api.Asset;
 import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
 
 /**
  * A simple OSGi manifest builder.
@@ -71,6 +72,22 @@ public final class OSGiManifestBuilder implements Asset
    {
       pw.println(Constants.BUNDLE_SYMBOLICNAME + ": " + symbolicName);
       return this;
+   }
+
+   public OSGiManifestBuilder addBundleVersion(Version version)
+   {
+      pw.println(Constants.BUNDLE_VERSION + ": " + version);
+      return this;
+   }
+
+   public OSGiManifestBuilder addBundleVersion(String version)
+   {
+      return addBundleVersion(Version.parseVersion(version));
+   }
+
+   public OSGiManifestBuilder addBundleActivator(Class<?> bundleActivator)
+   {
+      return addBundleActivator(bundleActivator.getName());
    }
 
    public OSGiManifestBuilder addBundleActivator(String bundleActivator)
