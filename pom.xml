@@ -34,7 +34,7 @@
     <version.args4j>2.0.12</version.args4j>
     <version.jboss.osgi.jmx>1.0.5</version.jboss.osgi.jmx>
     <version.jboss.osgi.vfs>1.0.0</version.jboss.osgi.vfs>
-    <version.jboss.shrinkwrap>1.0.0-alpha-7</version.jboss.shrinkwrap>
+    <version.jboss.shrinkwrap>1.0.0-alpha-9</version.jboss.shrinkwrap>
     <version.osgi>4.2.0</version.osgi>
   </properties>
   

@@ -39,8 +39,8 @@ import org.jboss.osgi.spi.util.ConstantsHelper;
 import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.Archives;
 import org.jboss.shrinkwrap.api.Asset;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.osgi.framework.Bundle;
@@ -183,7 +183,7 @@ public class OSGiTestHelper
 
    public Archive<?> assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException
    {
-      JavaArchive archive = Archives.create(name + ".jar", JavaArchive.class);
+      JavaArchive archive = ShrinkWrap.create(name + ".jar", JavaArchive.class);
       if (resources != null)
       {
          for (String res : resources)
