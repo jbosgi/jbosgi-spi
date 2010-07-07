@@ -53,9 +53,9 @@ import org.osgi.framework.launch.FrameworkFactory;
  * The PropertiesBootstrapProvider supports the following properties
  * 
  * <ul>
- * <li><b>org.jboss.osgi.spi.framework.autoInstall</b> - Bundles that need to be installed with the Framework automatically</li>
- * <li><b>org.jboss.osgi.spi.framework.autoStart</b> - Bundles that need to be started automatically</li>
- * <li><b>org.jboss.osgi.spi.framework.extra</b> - An URL to extra properties, which recursivly may conatin this property.</li>
+ * <li><b>org.jboss.osgi.framework.autoInstall</b> - Bundles that need to be installed with the Framework automatically</li>
+ * <li><b>org.jboss.osgi.framework.autoStart</b> - Bundles that need to be started automatically</li>
+ * <li><b>org.jboss.osgi.framework.extra</b> - An URL to extra properties, which recursivly may conatin this property.</li>
  * </ul>
  * 
  * All other properties are passed on to configure the framework.
@@ -68,11 +68,11 @@ import org.osgi.framework.launch.FrameworkFactory;
  *       javax.management
  *    
  *    # Bundles that need to be installed with the Framework automatically 
- *    org.jboss.osgi.spi.framework.autoInstall=\
+ *    org.jboss.osgi.framework.autoInstall=\
  *       file://${test.archive.directory}/bundles/org.osgi.compendium.jar
  *    
  *    # Bundles that need to be started automatically 
- *    org.jboss.osgi.spi.framework.autoStart=\
+ *    org.jboss.osgi.framework.autoStart=\
  *       file://${test.archive.directory}/bundles/org.apache.felix.log.jar \
  *       file://${test.archive.directory}/bundles/jboss-osgi-common.jar \
  * </pre>
@@ -90,12 +90,12 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
    /** The default framework config: jboss-osgi-framework.properties */
    public static final String DEFAULT_OSGI_FRAMEWORK_PROPERTIES = "jboss-osgi-framework.properties";
 
-   /** Optional list of bundles that get installed automatically: org.jboss.osgi.spi.framework.autoInstall */
-   public static final String PROP_OSGI_FRAMEWORK_AUTO_INSTALL = "org.jboss.osgi.spi.framework.autoInstall";
-   /** Optional list of bundles that get started automatically: org.jboss.osgi.spi.framework.autoStart */
-   public static final String PROP_OSGI_FRAMEWORK_AUTO_START = "org.jboss.osgi.spi.framework.autoStart";
-   /** Optional path to extra properties: org.jboss.osgi.spi.framework.extra */
-   public static final String PROP_OSGI_FRAMEWORK_EXTRA = "org.jboss.osgi.spi.framework.extra";
+   /** Optional list of bundles that get installed automatically: org.jboss.osgi.framework.autoInstall */
+   public static final String PROP_OSGI_FRAMEWORK_AUTO_INSTALL = "org.jboss.osgi.framework.autoInstall";
+   /** Optional list of bundles that get started automatically: org.jboss.osgi.framework.autoStart */
+   public static final String PROP_OSGI_FRAMEWORK_AUTO_START = "org.jboss.osgi.framework.autoStart";
+   /** Optional path to extra properties: org.jboss.osgi.framework.extra */
+   public static final String PROP_OSGI_FRAMEWORK_EXTRA = "org.jboss.osgi.framework.extra";
 
    private static Set<String> internalProps = new HashSet<String>();
    static
