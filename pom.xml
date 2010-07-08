@@ -33,12 +33,12 @@
   <properties>
     <version.args4j>2.0.12</version.args4j>
     <version.jboss.osgi.jmx>1.0.5</version.jboss.osgi.jmx>
-    <version.jboss.osgi.vfs>1.0.0</version.jboss.osgi.vfs>
+    <version.jboss.osgi.vfs>1.0.1-SNAPSHOT</version.jboss.osgi.vfs>
     <version.jboss.shrinkwrap>1.0.0-alpha-9</version.jboss.shrinkwrap>
     <version.osgi>4.2.0</version.osgi>
   </properties>
   
-  <!-- Subversion -->
+  <!-- Source Control -->
   <scm>
     <connection>scm:git:git://github.com/jbosgi/jbosgi-spi.git</connection>
     <developerConnection>scm:git:git@github.com:jbosgi/jbosgi-spi.git</developerConnection>
