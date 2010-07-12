@@ -264,7 +264,7 @@ public class BundleInfo implements Serializable
          rootFile.close();
    }
 
-   private Manifest getManifest()
+   public Manifest getManifest()
    {
       if (manifest == null)
       {

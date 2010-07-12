@@ -49,6 +49,7 @@ public final class OSGiManifestBuilder implements Asset
    private List<String> importPackages = new ArrayList<String>();
    private List<String> exportPackages = new ArrayList<String>();
    private List<String> dynamicImportPackages = new ArrayList<String>();
+   private List<String> requiredBundles = new ArrayList<String>();
 
    public static OSGiManifestBuilder newInstance()
    {
@@ -93,6 +94,12 @@ public final class OSGiManifestBuilder implements Asset
    public OSGiManifestBuilder addBundleActivator(String bundleActivator)
    {
       pw.println(Constants.BUNDLE_ACTIVATOR + ": " + bundleActivator);
+      return this;
+   }
+
+   public OSGiManifestBuilder addRequireBundle(String requiredBundle)
+   {
+      requiredBundles.add(requiredBundle);
       return this;
    }
 
@@ -144,6 +151,20 @@ public final class OSGiManifestBuilder implements Asset
 
    public Manifest getManifest()
    {
+      // Require-Bundle
+      if (requiredBundles.size() > 0)
+      {
+         pw.print(Constants.REQUIRE_BUNDLE + ": ");
+         for (int i = 0; i < requiredBundles.size(); i++)
+         {
+            if (i > 0)
+               pw.print(",");
+            
+            pw.print(requiredBundles.get(i));
+         }
+         pw.println();
+      }
+      
       // Export-Package
       if (exportPackages.size() > 0)
       {
