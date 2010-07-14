@@ -26,15 +26,15 @@
   <parent>
     <groupId>org.jboss.osgi</groupId>
     <artifactId>jboss-osgi-parent</artifactId>
-    <version>1.0.7-SNAPSHOT</version>
+    <version>1.0.6</version>
   </parent>
 
   <!-- Properties -->
   <properties>
     <version.args4j>2.0.12</version.args4j>
-    <version.jboss.osgi.jmx>1.0.5</version.jboss.osgi.jmx>
-    <version.jboss.osgi.vfs>1.0.1-SNAPSHOT</version.jboss.osgi.vfs>
-    <version.jboss.shrinkwrap>1.0.0-alpha-9</version.jboss.shrinkwrap>
+    <version.jboss.osgi.jmx>1.0.7</version.jboss.osgi.jmx>
+    <version.jboss.osgi.vfs>1.0.0</version.jboss.osgi.vfs>
+    <version.jboss.shrinkwrap>1.0.0-alpha-10</version.jboss.shrinkwrap>
     <version.osgi>4.2.0</version.osgi>
   </properties>
   
