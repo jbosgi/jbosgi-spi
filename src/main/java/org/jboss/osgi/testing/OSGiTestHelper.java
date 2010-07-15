@@ -183,7 +183,7 @@ public class OSGiTestHelper
 
    public Archive<?> assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException
    {
-      JavaArchive archive = ShrinkWrap.create(name + ".jar", JavaArchive.class);
+      JavaArchive archive = ShrinkWrap.create(JavaArchive.class, name + ".jar");
       if (resources != null)
       {
          for (String res : resources)
