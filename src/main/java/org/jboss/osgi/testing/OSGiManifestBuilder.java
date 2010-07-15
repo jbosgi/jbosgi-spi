@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import org.jboss.shrinkwrap.api.Asset;
+import org.jboss.shrinkwrap.api.asset.Asset;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 
