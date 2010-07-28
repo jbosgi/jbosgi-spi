@@ -39,7 +39,6 @@ import java.util.Set;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.internal.StringPropertyReplacer;
-import org.jboss.osgi.spi.util.ExportedPackageHelper;
 import org.jboss.osgi.spi.util.ServiceLoader;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -175,10 +174,6 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
             if (context == null)
                throw new FrameworkException("Cannot obtain system context");
 
-            // Log the the framework packages
-            ExportedPackageHelper packageHelper = new ExportedPackageHelper(context);
-            packageHelper.logExportedPackages(frameworkImpl);
-
             // Init the the autoInstall URLs
             List<URL> autoInstall = getBundleURLs(props, PROP_OSGI_FRAMEWORK_AUTO_INSTALL);
 
@@ -212,7 +207,6 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider
                if (bundle != null)
                {
                   bundle.start();
-                  packageHelper.logExportedPackages(bundle);
                   log.info("Started bundle: " + bundle.getSymbolicName());
                }
             }

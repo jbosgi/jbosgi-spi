@@ -25,7 +25,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.Dictionary;
 
-import org.jboss.osgi.spi.util.ExportedPackageHelper;
 import org.jboss.osgi.testing.OSGiBundle;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -138,9 +137,6 @@ public class EmbeddedBundle extends OSGiBundleImpl
    protected void startInternal() throws BundleException
    {
       bundle.start();
-      
-      ExportedPackageHelper helper = new ExportedPackageHelper(bundle.getBundleContext());
-      helper.logExportedPackages(bundle);
    }
 
    @Override
