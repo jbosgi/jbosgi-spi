@@ -188,13 +188,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       return systemContext.installBundle(location, inputStream);
    }
 
-   protected void assertLoadClass(Bundle bundle, String className, Bundle exporter) throws BundleException
-   {
-      Class<?> clazz = assertLoadClass(bundle, className);
-      Bundle actual = getPackageAdmin().getBundle(clazz);
-      assertEquals("Loaded from ClassLoader", exporter, actual);
-   }
-
    @Override
    public void frameworkEvent(FrameworkEvent event)
    {

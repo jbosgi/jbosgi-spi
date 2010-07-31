@@ -299,4 +299,11 @@ public class OSGiTestHelper
          // expected
       }
    }
+
+   public void assertLoadClass(Bundle bundle, String className, Bundle exporter) 
+   {
+      Class<?> importerClazz = assertLoadClass(bundle, className);
+      Class<?> exporterClazz = assertLoadClass(exporter, className);
+      assertEquals("Loaded from ClassLoader", importerClazz.getClassLoader(), exporterClazz.getClassLoader());
+   }
 }

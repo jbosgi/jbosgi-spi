@@ -220,4 +220,12 @@ public abstract class OSGiTest
    {
       getTestHelper().assertLoadClassFail(bundle, className);
    }
+
+   /**
+    * Delegates to {@link OSGiTestHelper#assertLoadClass(Bundle, String, Bundle)}
+    */
+   protected void assertLoadClass(Bundle bundle, String className, Bundle exporter) 
+   {
+      getTestHelper().assertLoadClass(bundle, className, exporter);
+   }
 }
