@@ -38,6 +38,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -51,6 +53,7 @@ import org.jboss.osgi.testing.internal.ManagementSupport;
 import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -99,6 +102,22 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       {
          createFramework();
          framework.start();
+      }
+   }
+
+   @After
+   public void tearDown() throws Exception
+   {
+      super.tearDown();
+      
+      try
+      {
+         // This cleans up any dangling bundles that are uninstalled, but not yet refreshed.
+         packageAdminRefreshAll();
+      }
+      catch (Throwable th)
+      {
+         log.info("Was not able to clean up packages using PackageAdmin", th);
       }
    }
 
@@ -496,6 +515,38 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
          sref = systemContext.getServiceReference(clazz);
       }
       return sref;
+   }
+
+   // Call this method at the end of a finally block of any test that uses 
+   // Bundle.update() or Bundle.uninstall(), it will clean up any
+   // available revisions of the bundle that may still be available.
+   protected void packageAdminRefreshAll() throws Exception
+   {
+      packageAdminRefresh(null);
+   }
+
+   protected void packageAdminRefresh(Bundle[] bundles) throws Exception
+   {
+      final CountDownLatch latch = new CountDownLatch(1);
+      FrameworkListener fl = new FrameworkListener()
+      {
+         @Override
+         public void frameworkEvent(FrameworkEvent event)
+         {
+            if (event.getType() == FrameworkEvent.PACKAGES_REFRESHED)
+               latch.countDown();
+         }
+      };
+      try
+      {
+         getSystemContext().addFrameworkListener(fl);
+         getPackageAdmin().refreshPackages(bundles);
+         assertTrue(latch.await(10, TimeUnit.SECONDS));
+      }
+      finally
+      {
+         getSystemContext().removeFrameworkListener(fl);
+      }
    }
 
    @SuppressWarnings("rawtypes")
