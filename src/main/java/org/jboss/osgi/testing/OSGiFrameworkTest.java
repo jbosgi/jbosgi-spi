@@ -108,17 +108,8 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    @After
    public void tearDown() throws Exception
    {
+      packageAdminRefreshAll();
       super.tearDown();
-      
-      try
-      {
-         // This cleans up any dangling bundles that are uninstalled, but not yet refreshed.
-         packageAdminRefreshAll();
-      }
-      catch (Throwable th)
-      {
-         log.info("Was not able to clean up packages using PackageAdmin", th);
-      }
    }
 
    private boolean isBeforeClassPresent()
@@ -527,6 +518,11 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
 
    protected void packageAdminRefresh(Bundle[] bundles) throws Exception
    {
+      // Nothing to do if the framework was 
+      // not created or shutdown already
+      if (framework == null)
+         return;
+      
       final CountDownLatch latch = new CountDownLatch(1);
       FrameworkListener fl = new FrameworkListener()
       {
