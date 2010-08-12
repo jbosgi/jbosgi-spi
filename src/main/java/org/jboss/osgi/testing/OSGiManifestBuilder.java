@@ -217,7 +217,7 @@ public final class OSGiManifestBuilder implements Asset
          pw.println();
       }
       
-      String manifestString = sw.toString().trim();
+      String manifestString = sw.toString();
       if (log.isTraceEnabled())
          log.trace(manifestString);
       
