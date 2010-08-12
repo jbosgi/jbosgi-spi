@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
@@ -44,6 +45,9 @@ import org.osgi.framework.Version;
  */
 public final class OSGiManifestBuilder implements Asset
 {
+   // Provide logging
+   private static final Logger log = Logger.getLogger(OSGiManifestBuilder.class);
+   
    private StringWriter sw;
    private PrintWriter pw;
    private List<String> importPackages = new ArrayList<String>();
@@ -97,6 +101,12 @@ public final class OSGiManifestBuilder implements Asset
       return this;
    }
 
+   public OSGiManifestBuilder addFragmentHost(String fragmentHost)
+   {
+      pw.println(Constants.FRAGMENT_HOST + ": " + fragmentHost);
+      return this;
+   }
+   
    public OSGiManifestBuilder addRequireBundle(String requiredBundle)
    {
       requiredBundles.add(requiredBundle);
@@ -207,9 +217,13 @@ public final class OSGiManifestBuilder implements Asset
          pw.println();
       }
       
+      String manifestString = sw.toString();
+      if (log.isTraceEnabled())
+         log.trace("OSGiManifest\n" + manifestString);
+      
       try
       {
-         Manifest manifest = new Manifest(new ByteArrayInputStream(sw.toString().getBytes()));
+         Manifest manifest = new Manifest(new ByteArrayInputStream(manifestString.getBytes()));
          return manifest;
       }
       catch (IOException ex)

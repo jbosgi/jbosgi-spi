@@ -227,7 +227,8 @@ public class OSGiTestHelper
       File target = File.createTempFile("osgi-bundle_", ".jar");
       exporter.exportZip(target, true);
       target.deleteOnExit();
-      return AbstractVFS.getRoot(target.toURI().toURL());
+      VirtualFile rootFile = AbstractVFS.getRoot(target.toURI().toURL());
+      return rootFile;
    }
 
    private void addResources(JavaArchive archive, VirtualFile basedir, VirtualFile resdir) throws IOException
