@@ -114,7 +114,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       }
       catch (Exception ex)
       {
-         // [FIXME] Remove this catch clause and make sure refreshPackages() acatually works in @After
+         // [FIXME] Remove this catch clause and make sure refreshPackages() actually works in @After
          log.error("Cannot refresh packages in @After", ex);
          System.err.println("FIXME: " + ex);
       }
