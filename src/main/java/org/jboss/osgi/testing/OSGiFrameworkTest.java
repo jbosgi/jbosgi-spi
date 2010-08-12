@@ -108,7 +108,16 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    @After
    public void tearDown() throws Exception
    {
-      packageAdminRefreshAll();
+      try
+      {
+         refreshPackages(null);
+      }
+      catch (Exception ex)
+      {
+         // [FIXME] Remove this catch clause and make sure refreshPackages() acatually works in @After
+         log.error("Cannot refresh packages in @After", ex);
+         System.err.println("FIXME: " + ex);
+      }
       super.tearDown();
    }
 
@@ -508,19 +517,11 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       return sref;
    }
 
-   // Call this method at the end of a finally block of any test that uses 
-   // Bundle.update() or Bundle.uninstall(), it will clean up any
-   // available revisions of the bundle that may still be available.
-   protected void packageAdminRefreshAll() throws Exception
-   {
-      packageAdminRefresh(null);
-   }
-
-   protected void packageAdminRefresh(Bundle[] bundles) throws Exception
+   protected void refreshPackages(Bundle[] bundles) throws Exception
    {
       // Nothing to do if the framework was 
       // not created or shutdown already
-      if (framework == null)
+      if (framework == null || framework.getState() != Bundle.ACTIVE)
          return;
       
       final CountDownLatch latch = new CountDownLatch(1);
@@ -533,15 +534,17 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
                latch.countDown();
          }
       };
+      
+      BundleContext systemContext = getSystemContext();
       try
       {
-         getSystemContext().addFrameworkListener(fl);
+         systemContext.addFrameworkListener(fl);
          getPackageAdmin().refreshPackages(bundles);
          assertTrue(latch.await(10, TimeUnit.SECONDS));
       }
       finally
       {
-         getSystemContext().removeFrameworkListener(fl);
+         systemContext.removeFrameworkListener(fl);
       }
    }
 
