@@ -176,12 +176,12 @@ public class OSGiTestHelper
       return framework;
    }
 
-   public Archive<?> assembleArchive(String name, String resource, Class<?>... packages) throws Exception
+   public JavaArchive assembleArchive(String name, String resource, Class<?>... packages) throws Exception
    {
       return assembleArchive(name, new String[] { resource }, packages);
    }
 
-   public Archive<?> assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException
+   public JavaArchive assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException
    {
       JavaArchive archive = ShrinkWrap.create(JavaArchive.class, name + ".jar");
       if (resources != null)
@@ -220,8 +220,7 @@ public class OSGiTestHelper
       return archive;
    }
 
-   @SuppressWarnings("rawtypes")
-   public static VirtualFile toVirtualFile(Archive archive) throws IOException, MalformedURLException
+   public static VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
    {
       ZipExporter exporter = archive.as(ZipExporter.class);
       File target = File.createTempFile("osgi-bundle_", ".jar");

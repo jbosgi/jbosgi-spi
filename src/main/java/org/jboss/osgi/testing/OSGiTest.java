@@ -32,6 +32,7 @@ import javax.naming.NamingException;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.After;
 import org.junit.Before;
 import org.osgi.framework.Bundle;
@@ -176,7 +177,7 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#assembleArchive(String, String, Class...)}
     */
-   protected Archive<?> assembleArchive(String name, String resource, Class<?>... packages) throws Exception
+   protected JavaArchive assembleArchive(String name, String resource, Class<?>... packages) throws Exception
    {
       return getTestHelper().assembleArchive(name, resource, packages);
    }
@@ -184,7 +185,7 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#assembleArchive(String, String[], Class...)}
     */
-   protected Archive<?> assembleArchive(String name, String[] resources, Class<?>... packages) throws Exception
+   protected JavaArchive assembleArchive(String name, String[] resources, Class<?>... packages) throws Exception
    {
       return getTestHelper().assembleArchive(name, resources, packages);
    }
