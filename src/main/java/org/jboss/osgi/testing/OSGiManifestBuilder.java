@@ -79,6 +79,12 @@ public final class OSGiManifestBuilder implements Asset
       return this;
    }
 
+   public OSGiManifestBuilder addBundleName(String name)
+   {
+      pw.println(Constants.BUNDLE_NAME + ": " + name);
+      return this;
+   }
+
    public OSGiManifestBuilder addBundleVersion(Version version)
    {
       pw.println(Constants.BUNDLE_VERSION + ": " + version);
