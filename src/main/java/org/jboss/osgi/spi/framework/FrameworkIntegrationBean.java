@@ -21,8 +21,6 @@
  */
 package org.jboss.osgi.spi.framework;
 
-//$Id$
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.logging.Logger;
-import org.jboss.osgi.spi.util.ExportedPackageHelper;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -135,10 +132,6 @@ public abstract class FrameworkIntegrationBean
       if (context == null)
          throw new FrameworkException("Cannot obtain system context");
 
-      // Log the the framework packages
-      ExportedPackageHelper packageHelper = new ExportedPackageHelper(context);
-      packageHelper.logExportedPackages(getBundle());
-      
       Map<URL, Bundle> autoBundles = new HashMap<URL, Bundle>();
 
       // Add the autoStart bundles to autoInstall
@@ -176,7 +169,6 @@ public abstract class FrameworkIntegrationBean
             if (bundle != null)
             {
                bundle.start();
-               packageHelper.logExportedPackages(bundle);
                log.info("Started bundle: " + bundle.getSymbolicName());
             }
          }

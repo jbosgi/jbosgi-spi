@@ -277,6 +277,10 @@ class RemoteBundle extends OSGiBundleImpl
       }
       catch (IOException ex)
       {
+         Throwable cause = ex.getCause();
+         if (cause instanceof BundleException)
+            throw (BundleException)cause;
+         
          throw new BundleException("Cannot start bundle: " + this, ex);
       }
    }
@@ -291,6 +295,10 @@ class RemoteBundle extends OSGiBundleImpl
       }
       catch (IOException ex)
       {
+         Throwable cause = ex.getCause();
+         if (cause instanceof BundleException)
+            throw (BundleException)cause;
+         
          throw new BundleException("Cannot stop bundle: " + this, ex);
       }
    }

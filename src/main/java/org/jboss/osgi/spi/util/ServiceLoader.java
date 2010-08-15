@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.jboss.logging.Logger;
@@ -50,8 +51,27 @@ public abstract class ServiceLoader
    @SuppressWarnings("unchecked")
    public static <T> List<T> loadServices(Class<T> serviceClass)
    {
+      if (serviceClass == null)
+         throw new IllegalArgumentException("Null serviceClass");
+      
       List<T> services = new ArrayList<T>();
       ClassLoader loader = serviceClass.getClassLoader();
+
+      // First try the system property
+      String serviceClassName = System.getProperty(serviceClass.getName());
+      if (serviceClassName != null)
+      {
+         try
+         {
+            Class<T> implClass = (Class<T>)loader.loadClass(serviceClassName);
+            services.add(implClass.newInstance());
+            return Collections.unmodifiableList(services);
+         }
+         catch (Exception ex)
+         {
+            throw new IllegalStateException("Failed to load service: " + serviceClassName, ex);
+         }
+      }
 
       // Use the Services API (as detailed in the JAR specification), if available, to determine the classname.
       String filename = "META-INF/services/" + serviceClass.getName();
@@ -99,7 +119,7 @@ public abstract class ServiceLoader
          }
       }
 
-      return services;
+      return Collections.unmodifiableList(services);
    }
 
    /**

@@ -20,20 +20,20 @@
   <artifactId>jboss-osgi-spi</artifactId>
   <packaging>jar</packaging>
 
-  <version>1.0.10-SNAPSHOT</version>
+  <version>1.0.12-SNAPSHOT</version>
   
   <!-- Parent -->
   <parent>
     <groupId>org.jboss.osgi</groupId>
     <artifactId>jboss-osgi-parent</artifactId>
-    <version>1.0.7-SNAPSHOT</version>
+    <version>1.0.9</version>
   </parent>
 
   <!-- Properties -->
   <properties>
     <version.args4j>2.0.12</version.args4j>
     <version.jboss.osgi.jmx>1.0.7</version.jboss.osgi.jmx>
-    <version.jboss.osgi.vfs>1.0.0</version.jboss.osgi.vfs>
+    <version.jboss.osgi.vfs>1.0.1</version.jboss.osgi.vfs>
     <version.jboss.shrinkwrap>1.0.0-alpha-10</version.jboss.shrinkwrap>
     <version.osgi>4.2.0</version.osgi>
   </properties>
@@ -56,7 +56,7 @@
     </dependency> 
     <dependency>
       <groupId>org.jboss.logging</groupId>
-      <artifactId>jboss-logging-spi</artifactId>
+      <artifactId>jboss-logging</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.osgi.jmx</groupId>

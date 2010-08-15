@@ -29,6 +29,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -38,6 +39,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -48,9 +51,9 @@ import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.util.ConstantsHelper;
 import org.jboss.osgi.testing.internal.EmbeddedRuntime;
 import org.jboss.osgi.testing.internal.ManagementSupport;
-import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -102,18 +105,25 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       }
    }
 
-   private boolean isBeforeClassPresent()
+   @After
+   public void tearDown() throws Exception
    {
-      boolean isPresent = false;
-      for (Method method : getClass().getDeclaredMethods())
+      refreshPackages(null);
+      
+      // Report and cleanup left over files in the bundle stream dir
+      File streamDir = new File("./target/osgi-store/bundle-0/bundle-streams");
+      if (streamDir.exists() && streamDir.list().length > 0)
       {
-         if (method.isAnnotationPresent(BeforeClass.class))
+         List<String> filelist = Arrays.asList(streamDir.list());
+         System.err.println("Bundle streams not cleaned up: " + filelist);
+         for (String name : filelist)
          {
-            isPresent = true;
-            break;
+            File file = new File(streamDir + File.separator + name);
+            file.delete();
          }
       }
-      return isPresent;
+      
+      super.tearDown();
    }
 
    @AfterClass
@@ -171,28 +181,25 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
 
    protected Bundle installBundle(VirtualFile virtualFile) throws BundleException, IOException
    {
-      String location = virtualFile.getPathName();
-      return installBundle(location, virtualFile.openStream());
+      return getSystemContext().installBundle(virtualFile.getName(), virtualFile.openStream());
    }
 
    protected Bundle installBundle(String location) throws BundleException, IOException
    {
-      URL bundleURL = getTestHelper().getTestArchiveURL(location);
-      VirtualFile virtualFile = AbstractVFS.getRoot(bundleURL);
-      return installBundle(location, virtualFile.openStream());
+      try
+      {
+         new URL(location);
+      }
+      catch (Exception e)
+      {
+         location = getTestHelper().getTestArchivePath(location);
+      }
+      return getSystemContext().installBundle(location);
    }
 
    protected Bundle installBundle(String location, InputStream inputStream) throws BundleException
    {
-      BundleContext systemContext = getSystemContext();
-      return systemContext.installBundle(location, inputStream);
-   }
-
-   protected void assertLoadClass(Bundle bundle, String className, Bundle exporter) throws BundleException
-   {
-      Class<?> clazz = assertLoadClass(bundle, className);
-      Bundle actual = getPackageAdmin().getBundle(clazz);
-      assertEquals("Loaded from ClassLoader", exporter, actual);
+      return getSystemContext().installBundle(location, inputStream);
    }
 
    @Override
@@ -503,6 +510,51 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
          sref = systemContext.getServiceReference(clazz);
       }
       return sref;
+   }
+
+   protected void refreshPackages(Bundle[] bundles) throws Exception
+   {
+      // Nothing to do if the framework was 
+      // not created or shutdown already
+      if (framework == null || framework.getState() != Bundle.ACTIVE)
+         return;
+
+      final CountDownLatch latch = new CountDownLatch(1);
+      FrameworkListener fl = new FrameworkListener()
+      {
+         @Override
+         public void frameworkEvent(FrameworkEvent event)
+         {
+            if (event.getType() == FrameworkEvent.PACKAGES_REFRESHED)
+               latch.countDown();
+         }
+      };
+
+      BundleContext systemContext = getSystemContext();
+      try
+      {
+         systemContext.addFrameworkListener(fl);
+         getPackageAdmin().refreshPackages(bundles);
+         assertTrue(latch.await(10, TimeUnit.SECONDS));
+      }
+      finally
+      {
+         systemContext.removeFrameworkListener(fl);
+      }
+   }
+
+   private boolean isBeforeClassPresent()
+   {
+      boolean isPresent = false;
+      for (Method method : getClass().getDeclaredMethods())
+      {
+         if (method.isAnnotationPresent(BeforeClass.class))
+         {
+            isPresent = true;
+            break;
+         }
+      }
+      return isPresent;
    }
 
    @SuppressWarnings("rawtypes")

@@ -56,8 +56,8 @@ public class OSGiTestHelper
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiTestHelper.class);
    
-   private static final String SYSPROP_TEST_RESOURCES_DIRECTORY = "test.resources.directory";
-   private static final String SYSPROP_TEST_ARCHIVE_DIRECTORY = "test.archive.directory";
+   public static final String SYSPROP_TEST_RESOURCES_DIRECTORY = "test.resources.directory";
+   public static final String SYSPROP_TEST_ARCHIVE_DIRECTORY = "test.archive.directory";
 
    private static String testResourcesDir;
    private static String testArchiveDir;
@@ -176,12 +176,12 @@ public class OSGiTestHelper
       return framework;
    }
 
-   public Archive<?> assembleArchive(String name, String resource, Class<?>... packages) throws Exception
+   public JavaArchive assembleArchive(String name, String resource, Class<?>... packages) throws Exception
    {
       return assembleArchive(name, new String[] { resource }, packages);
    }
 
-   public Archive<?> assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException
+   public JavaArchive assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException
    {
       JavaArchive archive = ShrinkWrap.create(JavaArchive.class, name + ".jar");
       if (resources != null)
@@ -220,14 +220,14 @@ public class OSGiTestHelper
       return archive;
    }
 
-   @SuppressWarnings("rawtypes")
-   public static VirtualFile toVirtualFile(Archive archive) throws IOException, MalformedURLException
+   public static VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
    {
       ZipExporter exporter = archive.as(ZipExporter.class);
       File target = File.createTempFile("osgi-bundle_", ".jar");
       exporter.exportZip(target, true);
       target.deleteOnExit();
-      return AbstractVFS.getRoot(target.toURI().toURL());
+      VirtualFile rootFile = AbstractVFS.getRoot(target.toURI().toURL());
+      return rootFile;
    }
 
    private void addResources(JavaArchive archive, VirtualFile basedir, VirtualFile resdir) throws IOException
@@ -298,5 +298,12 @@ public class OSGiTestHelper
       {
          // expected
       }
+   }
+
+   public void assertLoadClass(Bundle bundle, String className, Bundle exporter) 
+   {
+      Class<?> importerClazz = assertLoadClass(bundle, className);
+      Class<?> exporterClazz = assertLoadClass(exporter, className);
+      assertEquals("Loaded from ClassLoader", importerClazz.getClassLoader(), exporterClazz.getClassLoader());
    }
 }
