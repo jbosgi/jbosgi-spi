@@ -29,6 +29,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -50,7 +51,6 @@ import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.util.ConstantsHelper;
 import org.jboss.osgi.testing.internal.EmbeddedRuntime;
 import org.jboss.osgi.testing.internal.ManagementSupport;
-import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.After;
@@ -108,31 +108,22 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    @After
    public void tearDown() throws Exception
    {
-      try
+      refreshPackages(null);
+      
+      // Report and cleanup left over files in the bundle stream dir
+      File streamDir = new File("./target/osgi-store/bundle-0/bundle-streams");
+      if (streamDir.exists() && streamDir.list().length > 0)
       {
-         refreshPackages(null);
-      }
-      catch (Exception ex)
-      {
-         // [FIXME] Remove this catch clause and make sure refreshPackages() actually works in @After
-         log.error("Cannot refresh packages in @After", ex);
-         System.err.println("FIXME: " + ex);
-      }
-      super.tearDown();
-   }
-
-   private boolean isBeforeClassPresent()
-   {
-      boolean isPresent = false;
-      for (Method method : getClass().getDeclaredMethods())
-      {
-         if (method.isAnnotationPresent(BeforeClass.class))
+         List<String> filelist = Arrays.asList(streamDir.list());
+         System.err.println("Bundle streams not cleaned up: " + filelist);
+         for (String name : filelist)
          {
-            isPresent = true;
-            break;
+            File file = new File(streamDir + File.separator + name);
+            file.delete();
          }
       }
-      return isPresent;
+      
+      super.tearDown();
    }
 
    @AfterClass
@@ -190,21 +181,25 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
 
    protected Bundle installBundle(VirtualFile virtualFile) throws BundleException, IOException
    {
-      String location = virtualFile.getPathName();
-      return installBundle(location, virtualFile.openStream());
+      return getSystemContext().installBundle(virtualFile.getName(), virtualFile.openStream());
    }
 
    protected Bundle installBundle(String location) throws BundleException, IOException
    {
-      URL bundleURL = getTestHelper().getTestArchiveURL(location);
-      VirtualFile virtualFile = AbstractVFS.getRoot(bundleURL);
-      return installBundle(location, virtualFile.openStream());
+      try
+      {
+         new URL(location);
+      }
+      catch (Exception e)
+      {
+         location = getTestHelper().getTestArchivePath(location);
+      }
+      return getSystemContext().installBundle(location);
    }
 
    protected Bundle installBundle(String location, InputStream inputStream) throws BundleException
    {
-      BundleContext systemContext = getSystemContext();
-      return systemContext.installBundle(location, inputStream);
+      return getSystemContext().installBundle(location, inputStream);
    }
 
    @Override
@@ -523,7 +518,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       // not created or shutdown already
       if (framework == null || framework.getState() != Bundle.ACTIVE)
          return;
-      
+
       final CountDownLatch latch = new CountDownLatch(1);
       FrameworkListener fl = new FrameworkListener()
       {
@@ -534,7 +529,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
                latch.countDown();
          }
       };
-      
+
       BundleContext systemContext = getSystemContext();
       try
       {
@@ -546,6 +541,20 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       {
          systemContext.removeFrameworkListener(fl);
       }
+   }
+
+   private boolean isBeforeClassPresent()
+   {
+      boolean isPresent = false;
+      for (Method method : getClass().getDeclaredMethods())
+      {
+         if (method.isAnnotationPresent(BeforeClass.class))
+         {
+            isPresent = true;
+            break;
+         }
+      }
+      return isPresent;
    }
 
    @SuppressWarnings("rawtypes")

@@ -56,8 +56,8 @@ public class OSGiTestHelper
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiTestHelper.class);
    
-   private static final String SYSPROP_TEST_RESOURCES_DIRECTORY = "test.resources.directory";
-   private static final String SYSPROP_TEST_ARCHIVE_DIRECTORY = "test.archive.directory";
+   public static final String SYSPROP_TEST_RESOURCES_DIRECTORY = "test.resources.directory";
+   public static final String SYSPROP_TEST_ARCHIVE_DIRECTORY = "test.archive.directory";
 
    private static String testResourcesDir;
    private static String testArchiveDir;
