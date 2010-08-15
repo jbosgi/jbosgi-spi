@@ -108,21 +108,19 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    @After
    public void tearDown() throws Exception
    {
-      refreshPackages(null);
-      
-      // Report and cleanup left over files in the bundle stream dir
-      File streamDir = new File("./target/osgi-store/bundle-0/bundle-streams");
-      if (streamDir.exists() && streamDir.list().length > 0)
+      // Nothing to do if the framework was not created or shutdown already
+      if (framework != null && framework.getState() == Bundle.ACTIVE)
       {
-         List<String> filelist = Arrays.asList(streamDir.list());
-         System.err.println("Bundle streams not cleaned up: " + filelist);
-         for (String name : filelist)
+         refreshPackages(null);
+         
+         // Report and cleanup left over files in the bundle stream dir
+         File streamDir = new File("./target/osgi-store/bundle-0/bundle-streams");
+         if (streamDir.exists() && streamDir.list().length > 0)
          {
-            File file = new File(streamDir + File.separator + name);
-            file.delete();
+            List<String> filelist = Arrays.asList(streamDir.list());
+            System.err.println("Bundle streams not cleaned up: " + filelist);
          }
       }
-      
       super.tearDown();
    }
 
@@ -175,8 +173,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
 
    protected Bundle installBundle(Archive<?> archive) throws BundleException, IOException
    {
-      VirtualFile virtualFile = OSGiTestHelper.toVirtualFile(archive);
-      return installBundle(archive.getName(), virtualFile.openStream());
+      return installBundle(archive.getName(), toInputStream(archive));
    }
 
    protected Bundle installBundle(VirtualFile virtualFile) throws BundleException, IOException
@@ -514,11 +511,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
 
    protected void refreshPackages(Bundle[] bundles) throws Exception
    {
-      // Nothing to do if the framework was 
-      // not created or shutdown already
-      if (framework == null || framework.getState() != Bundle.ACTIVE)
-         return;
-
       final CountDownLatch latch = new CountDownLatch(1);
       FrameworkListener fl = new FrameworkListener()
       {

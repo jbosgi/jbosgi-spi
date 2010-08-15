@@ -23,6 +23,7 @@ package org.jboss.osgi.testing;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -196,6 +197,14 @@ public abstract class OSGiTest
    protected VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
    {
       return OSGiTestHelper.toVirtualFile(archive);
+   }
+   
+   /**
+    * Delegates to {@link OSGiTestHelper#toInputStream(Archive)}
+    */
+   protected InputStream toInputStream(Archive<?> archive) throws IOException, MalformedURLException
+   {
+      return OSGiTestHelper.toInputStream(archive);
    }
    
    /**

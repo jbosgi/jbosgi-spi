@@ -24,6 +24,8 @@ package org.jboss.osgi.testing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -228,6 +230,17 @@ public class OSGiTestHelper
       target.deleteOnExit();
       VirtualFile rootFile = AbstractVFS.getRoot(target.toURI().toURL());
       return rootFile;
+   }
+
+   public static InputStream toInputStream(Archive<?> archive) throws IOException
+   {
+      ZipExporter exporter = archive.as(ZipExporter.class);
+      ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+      exporter.exportZip(baos);
+      baos.flush();
+      baos.close();
+      
+      return new ByteArrayInputStream(baos.toByteArray());
    }
 
    private void addResources(JavaArchive archive, VirtualFile basedir, VirtualFile resdir) throws IOException
