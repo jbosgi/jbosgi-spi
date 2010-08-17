@@ -231,6 +231,19 @@ public class RemoteRuntime extends OSGiRuntimeImpl
    }
 
    @Override
+   public void refreshPackages(OSGiBundle[] bundles) throws IOException
+   {
+      long[] bundleIds = null;
+      if (bundles != null)
+      {
+         bundleIds = new long[bundles.length];
+         for (int i = 0; i < bundles.length ; i++)
+            bundleIds[i] = bundles[i].getBundleId();
+      }
+      getFrameworkMBean().refreshBundles(bundleIds);
+   }
+
+   @Override
    public void shutdown()
    {
       super.shutdown();

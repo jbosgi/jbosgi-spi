@@ -48,6 +48,7 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
+import org.osgi.service.packageadmin.PackageAdmin;
 
 /**
  * An embedded implementation of the {@link OSGiRuntime}
@@ -167,6 +168,22 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
             System.setProperty(entry.getKey(), entry.getValue());
       }
       super.addCapability(capability);
+   }
+
+   @Override
+   public void refreshPackages(OSGiBundle[] bundles) throws IOException
+   {
+      BundleContext context = getSystemContext();
+      ServiceReference sref = context.getServiceReference(PackageAdmin.class.getName());
+      PackageAdmin packageAdmin = (PackageAdmin)context.getService(sref);
+      Bundle[] bundleArr = null;
+      if (bundles != null)
+      {
+         bundleArr = new Bundle[bundles.length];
+         for (int i = 0; i < bundles.length ; i++)
+            bundleArr[i] = ((EmbeddedBundle)bundles[i]).getBundle();
+      }
+      packageAdmin.refreshPackages(bundleArr);
    }
 
    @Override

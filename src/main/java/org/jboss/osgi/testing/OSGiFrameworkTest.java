@@ -32,7 +32,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -56,7 +55,6 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -97,7 +95,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    public void setUp() throws Exception
    {
       super.setUp();
-
       if (framework == null && isBeforeClassPresent() == false)
       {
          createFramework();
@@ -533,20 +530,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       {
          systemContext.removeFrameworkListener(fl);
       }
-   }
-
-   private boolean isBeforeClassPresent()
-   {
-      boolean isPresent = false;
-      for (Method method : getClass().getDeclaredMethods())
-      {
-         if (method.isAnnotationPresent(BeforeClass.class))
-         {
-            isPresent = true;
-            break;
-         }
-      }
-      return isPresent;
    }
 
    @SuppressWarnings("rawtypes")
