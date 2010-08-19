@@ -108,8 +108,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       // Nothing to do if the framework was not created or shutdown already
       if (framework != null && framework.getState() == Bundle.ACTIVE)
       {
-         refreshPackages(null);
-         
          // Report and cleanup left over files in the bundle stream dir
          File streamDir = new File("./target/osgi-store/bundle-0/bundle-streams");
          if (streamDir.exists() && streamDir.list().length > 0)
