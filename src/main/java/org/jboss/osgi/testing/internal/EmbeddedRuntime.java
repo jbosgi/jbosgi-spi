@@ -23,11 +23,15 @@ package org.jboss.osgi.testing.internal;
 
 // $Id$
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
@@ -45,6 +49,8 @@ import org.jboss.osgi.vfs.VirtualFile;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
@@ -173,9 +179,10 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
    @Override
    public void refreshPackages(OSGiBundle[] bundles) throws IOException
    {
-      BundleContext context = getSystemContext();
-      ServiceReference sref = context.getServiceReference(PackageAdmin.class.getName());
-      PackageAdmin packageAdmin = (PackageAdmin)context.getService(sref);
+      BundleContext sysContext = getSystemContext();
+      ServiceReference sref = sysContext.getServiceReference(PackageAdmin.class.getName());
+      PackageAdmin packageAdmin = (PackageAdmin)sysContext.getService(sref);
+      
       Bundle[] bundleArr = null;
       if (bundles != null)
       {
@@ -183,7 +190,32 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
          for (int i = 0; i < bundles.length ; i++)
             bundleArr[i] = ((EmbeddedBundle)bundles[i]).getBundle();
       }
-      packageAdmin.refreshPackages(bundleArr);
+   
+      final CountDownLatch latch = new CountDownLatch(1);
+      FrameworkListener fl = new FrameworkListener()
+      {
+         @Override
+         public void frameworkEvent(FrameworkEvent event)
+         {
+            if (event.getType() == FrameworkEvent.PACKAGES_REFRESHED)
+               latch.countDown();
+         }
+      };
+
+      try
+      {
+         sysContext.addFrameworkListener(fl);
+         packageAdmin.refreshPackages(bundleArr);
+         assertTrue(latch.await(10, TimeUnit.SECONDS));
+      }
+      catch (InterruptedException ex)
+      {
+         // ignore
+      }
+      finally
+      {
+         sysContext.removeFrameworkListener(fl);
+      }
    }
 
    @Override

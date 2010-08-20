@@ -240,7 +240,17 @@ public class RemoteRuntime extends OSGiRuntimeImpl
          for (int i = 0; i < bundles.length ; i++)
             bundleIds[i] = bundles[i].getBundleId();
       }
-      getFrameworkMBean().refreshBundles(bundleIds);
+      try
+      {
+         // This is an asynchronous opertation. Give it some time
+         // [JBOSGI-381] Make it possible to listen to remote framework events
+         getFrameworkMBean().refreshBundles(bundleIds);
+         Thread.sleep(2000);
+      }
+      catch (InterruptedException ex)
+      {
+         // ignore
+      }
    }
 
    @Override
