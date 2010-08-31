@@ -24,8 +24,6 @@ package org.jboss.osgi.testing;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
-import org.jboss.osgi.testing.internal.EmbeddedRuntime;
-import org.jboss.osgi.testing.internal.RemoteRuntime;
 import org.osgi.framework.Bundle;
 
 /**
@@ -65,32 +63,6 @@ public class OSGiRuntimeHelper extends OSGiTestHelper
       bootProvider = null;
    }
 
-   public OSGiRuntime getDefaultRuntime()
-   {
-      OSGiRuntime runtime;
-
-      String target = System.getProperty("target.container");
-      if (target == null)
-      {
-         runtime = getEmbeddedRuntime();
-      }
-      else
-      {
-         runtime = getRemoteRuntime();
-      }
-      return runtime;
-   }
-
-   public OSGiRuntime getEmbeddedRuntime()
-   {
-      return new EmbeddedRuntime(this);
-   }
-
-   public OSGiRuntime getRemoteRuntime()
-   {
-      return new RemoteRuntime(this);
-   }
-   
    public static void failsafeStop(OSGiBundle bundle)
    {
       if (bundle != null)

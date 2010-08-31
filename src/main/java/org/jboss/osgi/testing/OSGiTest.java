@@ -23,6 +23,8 @@ package org.jboss.osgi.testing;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -35,6 +37,7 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.osgi.framework.Bundle;
 
 /**
@@ -199,6 +202,14 @@ public abstract class OSGiTest
    }
    
    /**
+    * Delegates to {@link OSGiTestHelper#toInputStream(Archive)}
+    */
+   protected InputStream toInputStream(Archive<?> archive) throws IOException, MalformedURLException
+   {
+      return OSGiTestHelper.toInputStream(archive);
+   }
+   
+   /**
     * Delegates to {@link OSGiTestHelper#assertBundleState(int, int)}
     */
    protected void assertBundleState(int expState, int wasState)
@@ -228,5 +239,19 @@ public abstract class OSGiTest
    protected void assertLoadClass(Bundle bundle, String className, Bundle exporter) 
    {
       getTestHelper().assertLoadClass(bundle, className, exporter);
+   }
+
+   boolean isBeforeClassPresent()
+   {
+      boolean isPresent = false;
+      for (Method method : getClass().getDeclaredMethods())
+      {
+         if (method.isAnnotationPresent(BeforeClass.class))
+         {
+            isPresent = true;
+            break;
+         }
+      }
+      return isPresent;
    }
 }

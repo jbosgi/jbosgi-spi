@@ -37,6 +37,7 @@ import org.osgi.jmx.framework.BundleStateMBean;
 import org.osgi.jmx.framework.FrameworkMBean;
 import org.osgi.jmx.framework.PackageStateMBean;
 import org.osgi.jmx.framework.ServiceStateMBean;
+import org.osgi.service.packageadmin.PackageAdmin;
 
 /**
  * An abstraction of an OSGi Runtime.
@@ -176,9 +177,14 @@ public interface OSGiRuntime
    boolean isRemoteRuntime();
 
    /**
+    * Refresh the packages through {@link PackageAdmin#refreshPackages(org.osgi.framework.Bundle[])} 
+    */
+   void refreshPackages(OSGiBundle[] bundles) throws IOException;
+   
+   /**
     * Shutdown the {@link OSGiRuntime}.
     * 
-    * This will remove all installed {@link OSGiBundle}s and added {@link Capability}.
+    * This will remove added {@link Capability}.
     */
    void shutdown();
 }

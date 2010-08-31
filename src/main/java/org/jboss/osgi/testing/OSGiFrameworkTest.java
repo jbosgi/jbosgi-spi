@@ -32,7 +32,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -56,7 +55,6 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -97,7 +95,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    public void setUp() throws Exception
    {
       super.setUp();
-
       if (framework == null && isBeforeClassPresent() == false)
       {
          createFramework();
@@ -108,21 +105,17 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    @After
    public void tearDown() throws Exception
    {
-      refreshPackages(null);
-      
-      // Report and cleanup left over files in the bundle stream dir
-      File streamDir = new File("./target/osgi-store/bundle-0/bundle-streams");
-      if (streamDir.exists() && streamDir.list().length > 0)
+      // Nothing to do if the framework was not created or shutdown already
+      if (framework != null && framework.getState() == Bundle.ACTIVE)
       {
-         List<String> filelist = Arrays.asList(streamDir.list());
-         System.err.println("Bundle streams not cleaned up: " + filelist);
-         for (String name : filelist)
+         // Report and cleanup left over files in the bundle stream dir
+         File streamDir = new File("./target/osgi-store/bundle-0/bundle-streams");
+         if (streamDir.exists() && streamDir.list().length > 0)
          {
-            File file = new File(streamDir + File.separator + name);
-            file.delete();
+            List<String> filelist = Arrays.asList(streamDir.list());
+            System.err.println("Bundle streams not cleaned up: " + filelist);
          }
       }
-      
       super.tearDown();
    }
 
@@ -175,8 +168,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
 
    protected Bundle installBundle(Archive<?> archive) throws BundleException, IOException
    {
-      VirtualFile virtualFile = OSGiTestHelper.toVirtualFile(archive);
-      return installBundle(archive.getName(), virtualFile.openStream());
+      return installBundle(archive.getName(), toInputStream(archive));
    }
 
    protected Bundle installBundle(VirtualFile virtualFile) throws BundleException, IOException
@@ -514,11 +506,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
 
    protected void refreshPackages(Bundle[] bundles) throws Exception
    {
-      // Nothing to do if the framework was 
-      // not created or shutdown already
-      if (framework == null || framework.getState() != Bundle.ACTIVE)
-         return;
-
       final CountDownLatch latch = new CountDownLatch(1);
       FrameworkListener fl = new FrameworkListener()
       {
@@ -541,20 +528,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       {
          systemContext.removeFrameworkListener(fl);
       }
-   }
-
-   private boolean isBeforeClassPresent()
-   {
-      boolean isPresent = false;
-      for (Method method : getClass().getDeclaredMethods())
-      {
-         if (method.isAnnotationPresent(BeforeClass.class))
-         {
-            isPresent = true;
-            break;
-         }
-      }
-      return isPresent;
    }
 
    @SuppressWarnings("rawtypes")

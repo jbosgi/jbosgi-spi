@@ -21,6 +21,12 @@
  */
 package org.jboss.osgi.testing;
 
+import org.jboss.osgi.testing.internal.EmbeddedRuntime;
+import org.jboss.osgi.testing.internal.RemoteRuntime;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+
 /**
  * An abstract OSGi runtime test.
  * 
@@ -31,43 +37,79 @@ package org.jboss.osgi.testing;
  */
 public abstract class OSGiRuntimeTest extends OSGiTest
 {
-   private OSGiRuntimeHelper helper;
+   private static OSGiRuntime runtime;
 
-   /**
-    * Get the test helper used by this test
-    * 
-    * Overwrite if you need to supply another helper
-    * i.e. one that you have statically setup 
-    */
-   protected OSGiRuntimeHelper getRuntimeHelper()
+   @Before
+   public void setUp() throws Exception
    {
-      if (helper == null)
-         helper = new OSGiRuntimeHelper();
+      super.setUp();
 
-      return helper;
+      if (runtime == null && isBeforeClassPresent() == false)
+         runtime = createDefaultRuntime();
+   }
+
+   @After
+   public void tearDown() throws Exception
+   {
+      //getRuntime().refreshPackages(null);
+      super.tearDown();
+   }
+   
+   @AfterClass
+   public static void afterClass() throws Exception
+   {
+      shutdownRuntime();
+   }
+
+   public static void shutdownRuntime()
+   {
+      // Nothing to do if the runtime was not created
+      if (runtime != null)
+      {
+         runtime.shutdown();
+         runtime = null;
+      }
+   }
+   
+   public static OSGiRuntime getRuntime() 
+   {
+      if (runtime == null)
+         throw new IllegalStateException("OSGiRuntime not available. Use createRuntime()");
+
+      return runtime;
    }
 
    /**
     * Delegates to {@link OSGiRuntimeHelper#getDefaultRuntime()}
     */
-   protected OSGiRuntime getDefaultRuntime()
+   public static OSGiRuntime createDefaultRuntime()
    {
-      return getRuntimeHelper().getDefaultRuntime();
+      String target = System.getProperty("target.container");
+      if (target == null)
+      {
+         return createEmbeddedRuntime();
+      }
+      else
+      {
+         return createRemoteRuntime();
+      }
    }
 
    /**
     * Delegates to {@link OSGiRuntimeHelper#getEmbeddedRuntime()}
     */
-   protected OSGiRuntime getEmbeddedRuntime()
+   public static OSGiRuntime createEmbeddedRuntime()
    {
-      return getRuntimeHelper().getEmbeddedRuntime();
+      runtime = new EmbeddedRuntime(new OSGiRuntimeHelper());
+      return runtime;
    }
 
    /**
     * Delegates to {@link OSGiRuntimeHelper#getRemoteRuntime()}
     */
-   public OSGiRuntime getRemoteRuntime()
+   public static OSGiRuntime createRemoteRuntime()
    {
-      return getRuntimeHelper().getRemoteRuntime();
+      runtime = new RemoteRuntime(new OSGiRuntimeHelper());
+      return runtime;
    }
 }
