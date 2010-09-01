@@ -27,8 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -47,13 +48,14 @@ public final class OSGiManifestBuilder implements Asset
 {
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiManifestBuilder.class);
-   
+
    private StringWriter sw;
    private PrintWriter pw;
-   private List<String> importPackages = new ArrayList<String>();
-   private List<String> exportPackages = new ArrayList<String>();
-   private List<String> dynamicImportPackages = new ArrayList<String>();
-   private List<String> requiredBundles = new ArrayList<String>();
+   private Set<String> importPackages = new LinkedHashSet<String>();
+   private Set<String> exportPackages = new LinkedHashSet<String>();
+   private Set<String> dynamicImportPackages = new LinkedHashSet<String>();
+   private Set<String> requiredBundles = new LinkedHashSet<String>();
+   private Manifest manifest;
 
    public static OSGiManifestBuilder newInstance()
    {
@@ -64,30 +66,30 @@ public final class OSGiManifestBuilder implements Asset
    {
       sw = new StringWriter();
       pw = new PrintWriter(sw);
-      pw.println(Attributes.Name.MANIFEST_VERSION + ": 1.0");
+      append(Attributes.Name.MANIFEST_VERSION + ": 1.0", true);
    }
 
    public OSGiManifestBuilder addBundleManifestVersion(int version)
    {
-      pw.println(Constants.BUNDLE_MANIFESTVERSION + ": " + version);
+      append(Constants.BUNDLE_MANIFESTVERSION + ": " + version, true);
       return this;
    }
 
    public OSGiManifestBuilder addBundleSymbolicName(String symbolicName)
    {
-      pw.println(Constants.BUNDLE_SYMBOLICNAME + ": " + symbolicName);
+      append(Constants.BUNDLE_SYMBOLICNAME + ": " + symbolicName, true);
       return this;
    }
 
    public OSGiManifestBuilder addBundleName(String name)
    {
-      pw.println(Constants.BUNDLE_NAME + ": " + name);
+      append(Constants.BUNDLE_NAME + ": " + name, true);
       return this;
    }
 
    public OSGiManifestBuilder addBundleVersion(Version version)
    {
-      pw.println(Constants.BUNDLE_VERSION + ": " + version);
+      append(Constants.BUNDLE_VERSION + ": " + version, true);
       return this;
    }
 
@@ -103,16 +105,16 @@ public final class OSGiManifestBuilder implements Asset
 
    public OSGiManifestBuilder addBundleActivator(String bundleActivator)
    {
-      pw.println(Constants.BUNDLE_ACTIVATOR + ": " + bundleActivator);
+      append(Constants.BUNDLE_ACTIVATOR + ": " + bundleActivator, true);
       return this;
    }
 
    public OSGiManifestBuilder addFragmentHost(String fragmentHost)
    {
-      pw.println(Constants.FRAGMENT_HOST + ": " + fragmentHost);
+      append(Constants.FRAGMENT_HOST + ": " + fragmentHost, true);
       return this;
    }
-   
+
    public OSGiManifestBuilder addRequireBundle(String requiredBundle)
    {
       requiredBundles.add(requiredBundle);
@@ -161,81 +163,72 @@ public final class OSGiManifestBuilder implements Asset
 
    public OSGiManifestBuilder addManifestHeader(String key, String value)
    {
-      pw.println(key + ": " + value);
+      append(key + ": " + value, true);
       return this;
    }
 
    public Manifest getManifest()
    {
-      // Require-Bundle
-      if (requiredBundles.size() > 0)
+      if (manifest == null)
       {
-         pw.print(Constants.REQUIRE_BUNDLE + ": ");
-         for (int i = 0; i < requiredBundles.size(); i++)
+         // Require-Bundle
+         if (requiredBundles.size() > 0)
          {
-            if (i > 0)
-               pw.print(",");
-            
-            pw.print(requiredBundles.get(i));
+            append(Constants.REQUIRE_BUNDLE + ": ", false);
+            Iterator<String> iterator = requiredBundles.iterator();
+            append(iterator.next(), false);
+            while (iterator.hasNext())
+               append("," + iterator.next(), false);
+            append(null, true);
          }
-         pw.println();
-      }
-      
-      // Export-Package
-      if (exportPackages.size() > 0)
-      {
-         pw.print(Constants.EXPORT_PACKAGE + ": ");
-         for (int i = 0; i < exportPackages.size(); i++)
+
+         // Export-Package
+         if (exportPackages.size() > 0)
          {
-            if (i > 0)
-               pw.print(",");
-            
-            pw.print(exportPackages.get(i));
+            append(Constants.EXPORT_PACKAGE + ": ", false);
+            Iterator<String> iterator = exportPackages.iterator();
+            append(iterator.next(), false);
+            while (iterator.hasNext())
+               append("," + iterator.next(), false);
+            append(null, true);
          }
-         pw.println();
-      }
-      
-      // Import-Package
-      if (importPackages.size() > 0)
-      {
-         pw.print(Constants.IMPORT_PACKAGE + ": ");
-         for (int i = 0; i < importPackages.size(); i++)
+
+         // Import-Package
+         if (importPackages.size() > 0)
          {
-            if (i > 0)
-               pw.print(",");
-            
-            pw.print(importPackages.get(i));
+            append(Constants.IMPORT_PACKAGE + ": ", false);
+            Iterator<String> iterator = importPackages.iterator();
+            append(iterator.next(), false);
+            while (iterator.hasNext())
+               append("," + iterator.next(), false);
+            append(null, true);
          }
-         pw.println();
-      }
-      
-      // DynamicImport-Package
-      if (dynamicImportPackages.size() > 0)
-      {
-         pw.print(Constants.DYNAMICIMPORT_PACKAGE + ": ");
-         for (int i = 0; i < dynamicImportPackages.size(); i++)
+
+         // DynamicImport-Package
+         if (dynamicImportPackages.size() > 0)
          {
-            if (i > 0)
-               pw.print(",");
-            
-            pw.print(dynamicImportPackages.get(i));
+            append(Constants.DYNAMICIMPORT_PACKAGE + ": ", false);
+            Iterator<String> iterator = dynamicImportPackages.iterator();
+            append(iterator.next(), false);
+            while (iterator.hasNext())
+               append("," + iterator.next(), false);
+            append(null, true);
          }
-         pw.println();
+
+         String manifestString = sw.toString();
+         if (log.isTraceEnabled())
+            log.trace(manifestString);
+
+         try
+         {
+            manifest = new Manifest(new ByteArrayInputStream(manifestString.getBytes()));
+         }
+         catch (IOException ex)
+         {
+            throw new IllegalStateException("Cannot create manifest", ex);
+         }
       }
-      
-      String manifestString = sw.toString();
-      if (log.isTraceEnabled())
-         log.trace(manifestString);
-      
-      try
-      {
-         Manifest manifest = new Manifest(new ByteArrayInputStream(manifestString.getBytes()));
-         return manifest;
-      }
-      catch (IOException ex)
-      {
-         throw new IllegalStateException("Cannot create manifest", ex);
-      }
+      return manifest;
    }
 
    @Override
@@ -252,5 +245,16 @@ public final class OSGiManifestBuilder implements Asset
       {
          throw new IllegalStateException("Cannot provide manifest InputStream", ex);
       }
+   }
+
+   private void append(String line, boolean newline)
+   {
+      if (manifest != null)
+         throw new IllegalStateException("Cannot append to already existing manifest");
+      
+      if (line != null)
+         pw.print(line);
+      if (newline == true)
+         pw.println();
    }
 }

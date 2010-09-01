@@ -467,11 +467,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       return getJMXSupport().getServiceStateMBean();
    }
 
-   protected ClipboardMBean getClipboardMBean() throws IOException
-   {
-      return getJMXSupport().getClipboardMBean();
-   }
-
    private ManagementSupport getJMXSupport()
    {
       if (jmxSupport == null)
