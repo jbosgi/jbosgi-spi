@@ -36,7 +36,6 @@ import javax.naming.NamingException;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.capability.Capability;
 import org.jboss.osgi.spi.util.BundleInfo;
-import org.jboss.osgi.testing.ClipboardMBean;
 import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.jboss.osgi.testing.OSGiRuntimeHelper;
@@ -229,12 +228,6 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       return getJMXSupport().getServiceStateMBean();
    }
 
-   @Override
-   public ClipboardMBean getClipboardMBean() throws IOException
-   {
-      return getJMXSupport().getClipboardMBean();
-   }
-   
    private ManagementSupport getJMXSupport()
    {
       if (jmxSupport == null)

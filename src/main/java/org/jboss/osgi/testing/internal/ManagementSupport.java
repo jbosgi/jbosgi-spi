@@ -32,7 +32,6 @@ import org.jboss.osgi.jmx.FrameworkMBeanExt;
 import org.jboss.osgi.jmx.ObjectNameFactory;
 import org.jboss.osgi.jmx.PackageStateMBeanExt;
 import org.jboss.osgi.jmx.ServiceStateMBeanExt;
-import org.jboss.osgi.testing.ClipboardMBean;
 import org.osgi.jmx.framework.BundleStateMBean;
 import org.osgi.jmx.framework.FrameworkMBean;
 import org.osgi.jmx.framework.PackageStateMBean;
@@ -129,23 +128,5 @@ public class ManagementSupport
          serviceState = getMBeanProxy(objectName, ServiceStateMBean.class);
       }
       return serviceState;
-   }
-
-   public ClipboardMBean getClipboardMBean() throws IOException
-   {
-      ObjectName objectName = ObjectNameFactory.create(ClipboardMBean.OBJECTNAME);
-      if (mbeanServer.isRegistered(objectName) == false)
-      {
-         try
-         {
-            mbeanServer.createMBean(ClipboardImpl.class.getName(), objectName);
-         }
-         catch (Exception ex)
-         {
-            throw new IllegalStateException("Cannot create ClipboardMBean", ex);
-         }
-      }
-      ClipboardMBean clipboard = getMBeanProxy(objectName, ClipboardMBean.class);
-      return clipboard;
    }
 }

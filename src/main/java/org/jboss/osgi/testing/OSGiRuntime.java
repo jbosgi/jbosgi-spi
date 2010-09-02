@@ -108,11 +108,6 @@ public interface OSGiRuntime
    PackageStateMBean getPackageStateMBean() throws IOException;
 
    /**
-    * Get the ClipboardMBean
-    */
-   ClipboardMBean getClipboardMBean() throws IOException;
-   
-   /**
     * Get the array of installed {@link OSGiBundle}s
     */
    OSGiBundle[] getBundles();
