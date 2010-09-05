@@ -67,18 +67,18 @@ public class ManagementSupport
    public FrameworkMBean getFrameworkMBean() throws IOException
    {
       FrameworkMBean frameworkState = null;
-
       ObjectName objectName = ObjectNameFactory.create(FrameworkMBeanExt.OBJECTNAME);
       if (mbeanServer.isRegistered(objectName))
       {
          frameworkState = getMBeanProxy(objectName, FrameworkMBeanExt.class);
+         return frameworkState;
       }
-      else
+      objectName = ObjectNameFactory.create(FrameworkMBean.OBJECTNAME);
+      if (mbeanServer.isRegistered(objectName))
       {
-         objectName = ObjectNameFactory.create(FrameworkMBean.OBJECTNAME);
          frameworkState = getMBeanProxy(objectName, FrameworkMBean.class);
+         return frameworkState;
       }
-
       return frameworkState;
    }
 
@@ -89,11 +89,13 @@ public class ManagementSupport
       if (mbeanServer.isRegistered(objectName))
       {
          bundleState = getMBeanProxy(objectName, BundleStateMBeanExt.class);
+         return bundleState;
       }
-      else
+      objectName = ObjectNameFactory.create(BundleStateMBean.OBJECTNAME);
+      if (mbeanServer.isRegistered(objectName))
       {
-         objectName = ObjectNameFactory.create(BundleStateMBean.OBJECTNAME);
          bundleState = getMBeanProxy(objectName, BundleStateMBean.class);
+         return bundleState;
       }
       return bundleState;
    }
@@ -105,11 +107,13 @@ public class ManagementSupport
       if (mbeanServer.isRegistered(objectName))
       {
          packageState = getMBeanProxy(objectName, PackageStateMBeanExt.class);
+         return packageState;
       }
-      else
+      objectName = ObjectNameFactory.create(PackageStateMBean.OBJECTNAME);
+      if (mbeanServer.isRegistered(objectName))
       {
-         objectName = ObjectNameFactory.create(PackageStateMBean.OBJECTNAME);
          packageState = getMBeanProxy(objectName, PackageStateMBean.class);
+         return packageState;
       }
       return packageState;
    }
@@ -121,11 +125,13 @@ public class ManagementSupport
       if (mbeanServer.isRegistered(objectName))
       {
          serviceState = getMBeanProxy(objectName, ServiceStateMBeanExt.class);
+         return serviceState;
       }
-      else
+      objectName = ObjectNameFactory.create(ServiceStateMBean.OBJECTNAME);
+      if (mbeanServer.isRegistered(objectName))
       {
-         objectName = ObjectNameFactory.create(ServiceStateMBean.OBJECTNAME);
          serviceState = getMBeanProxy(objectName, ServiceStateMBean.class);
+         return serviceState;
       }
       return serviceState;
    }

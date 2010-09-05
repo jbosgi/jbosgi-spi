@@ -70,6 +70,17 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
    public EmbeddedRuntime(OSGiRuntimeHelper helper)
    {
       super(helper);
+      OSGiBootstrapProvider bootProvider = helper.getBootstrapProvider();
+      Framework framework = bootProvider.getFramework();
+      try
+      {
+         log.debug("Framework start: " + framework);
+         framework.start();
+      }
+      catch (BundleException ex)
+      {
+         throw new IllegalStateException("Cannot start framework", ex);
+      }
    }
 
    public static MBeanServer getLocalMBeanServer()
@@ -259,18 +270,6 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
    {
       OSGiBootstrapProvider bootProvider = getTestHelper().getBootstrapProvider();
       Framework framework = bootProvider.getFramework();
-      if (framework.getState() != Bundle.ACTIVE)
-      {
-         try
-         {
-            log.debug("Framework start: " + framework);
-            framework.start();
-         }
-         catch (BundleException ex)
-         {
-            throw new IllegalStateException("Cannot start framework", ex);
-         }
-      }
       return framework.getBundleContext();
    }
 }
