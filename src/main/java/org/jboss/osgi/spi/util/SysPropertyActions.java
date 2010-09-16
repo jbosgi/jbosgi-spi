@@ -19,7 +19,7 @@
   * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   */
-package org.jboss.osgi.spi.internal;
+package org.jboss.osgi.spi.util;
 
 // $Id$
 
@@ -32,7 +32,7 @@ import java.security.AccessController;
  * @author Scott.Stark@jboss.org
  */
 @SuppressWarnings("rawtypes")
-class SysPropertyActions
+public class SysPropertyActions
 {
    interface SysProps
    {

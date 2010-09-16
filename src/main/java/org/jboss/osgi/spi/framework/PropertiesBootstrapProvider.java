@@ -38,8 +38,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.jboss.logging.Logger;
-import org.jboss.osgi.spi.internal.StringPropertyReplacer;
 import org.jboss.osgi.spi.util.ServiceLoader;
+import org.jboss.osgi.spi.util.StringPropertyReplacer;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;

@@ -19,20 +19,23 @@
   * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   */
-package org.jboss.osgi.spi.internal;
+package org.jboss.osgi.spi.util;
 
-import java.util.Properties;
 import java.io.File;
 
+import org.osgi.framework.BundleContext;
+
 /**
- * A utility class for replacing properties in strings. 
+ * A utility class for replacing properties in strings.
  *
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  * @author <a href="Scott.Stark@jboss.org">Scott Stark</a>
  * @author <a href="claudio.vesco@previnet.it">Claudio Vesco</a>
  * @author <a href="mailto:adrian@jboss.com">Adrian Brock</a>
  * @author <a href="mailto:dimitris@jboss.org">Dimitris Andreadis</a>
- * @version <tt>$Revision$</tt> 
+ *
+ * @author Thomas.Diesler@jboss.com
+ * @since 16-Sep-2010
  */
 public final class StringPropertyReplacer
 {
@@ -56,52 +59,78 @@ public final class StringPropertyReplacer
    private static final int SEEN_DOLLAR = 1;
    private static final int IN_BRACKET = 2;
 
+   public interface PropertyProvider
+   {
+      String getProperty(String key);
+   }
+
    /**
     * Go through the input string and replace any occurance of ${p} with
     * the System.getProperty(p) value. If there is no such property p defined,
     * then the ${p} reference will remain unchanged.
-    * 
-    * If the property reference is of the form ${p:v} and there is no such property p,
-    * then the default value v will be returned.
-    * 
-    * If the property reference is of the form ${p1,p2} or ${p1,p2:v} then
-    * the primary and the secondary properties will be tried in turn, before
-    * returning either the unchanged input, or the default value.
-    * 
-    * The property ${/} is replaced with System.getProperty("file.separator")
-    * value and the property ${:} is replaced with System.getProperty("path.separator").
-    * 
+    *
     * @param string - the string with possible ${} references
     * @return the input string with all property references replaced if any.
     *    If there are no valid references the input string will be returned.
     */
    public static String replaceProperties(final String string)
    {
-      return replaceProperties(string, null);
+      return replaceProperties(string, new PropertyProvider()
+      {
+         @Override
+         public String getProperty(String key)
+         {
+            return System.getProperty(key);
+         }
+      });
    }
 
    /**
     * Go through the input string and replace any occurance of ${p} with
-    * the props.getProperty(p) value. If there is no such property p defined,
+    * the BundleContext.getProperty(p) value. If there is no such property p defined,
     * then the ${p} reference will remain unchanged.
-    * 
-    * If the property reference is of the form ${p:v} and there is no such property p,
-    * then the default value v will be returned.
-    * 
-    * If the property reference is of the form ${p1,p2} or ${p1,p2:v} then
-    * the primary and the secondary properties will be tried in turn, before
-    * returning either the unchanged input, or the default value.
-    * 
-    * The property ${/} is replaced with System.getProperty("file.separator")
-    * value and the property ${:} is replaced with System.getProperty("path.separator").
     *
     * @param string - the string with possible ${} references
-    * @param props - the source for ${x} property ref values, null means use System.getProperty()
     * @return the input string with all property references replaced if any.
     *    If there are no valid references the input string will be returned.
     */
-   public static String replaceProperties(final String string, final Properties props)
+   public static String replaceProperties(final String string, final BundleContext context)
    {
+      return replaceProperties(string, new PropertyProvider()
+      {
+         @Override
+         public String getProperty(String key)
+         {
+            return context.getProperty(key);
+         }
+      });
+   }
+
+   /**
+    * Go through the input string and replace any occurance of ${p} with
+    * the PropertyProvider.getProperty(p) value. If there is no such property p defined,
+    * then the ${p} reference will remain unchanged.
+    *
+    * If the property reference is of the form ${p:v} and there is no such property p,
+    * then the default value v will be returned.
+    *
+    * If the property reference is of the form ${p1,p2} or ${p1,p2:v} then
+    * the primary and the secondary properties will be tried in turn, before
+    * returning either the unchanged input, or the default value.
+    *
+    * The property ${/} is replaced with PropertyProvider.getProperty("file.separator")
+    * value and the property ${:} is replaced with PropertyProvider.getProperty("path.separator").
+    *
+    * @param string - the string with possible ${} references
+    * @param provider - the source for ${x} property ref values
+    * @return the input string with all property references replaced if any.
+    *    If there are no valid references the input string will be returned.
+    */
+   public static String replaceProperties(final String string, final PropertyProvider provider)
+   {
+      if (provider == null)
+         throw new IllegalArgumentException("Null provider");
+
       final char[] chars = string.toCharArray();
       StringBuffer buffer = new StringBuffer();
       boolean properties = false;
@@ -135,12 +164,13 @@ public final class StringPropertyReplacer
             {
                buffer.append("${}"); // REVIEW: Correct?
             }
-            else // Collect the system property
+            else
+            // Collect the system property
             {
                String value = null;
 
                String key = string.substring(start + 2, i);
-               
+
                // check for alias
                if (FILE_SEPARATOR_ALIAS.equals(key))
                {
@@ -152,12 +182,8 @@ public final class StringPropertyReplacer
                }
                else
                {
-                  // check from the properties
-                  if (props != null)
-                     value = props.getProperty(key);
-                  else
-                     value = System.getProperty(key);
-                  
+                  value = provider.getProperty(key);
+
                   if (value == null)
                   {
                      // Check for a default value ${key:default}
@@ -165,32 +191,29 @@ public final class StringPropertyReplacer
                      if (colon > 0)
                      {
                         String realKey = key.substring(0, colon);
-                        if (props != null)
-                           value = props.getProperty(realKey);
-                        else
-                           value = System.getProperty(realKey);
+                        value = provider.getProperty(key);
 
                         if (value == null)
                         {
-                           // Check for a composite key, "key1,key2"                           
-                           value = resolveCompositeKey(realKey, props);
-                        
+                           // Check for a composite key, "key1,key2"
+                           value = resolveCompositeKey(realKey, provider);
+
                            // Not a composite key either, use the specified default
                            if (value == null)
-                              value = key.substring(colon+1);
+                              value = key.substring(colon + 1);
                         }
                      }
                      else
                      {
                         // No default, check for a composite key, "key1,key2"
-                        value = resolveCompositeKey(key, props);
+                        value = resolveCompositeKey(key, provider);
                      }
                   }
                }
 
                if (value != null)
                {
-                  properties = true; 
+                  properties = true;
                   buffer.append(value);
                }
                else
@@ -199,7 +222,7 @@ public final class StringPropertyReplacer
                   buffer.append(key);
                   buffer.append('}');
                }
-               
+
             }
             start = i + 1;
             state = NORMAL;
@@ -217,45 +240,39 @@ public final class StringPropertyReplacer
       // Done
       return buffer.toString();
    }
-   
+
    /**
     * Try to resolve a "key" from the provided properties by
     * checking if it is actually a "key1,key2", in which case
     * try first "key1", then "key2". If all fails, return null.
-    * 
+    *
     * It also accepts "key1," and ",key2".
-    * 
+    *
     * @param key the key to resolve
     * @param props the properties to use
     * @return the resolved key or null
     */
-   private static String resolveCompositeKey(String key, Properties props)
+   private static String resolveCompositeKey(String key, PropertyProvider provider)
    {
       String value = null;
-      
+
       // Look for the comma
       int comma = key.indexOf(',');
       if (comma > -1)
       {
          // If we have a first part, try resolve it
          if (comma > 0)
-         {  
+         {
             // Check the first part
             String key1 = key.substring(0, comma);
-            if (props != null)
-               value = props.getProperty(key1);            
-            else
-               value = System.getProperty(key1);
+            value = provider.getProperty(key1);
          }
          // Check the second part, if there is one and first lookup failed
          if (value == null && comma < key.length() - 1)
          {
             String key2 = key.substring(comma + 1);
-            if (props != null)
-               value = props.getProperty(key2);
-            else
-               value = System.getProperty(key2);
-         }         
+            value = provider.getProperty(key2);
+         }
       }
       // Return whatever we've found or null
       return value;
