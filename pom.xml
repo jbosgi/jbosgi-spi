@@ -70,7 +70,7 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.shrinkwrap</groupId>
-      <artifactId>shrinkwrap-api</artifactId>
+      <artifactId>shrinkwrap-impl-base</artifactId>
       <version>${version.jboss.shrinkwrap}</version>
     </dependency>
     <dependency>
