@@ -40,10 +40,10 @@ import org.osgi.framework.Version;
 
 /**
  * Primitive access to bundle meta data and root virtual file.
- * 
+ *
  * The bundle info can be constructed from various locations.
- * If that succeeds, there is a valid OSGi Manifest. 
- * 
+ * If that succeeds, there is a valid OSGi Manifest.
+ *
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
@@ -143,6 +143,45 @@ public class BundleInfo implements Serializable
    }
 
    /**
+    * Validate manifest from the given virtual file.
+    * @param virtualFile The virtualFile that is checked for a valid manifest
+    * @return True if the virtualFile conatains a valid manifest
+    */
+   public static boolean isValidBundle(VirtualFile virtualFile)
+   {
+      try
+      {
+         Manifest manifest = VFSUtils.getManifest(virtualFile);
+         return isValidateBundleManifest(manifest);
+      }
+      catch (IOException e)
+      {
+         return false;
+      }
+   }
+
+   /**
+    * Validate a given bundle manifest.
+    * @param manifest The given manifest
+    * @return True if the manifest is valid
+    */
+   public static boolean isValidateBundleManifest(Manifest manifest)
+   {
+      if (manifest == null)
+         return false;
+
+      try
+      {
+         validateBundleManifest(manifest);
+         return true;
+      }
+      catch (BundleException e)
+      {
+         return false;
+      }
+   }
+
+   /**
     * Validate a given bundle manifest.
     * @param manifest The given manifest
     * @throws BundleException if this is not a valid bundle manifest
@@ -150,12 +189,12 @@ public class BundleInfo implements Serializable
    public static void validateBundleManifest(Manifest manifest) throws BundleException
    {
       // A bundle manifest must express the version of the OSGi manifest header
-      // syntax in the Bundle-ManifestVersion header. Bundles exploiting this version 
+      // syntax in the Bundle-ManifestVersion header. Bundles exploiting this version
       // of the Framework specification (or later) must specify this header.
       // The Framework version 1.3 (or later) bundle manifest version must be ’2’.
       // Bundle manifests written to previous specifications’ manifest syntax are
       // taken to have a bundle manifest version of '1', although there is no way to
-      // express this in such manifests. 
+      // express this in such manifests.
       int manifestVersion = getBundleManifestVersion(manifest);
       if (manifestVersion < 0)
          throw new BundleException("Cannot determine Bundle-ManifestVersion");
@@ -174,7 +213,7 @@ public class BundleInfo implements Serializable
       {
          if (symbolicName == null)
             throw new BundleException("Cannot obtain Bundle-SymbolicName");
-         
+
          // Parse the Bundle-Version string
          Version.parseVersion(bundleVersion).toString();
       }
@@ -183,7 +222,7 @@ public class BundleInfo implements Serializable
    /**
     * Get the bundle manifest version.
     * @param manifest The given manifest
-    * @return The value of the Bundle-ManifestVersion header, or -1 for a non OSGi manifest 
+    * @return The value of the Bundle-ManifestVersion header, or -1 for a non OSGi manifest
     */
    public static int getBundleManifestVersion(Manifest manifest)
    {
