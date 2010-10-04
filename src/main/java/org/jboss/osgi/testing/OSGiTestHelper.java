@@ -24,8 +24,6 @@ package org.jboss.osgi.testing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -194,7 +192,7 @@ public class OSGiTestHelper
             if (url == null)
                throw new IllegalArgumentException("Cannot load resource: " + res);
 
-            final VirtualFile file = AbstractVFS.getRoot(url);
+            final VirtualFile file = AbstractVFS.toVirtualFile(url);
             if (file.isDirectory())
             {
                addResources(archive, file, file);
@@ -210,7 +208,7 @@ public class OSGiTestHelper
          for (Class<?> clazz : packages)
          {
             URL url = clazz.getResource("/");
-            VirtualFile base = AbstractVFS.getRoot(url);
+            VirtualFile base = AbstractVFS.toVirtualFile(url);
 
             String path = clazz.getName().replace('.', '/');
             path = path.substring(0, path.lastIndexOf("/"));
@@ -225,22 +223,13 @@ public class OSGiTestHelper
    public static VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
    {
       ZipExporter exporter = archive.as(ZipExporter.class);
-      File target = File.createTempFile("osgi-bundle_", ".jar");
-      exporter.exportZip(target, true);
-      target.deleteOnExit();
-      VirtualFile rootFile = AbstractVFS.getRoot(target.toURI().toURL());
-      return rootFile;
+      return AbstractVFS.toVirtualFile(archive.getName(), exporter.exportZip());
    }
 
    public static InputStream toInputStream(Archive<?> archive) throws IOException
    {
       ZipExporter exporter = archive.as(ZipExporter.class);
-      ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-      exporter.exportZip(baos);
-      baos.flush();
-      baos.close();
-      
-      return new ByteArrayInputStream(baos.toByteArray());
+      return exporter.exportZip();
    }
 
    private void addResources(JavaArchive archive, VirtualFile basedir, VirtualFile resdir) throws IOException
