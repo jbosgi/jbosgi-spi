@@ -20,7 +20,7 @@
   <artifactId>jboss-osgi-spi</artifactId>
   <packaging>jar</packaging>
 
-  <version>1.0.16</version>
+  <version>1.0.17-SNAPSHOT</version>
   
   <!-- Parent -->
   <parent>
