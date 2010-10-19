@@ -41,7 +41,6 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.jboss.logging.Logger;
-import org.jboss.osgi.jmx.JMXServiceURLFactory;
 import org.jboss.osgi.jmx.MBeanProxy;
 import org.jboss.osgi.jmx.ObjectNameFactory;
 import org.jboss.osgi.jmx.ServiceStateMBeanExt;
@@ -220,7 +219,8 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       try
       {
          // Get the MBeanServerConnection through the JMXConnector
-         JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(getServerHost(), null, null);
+         String urlString = System.getProperty("jmx.service.url", "service:jmx:rmi:///jndi/rmi://" + getServerHost() + ":1090/jmxrmi");
+         JMXServiceURL serviceURL = new JMXServiceURL(urlString);
          jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
          return jmxConnector.getMBeanServerConnection();
       }
@@ -237,7 +237,7 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       if (bundles != null)
       {
          bundleIds = new long[bundles.length];
-         for (int i = 0; i < bundles.length ; i++)
+         for (int i = 0; i < bundles.length; i++)
             bundleIds[i] = bundles[i].getBundleId();
       }
       try

@@ -62,7 +62,7 @@ class RemoteBundle extends OSGiBundleImpl
    private long bundleId;
    private String location;
    private String symbolicName;
-   private BundleStateMBeanExt bundleState;
+   private BundleStateMBean bundleState;
    private Dictionary<String, String> defaultHeaders;
    private Dictionary<String, String> rawHeaders;
    private Version version;
@@ -73,8 +73,8 @@ class RemoteBundle extends OSGiBundleImpl
       super(runtime);
       this.bundleId = bundleId;
 
-      bundleState = (BundleStateMBeanExt)runtime.getBundleStateMBean();
-      
+      bundleState = runtime.getBundleStateMBean();
+
       symbolicName = bundleState.getSymbolicName(bundleId);
       location = bundleState.getLocation(bundleId);
 
@@ -84,21 +84,27 @@ class RemoteBundle extends OSGiBundleImpl
       // The getHeaders methods must continue to provide the manifest header
       // information after the bundle enters the UNINSTALLED state.
       defaultHeaders = getHeadersInternal(null);
-      rawHeaders = getHeadersInternal("");
+      if (bundleState instanceof BundleStateMBeanExt)
+         rawHeaders = getHeadersInternal("");
    }
 
    @SuppressWarnings("unchecked")
    private Dictionary<String, String> getHeadersInternal(String locale) throws IOException
    {
-      Dictionary<String, String> defaultHeaders = new Hashtable<String, String>();
-      TabularData headers = bundleState.getHeaders(bundleId, locale);
-      for (CompositeData aux : (Collection<CompositeData>)headers.values())
+      Dictionary<String, String> headers = new Hashtable<String, String>();
+      TabularData headerData;
+      if (locale == null)
+         headerData = bundleState.getHeaders(bundleId);
+      else
+         headerData = assertBundleStateMBeanExt().getHeaders(bundleId, locale);
+
+      for (CompositeData aux : (Collection<CompositeData>)headerData.values())
       {
          String key = (String)aux.get(JmxConstants.KEY);
          String value = (String)aux.get(JmxConstants.VALUE);
-         defaultHeaders.put(key, value);
+         headers.put(key, value);
       }
-      return new UnmodifiableDictionary(defaultHeaders);
+      return new UnmodifiableDictionary(headers);
    }
 
    @Override
@@ -197,7 +203,7 @@ class RemoteBundle extends OSGiBundleImpl
       assertNotUninstalled();
       try
       {
-         CompositeData propData = bundleState.getProperty(bundleId, key);
+         CompositeData propData = assertBundleStateMBeanExt().getProperty(bundleId, key);
          if (propData == null)
             return null;
 
@@ -215,7 +221,7 @@ class RemoteBundle extends OSGiBundleImpl
       assertNotUninstalled();
       try
       {
-         return toURL(bundleState.getEntry(bundleId, path), null);
+         return toURL(assertBundleStateMBeanExt().getEntry(bundleId, path), null);
       }
       catch (IOException ex)
       {
@@ -229,7 +235,7 @@ class RemoteBundle extends OSGiBundleImpl
       assertNotUninstalled();
       try
       {
-         return toURL(bundleState.getResource(bundleId, name), null);
+         return toURL(assertBundleStateMBeanExt().getResource(bundleId, name), null);
       }
       catch (IOException ex)
       {
@@ -243,7 +249,7 @@ class RemoteBundle extends OSGiBundleImpl
       assertNotUninstalled();
       try
       {
-         String filepath = bundleState.getDataFile(bundleId, filename);
+         String filepath = assertBundleStateMBeanExt().getDataFile(bundleId, filename);
          return filepath != null ? new File(filepath) : null;
       }
       catch (IOException ex)
@@ -258,7 +264,7 @@ class RemoteBundle extends OSGiBundleImpl
       assertNotUninstalled();
       try
       {
-         long exporterId = bundleState.loadClass(bundleId, name);
+         long exporterId = assertBundleStateMBeanExt().loadClass(bundleId, name);
          return getRuntime().getBundle(new Long(exporterId));
       }
       catch (IOException ex)
@@ -280,7 +286,7 @@ class RemoteBundle extends OSGiBundleImpl
          Throwable cause = ex.getCause();
          if (cause instanceof BundleException)
             throw (BundleException)cause;
-         
+
          throw new BundleException("Cannot start bundle: " + this, ex);
       }
    }
@@ -298,7 +304,7 @@ class RemoteBundle extends OSGiBundleImpl
          Throwable cause = ex.getCause();
          if (cause instanceof BundleException)
             throw (BundleException)cause;
-         
+
          throw new BundleException("Cannot stop bundle: " + this, ex);
       }
    }
@@ -322,6 +328,14 @@ class RemoteBundle extends OSGiBundleImpl
       {
          log.error("Cannot uninstall: " + getLocation(), ex);
       }
+   }
+
+   private BundleStateMBeanExt assertBundleStateMBeanExt()
+   {
+      if (bundleState instanceof BundleStateMBeanExt)
+         return (BundleStateMBeanExt)bundleState;
+
+      throw new IllegalStateException("BundleStateMBean extension not installed");
    }
 
    private URL toURL(String urlstr, URLStreamHandler sh)
