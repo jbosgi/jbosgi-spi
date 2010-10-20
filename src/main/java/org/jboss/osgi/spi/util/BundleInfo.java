@@ -300,7 +300,7 @@ public class BundleInfo implements Serializable
    public void close()
    {
       if (rootFile != null)
-         rootFile.close();
+         VFSUtils.safeClose(rootFile);
    }
 
    public Manifest getManifest()
