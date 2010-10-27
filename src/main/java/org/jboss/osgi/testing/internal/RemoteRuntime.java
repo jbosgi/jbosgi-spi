@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.testing.internal;
 
-// $Id$
 
 import java.io.IOException;
 import java.net.URL;

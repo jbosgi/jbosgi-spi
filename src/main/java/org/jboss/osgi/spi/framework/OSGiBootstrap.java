@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.framework;
 
-//$Id$
 
 import org.jboss.osgi.spi.internal.OSGiBootstrapBean;
 import org.kohsuke.args4j.CmdLineException;

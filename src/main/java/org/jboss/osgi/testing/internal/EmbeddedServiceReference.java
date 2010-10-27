@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.testing.internal;
 
-// $Id$
 
 import org.jboss.osgi.testing.OSGiServiceReference;
 import org.osgi.framework.ServiceReference;

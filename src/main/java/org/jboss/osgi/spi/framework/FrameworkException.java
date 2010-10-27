@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.framework;
 
-// $Id$
 
 /**
  * An OSGi Framework Exception that should be thrown on unrecoverable errors.

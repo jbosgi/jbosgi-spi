@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.testing.internal;
 
-// $Id$
 
 /**
  * A remote OSGi Framework exception that should be thrown on unrecoverable errors.

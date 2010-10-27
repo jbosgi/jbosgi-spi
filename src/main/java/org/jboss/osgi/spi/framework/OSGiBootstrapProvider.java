@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.framework;
 
-//$Id$
 
 import java.io.InputStream;
 import java.net.URL;

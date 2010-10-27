@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi;
 
-// $Id$
 
 /**
  * A RuntimeException that should be thrown for unimplemented features

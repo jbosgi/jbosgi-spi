@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.util;
 
-//$Id$
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;

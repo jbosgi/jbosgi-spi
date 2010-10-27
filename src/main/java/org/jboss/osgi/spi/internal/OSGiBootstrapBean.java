@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.internal;
 
-//$Id$
 
 import static org.jboss.osgi.spi.OSGiConstants.OSGI_HOME;
 import static org.jboss.osgi.spi.OSGiConstants.OSGI_SERVER_HOME;

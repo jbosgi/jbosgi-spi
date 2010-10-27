@@ -21,7 +21,6 @@
   */
 package org.jboss.osgi.spi.util;
 
-// $Id$
 
 import java.security.PrivilegedAction;
 import java.security.AccessController;

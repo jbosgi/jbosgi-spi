@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.framework;
 
-//$Id$
 
 import java.io.IOException;
 import java.io.InputStream;

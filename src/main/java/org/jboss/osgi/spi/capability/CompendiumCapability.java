@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.capability;
 
-//$Id$
 
 
 /**
