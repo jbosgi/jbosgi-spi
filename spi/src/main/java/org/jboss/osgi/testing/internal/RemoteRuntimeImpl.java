@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.testing.internal;
 
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,17 +44,18 @@ import org.jboss.osgi.jmx.ObjectNameFactory;
 import org.jboss.osgi.jmx.ServiceStateMBeanExt;
 import org.jboss.osgi.spi.util.BundleInfo;
 import org.jboss.osgi.testing.OSGiBundle;
+import org.jboss.osgi.testing.OSGiDeployerClient;
+import org.jboss.osgi.testing.OSGiRemoteRuntime;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.jboss.osgi.testing.OSGiRuntimeHelper;
 import org.jboss.osgi.testing.OSGiServiceReference;
-import org.jboss.osgi.testing.OSGiRemoteRuntime;
 import org.osgi.framework.BundleException;
 import org.osgi.jmx.framework.BundleStateMBean;
 import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
  * A remote implementation of the {@link OSGiRuntime}
- * 
+ *
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
@@ -97,25 +97,19 @@ public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRunt
       }
    }
 
-   /* (non-Javadoc)
- * @see org.jboss.osgi.testing.internal.RemoteRuntime#deploy(java.lang.String)
- */
-@Override
-public void deploy(String location) throws Exception
+   @Override
+   public void deploy(String location) throws Exception
    {
       URL archiveURL = getTestHelper().getTestArchiveURL(location);
-      MainDeployerClient deployer = new MainDeployerClient(this);
+      OSGiDeployerClient deployer = OSGiDeployerClient.Factory.getDeployerClient();
       deployer.deploy(archiveURL);
    }
 
-   /* (non-Javadoc)
- * @see org.jboss.osgi.testing.internal.RemoteRuntime#undeploy(java.lang.String)
- */
-@Override
-public void undeploy(String location) throws Exception
+   @Override
+   public void undeploy(String location) throws Exception
    {
       URL archiveURL = getTestHelper().getTestArchiveURL(location);
-      MainDeployerClient deployer = new MainDeployerClient(this);
+      OSGiDeployerClient deployer = OSGiDeployerClient.Factory.getDeployerClient();
       deployer.undeploy(archiveURL);
    }
 
