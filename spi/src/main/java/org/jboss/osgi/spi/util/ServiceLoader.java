@@ -33,7 +33,7 @@ import org.jboss.logging.Logger;
 
 /**
  * Loads service implementations from the requesters classpath.
- * 
+ *
  * @author Thomas.Diesler@jboss.com
  * @since 14-Dec-2006
  */
@@ -44,7 +44,7 @@ public abstract class ServiceLoader
 
    /**
     * Loads a list of service implementations defined in META-INF/services/${serviceClass}
-    * 
+    *
     * @param serviceClass The interface that is implemented by all loaded services
     * @return The list of available service or an empty list
     */
@@ -53,7 +53,7 @@ public abstract class ServiceLoader
    {
       if (serviceClass == null)
          throw new IllegalArgumentException("Null serviceClass");
-      
+
       List<T> services = new ArrayList<T>();
       ClassLoader loader = serviceClass.getClassLoader();
 
@@ -105,7 +105,7 @@ public abstract class ServiceLoader
                   }
                   catch (Exception ex)
                   {
-                     log.debug("Cannot load service: " + implClassName);
+                     log.debug("Cannot load service: " + implClassName, ex);
                   }
                }
 
@@ -124,7 +124,7 @@ public abstract class ServiceLoader
 
    /**
     * Loads the first of a list of service implementations defined in META-INF/services/${serviceClass}
-    * 
+    *
     * @param serviceClass The interface that is implemented by all loaded services
     * @return The first available service or null
     */

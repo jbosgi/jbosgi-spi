@@ -21,7 +21,7 @@
  */
 package org.jboss.osgi.testing;
 
-
+import java.io.IOException;
 import java.net.URL;
 
 import org.jboss.osgi.spi.util.ServiceLoader;
@@ -35,15 +35,18 @@ import org.osgi.framework.BundleException;
  */
 public interface OSGiDeployerClient
 {
-   void deploy(URL url) throws BundleException;
+   void deploy(URL url) throws BundleException, IOException;
 
-   void undeploy(URL url) throws BundleException;
+   void undeploy(URL url) throws BundleException, IOException;
 
    final class Factory
    {
-       public static OSGiDeployerClient getDeployerClient()
-       {
-          return ServiceLoader.loadService(OSGiDeployerClient.class);
-       }
+      public static OSGiDeployerClient getDeployerClient()
+      {
+         OSGiDeployerClient service = ServiceLoader.loadService(OSGiDeployerClient.class);
+         if (service == null)
+            throw new IllegalStateException("Cannot obtain OSGiDeployerClient service");
+         return service;
+      }
    }
 }

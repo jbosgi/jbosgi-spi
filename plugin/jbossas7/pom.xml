@@ -28,6 +28,7 @@
   <!-- Properties -->
   <properties>
     <version.jboss.as>7.0.0.Alpha2-SNAPSHOT</version.jboss.as>
+    <version.jboss.marshalling>1.3.0.CR8</version.jboss.marshalling>
   </properties>
   
   <!-- Dependencies -->
@@ -41,6 +42,11 @@
       <groupId>org.jboss.as</groupId>
       <artifactId>jboss-as-standalone-client</artifactId>
       <version>${version.jboss.as}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.marshalling</groupId>
+      <artifactId>jboss-marshalling-river</artifactId>
+      <version>${version.jboss.marshalling}</version>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>

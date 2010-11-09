@@ -21,9 +21,21 @@
  */
 package org.jboss.osgi.plugin.jbossas7;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Future;
 
-import org.jboss.osgi.spi.NotImplementedException;
+import org.jboss.as.standalone.client.api.StandaloneClient;
+import org.jboss.as.standalone.client.api.deployment.DeploymentAction;
+import org.jboss.as.standalone.client.api.deployment.DeploymentPlan;
+import org.jboss.as.standalone.client.api.deployment.DeploymentPlanBuilder;
+import org.jboss.as.standalone.client.api.deployment.ServerDeploymentActionResult;
+import org.jboss.as.standalone.client.api.deployment.ServerDeploymentManager;
+import org.jboss.as.standalone.client.api.deployment.ServerDeploymentPlanResult;
+import org.jboss.logging.Logger;
 import org.jboss.osgi.testing.OSGiDeployerClient;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.osgi.framework.BundleException;
@@ -36,15 +48,62 @@ import org.osgi.framework.BundleException;
  */
 public class DeployerClientImpl implements OSGiDeployerClient
 {
-   @Override
-   public void deploy(URL url) throws BundleException
+   // Provide logging
+   private static final Logger log = Logger.getLogger(DeployerClientImpl.class);
+
+   private ServerDeploymentManager deploymentManager;
+   private Map<String, String> registry = new HashMap<String, String>();
+
+   public DeployerClientImpl() throws IOException
    {
-      throw new NotImplementedException();
+      InetAddress address = InetAddress.getByName("127.0.0.1");
+      StandaloneClient client = StandaloneClient.Factory.create(address, 9999);
+      deploymentManager = client.getDeploymentManager();
+   }
+
+   @Override
+   public void deploy(URL url) throws BundleException, IOException
+   {
+      try
+      {
+         DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
+         builder = builder.add(url).andDeploy();
+
+         DeploymentPlan plan = builder.build();
+         DeploymentAction deployAction = builder.getLastAction();
+         Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
+         ServerDeploymentPlanResult planResult = future.get();
+
+         ServerDeploymentActionResult actionResult = planResult.getDeploymentActionResult(deployAction.getId());
+         Throwable deploymentException = actionResult.getDeploymentException();
+         if (deploymentException != null)
+            throw deploymentException;
+
+         registry.put(url.toExternalForm(), deployAction.getDeploymentUnitUniqueName());
+      }
+      catch (Throwable ex)
+      {
+         throw new BundleException("Cannot deploy: " + url, ex);
+      }
    }
 
    @Override
    public void undeploy(URL url) throws BundleException
    {
-      throw new NotImplementedException();
+      try
+      {
+         String uiqueName = registry.remove(url.toExternalForm());
+         if (uiqueName != null)
+         {
+            DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
+            DeploymentPlan plan = builder.remove(uiqueName).undeploy(uiqueName).build();
+            Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
+            future.get();
+         }
+      }
+      catch (Throwable ex)
+      {
+         log.warn("Cannot undeploy: " + url, ex);
+      }
    }
 }
