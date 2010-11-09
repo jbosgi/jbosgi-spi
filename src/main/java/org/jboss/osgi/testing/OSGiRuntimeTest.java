@@ -21,8 +21,8 @@
  */
 package org.jboss.osgi.testing;
 
-import org.jboss.osgi.testing.internal.EmbeddedRuntime;
-import org.jboss.osgi.testing.internal.RemoteRuntime;
+import org.jboss.osgi.testing.internal.EmbeddedRuntimeImpl;
+import org.jboss.osgi.testing.internal.RemoteRuntimeImpl;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -100,7 +100,7 @@ public abstract class OSGiRuntimeTest extends OSGiTest
     */
    public static OSGiRuntime createEmbeddedRuntime()
    {
-      runtime = new EmbeddedRuntime(new OSGiRuntimeHelper());
+      runtime = new EmbeddedRuntimeImpl(new OSGiRuntimeHelper());
       return runtime;
    }
 
@@ -109,7 +109,7 @@ public abstract class OSGiRuntimeTest extends OSGiTest
     */
    public static OSGiRuntime createRemoteRuntime()
    {
-      runtime = new RemoteRuntime(new OSGiRuntimeHelper());
+      runtime = new RemoteRuntimeImpl(new OSGiRuntimeHelper());
       return runtime;
    }
 }

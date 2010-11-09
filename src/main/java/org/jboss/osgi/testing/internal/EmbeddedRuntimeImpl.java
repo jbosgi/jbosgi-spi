@@ -41,6 +41,7 @@ import org.jboss.osgi.spi.capability.Capability;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.util.BundleInfo;
 import org.jboss.osgi.testing.OSGiBundle;
+import org.jboss.osgi.testing.OSGiEmbeddedRuntime;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.jboss.osgi.testing.OSGiRuntimeHelper;
 import org.jboss.osgi.testing.OSGiServiceReference;
@@ -61,12 +62,12 @@ import org.osgi.service.packageadmin.PackageAdmin;
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class EmbeddedRuntime extends OSGiRuntimeImpl
+public class EmbeddedRuntimeImpl extends OSGiRuntimeImpl implements OSGiEmbeddedRuntime
 {
    // Provide logging
-   private static final Logger log = Logger.getLogger(EmbeddedRuntime.class);
+   private static final Logger log = Logger.getLogger(EmbeddedRuntimeImpl.class);
    
-   public EmbeddedRuntime(OSGiRuntimeHelper helper)
+   public EmbeddedRuntimeImpl(OSGiRuntimeHelper helper)
    {
       super(helper);
       OSGiBootstrapProvider bootProvider = helper.getBootstrapProvider();
@@ -256,7 +257,7 @@ public class EmbeddedRuntime extends OSGiRuntimeImpl
    @Override
    public MBeanServerConnection getMBeanServer()
    {
-      return EmbeddedRuntime.getLocalMBeanServer();
+      return EmbeddedRuntimeImpl.getLocalMBeanServer();
    }
 
    @Override

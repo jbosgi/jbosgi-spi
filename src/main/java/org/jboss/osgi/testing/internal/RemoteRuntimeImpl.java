@@ -48,6 +48,7 @@ import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.jboss.osgi.testing.OSGiRuntimeHelper;
 import org.jboss.osgi.testing.OSGiServiceReference;
+import org.jboss.osgi.testing.OSGiRemoteRuntime;
 import org.osgi.framework.BundleException;
 import org.osgi.jmx.framework.BundleStateMBean;
 import org.osgi.jmx.framework.ServiceStateMBean;
@@ -58,14 +59,14 @@ import org.osgi.jmx.framework.ServiceStateMBean;
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class RemoteRuntime extends OSGiRuntimeImpl
+public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRuntime
 {
    // Provide logging
-   private static final Logger log = Logger.getLogger(RemoteRuntime.class);
+   private static final Logger log = Logger.getLogger(RemoteRuntimeImpl.class);
 
    private JMXConnector jmxConnector;
 
-   public RemoteRuntime(OSGiRuntimeHelper helper)
+   public RemoteRuntimeImpl(OSGiRuntimeHelper helper)
    {
       super(helper);
    }
@@ -96,14 +97,22 @@ public class RemoteRuntime extends OSGiRuntimeImpl
       }
    }
 
-   public void deploy(String location) throws Exception
+   /* (non-Javadoc)
+ * @see org.jboss.osgi.testing.internal.RemoteRuntime#deploy(java.lang.String)
+ */
+@Override
+public void deploy(String location) throws Exception
    {
       URL archiveURL = getTestHelper().getTestArchiveURL(location);
       MainDeployerClient deployer = new MainDeployerClient(this);
       deployer.deploy(archiveURL);
    }
 
-   public void undeploy(String location) throws Exception
+   /* (non-Javadoc)
+ * @see org.jboss.osgi.testing.internal.RemoteRuntime#undeploy(java.lang.String)
+ */
+@Override
+public void undeploy(String location) throws Exception
    {
       URL archiveURL = getTestHelper().getTestArchiveURL(location);
       MainDeployerClient deployer = new MainDeployerClient(this);

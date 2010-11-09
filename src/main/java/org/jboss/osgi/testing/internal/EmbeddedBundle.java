@@ -156,7 +156,7 @@ public class EmbeddedBundle extends OSGiBundleImpl
 
    private PackageAdmin getPackageAdmin()
    {
-      BundleContext context = ((EmbeddedRuntime)getRuntime()).getSystemContext();
+      BundleContext context = ((EmbeddedRuntimeImpl)getRuntime()).getSystemContext();
       ServiceReference sref = context.getServiceReference(PackageAdmin.class.getName());
       return (PackageAdmin)context.getService(sref);
    }

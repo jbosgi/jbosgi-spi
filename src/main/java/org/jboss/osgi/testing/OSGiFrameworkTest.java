@@ -47,7 +47,7 @@ import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.util.ConstantsHelper;
-import org.jboss.osgi.testing.internal.EmbeddedRuntime;
+import org.jboss.osgi.testing.internal.EmbeddedRuntimeImpl;
 import org.jboss.osgi.testing.internal.ManagementSupport;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
@@ -437,7 +437,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
 
    protected MBeanServer getMBeanServer()
    {
-      MBeanServer mbeanServer = EmbeddedRuntime.getLocalMBeanServer();
+      MBeanServer mbeanServer = EmbeddedRuntimeImpl.getLocalMBeanServer();
       return mbeanServer;
    }
 
