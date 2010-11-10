@@ -22,6 +22,7 @@
 package org.jboss.osgi.testing.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,6 +50,8 @@ import org.jboss.osgi.testing.OSGiRemoteRuntime;
 import org.jboss.osgi.testing.OSGiRuntime;
 import org.jboss.osgi.testing.OSGiRuntimeHelper;
 import org.jboss.osgi.testing.OSGiServiceReference;
+import org.jboss.osgi.testing.OSGiTestHelper;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.osgi.framework.BundleException;
 import org.osgi.jmx.framework.BundleStateMBean;
 import org.osgi.jmx.framework.ServiceStateMBean;
@@ -99,17 +102,23 @@ public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRunt
    }
 
    @Override
-   public void deploy(String location) throws Exception
+   public String deploy(String location) throws Exception
    {
       URL archiveURL = getTestHelper().getTestArchiveURL(location);
-      getDeployerClient().deploy(archiveURL);
+      return getDeployerClient().deploy(archiveURL);
    }
 
    @Override
-   public void undeploy(String location) throws Exception
+   public String deploy(JavaArchive archive) throws Exception
    {
-      URL archiveURL = getTestHelper().getTestArchiveURL(location);
-      getDeployerClient().undeploy(archiveURL);
+      InputStream input = OSGiTestHelper.toInputStream(archive);
+      return getDeployerClient().deploy(archive.getName(), input);
+   }
+
+   @Override
+   public void undeploy(String uniqueName) throws Exception
+   {
+      getDeployerClient().undeploy(uniqueName);
    }
 
    @Override

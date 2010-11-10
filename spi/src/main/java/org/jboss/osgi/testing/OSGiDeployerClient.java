@@ -22,10 +22,10 @@
 package org.jboss.osgi.testing;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import org.jboss.osgi.spi.util.ServiceLoader;
-import org.osgi.framework.BundleException;
 
 /**
  * An abstract deployer for the {@link OSGiRuntime}
@@ -35,9 +35,22 @@ import org.osgi.framework.BundleException;
  */
 public interface OSGiDeployerClient
 {
-   void deploy(URL url) throws BundleException, IOException;
+   /**
+    * Deploys an archive from the given location.
+    * @return The unique runtime name for this deployment
+    */
+   String deploy(URL url) throws IOException;
 
-   void undeploy(URL url) throws BundleException, IOException;
+   /**
+    * Deploys an archive from the given input stream.
+    * @return The unique runtime name for this deployment
+    */
+   String deploy(String name, InputStream input);
+
+   /**
+    * Undeploys the named unique deployment
+    */
+   void undeploy(String uniqueName) throws IOException;
 
    final class Factory
    {

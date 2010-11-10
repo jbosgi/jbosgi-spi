@@ -39,7 +39,7 @@ import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
  * A helper for bundle management.
- * 
+ *
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
@@ -68,13 +68,13 @@ public class ManagementSupport
    {
       FrameworkMBean frameworkState = null;
       ObjectName objectName = ObjectNameFactory.create(FrameworkMBeanExt.OBJECTNAME);
-      if (mbeanServer.isRegistered(objectName))
+      if (isRegisteredWithTimeout(objectName))
       {
          frameworkState = getMBeanProxy(objectName, FrameworkMBeanExt.class);
          return frameworkState;
       }
       objectName = ObjectNameFactory.create(FrameworkMBean.OBJECTNAME);
-      if (mbeanServer.isRegistered(objectName))
+      if (isRegisteredWithTimeout(objectName))
       {
          frameworkState = getMBeanProxy(objectName, FrameworkMBean.class);
          return frameworkState;
@@ -86,13 +86,13 @@ public class ManagementSupport
    {
       BundleStateMBean bundleState = null;
       ObjectName objectName = ObjectNameFactory.create(BundleStateMBeanExt.OBJECTNAME);
-      if (mbeanServer.isRegistered(objectName))
+      if (isRegisteredWithTimeout(objectName))
       {
          bundleState = getMBeanProxy(objectName, BundleStateMBeanExt.class);
          return bundleState;
       }
       objectName = ObjectNameFactory.create(BundleStateMBean.OBJECTNAME);
-      if (mbeanServer.isRegistered(objectName))
+      if (isRegisteredWithTimeout(objectName))
       {
          bundleState = getMBeanProxy(objectName, BundleStateMBean.class);
          return bundleState;
@@ -104,13 +104,13 @@ public class ManagementSupport
    {
       PackageStateMBean packageState = null;
       ObjectName objectName = ObjectNameFactory.create(PackageStateMBeanExt.OBJECTNAME);
-      if (mbeanServer.isRegistered(objectName))
+      if (isRegisteredWithTimeout(objectName))
       {
          packageState = getMBeanProxy(objectName, PackageStateMBeanExt.class);
          return packageState;
       }
       objectName = ObjectNameFactory.create(PackageStateMBean.OBJECTNAME);
-      if (mbeanServer.isRegistered(objectName))
+      if (isRegisteredWithTimeout(objectName))
       {
          packageState = getMBeanProxy(objectName, PackageStateMBean.class);
          return packageState;
@@ -122,17 +122,37 @@ public class ManagementSupport
    {
       ServiceStateMBean serviceState = null;
       ObjectName objectName = ObjectNameFactory.create(ServiceStateMBeanExt.OBJECTNAME);
-      if (mbeanServer.isRegistered(objectName))
+      if (isRegisteredWithTimeout(objectName))
       {
          serviceState = getMBeanProxy(objectName, ServiceStateMBeanExt.class);
          return serviceState;
       }
       objectName = ObjectNameFactory.create(ServiceStateMBean.OBJECTNAME);
-      if (mbeanServer.isRegistered(objectName))
+      if (isRegisteredWithTimeout(objectName))
       {
          serviceState = getMBeanProxy(objectName, ServiceStateMBean.class);
          return serviceState;
       }
       return serviceState;
+   }
+
+   private boolean isRegisteredWithTimeout(ObjectName objectName) throws IOException
+   {
+      int timeout = 10000;
+      boolean registered = mbeanServer.isRegistered(objectName);
+      while(registered == false && timeout > 0)
+      {
+         try
+         {
+            Thread.sleep(100);
+         }
+         catch (InterruptedException ex)
+         {
+            // ignore
+         }
+         registered = mbeanServer.isRegistered(objectName);
+         timeout -= 100;
+      }
+      return registered;
    }
 }

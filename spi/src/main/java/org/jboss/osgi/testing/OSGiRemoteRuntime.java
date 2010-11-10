@@ -21,6 +21,8 @@
  */
 package org.jboss.osgi.testing;
 
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+
 /**
  * A remote extension to the {@link OSGiRuntime}
  *
@@ -29,7 +31,20 @@ package org.jboss.osgi.testing;
  */
 public interface OSGiRemoteRuntime extends OSGiRuntime
 {
-   void deploy(String location) throws Exception;
+   /**
+    * Deploys an archive from the given location string
+    * @return The unique runtime name for this deployment
+    */
+   String deploy(String location) throws Exception;
 
-   void undeploy(String location) throws Exception;
+   /**
+    * Deploys the given archive
+    * @return The unique runtime name for this deployment
+    */
+   String deploy(JavaArchive archive) throws Exception;
+
+   /**
+    * Undeploys the named unique deployment
+    */
+   void undeploy(String uniqueName) throws Exception;
 }
