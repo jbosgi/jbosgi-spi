@@ -86,14 +86,6 @@ public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRunt
    {
       try
       {
-         MBeanServerConnection mbeanServer = getMBeanServer();
-         ObjectName oname = ObjectNameFactory.create("jboss.internal", "mbean", "ServiceContainer");
-         if (mbeanServer.isRegistered(oname))
-         {
-            Object[] params = new Object[] { "jboss.osgi.context", "ACTIVE" };
-            String[] signature = new String[] { String.class.getName(), String.class.getName() };
-            mbeanServer.invoke(oname, "setMode", params, signature);
-         }
          String location = info.getLocation();
          String streamURL = info.getRoot().getStreamURL().toExternalForm();
          long bundleId = getFrameworkMBean().installBundleFromURL(location, streamURL);
@@ -108,6 +100,7 @@ public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRunt
          throw new BundleException("Cannot install: " + info, ex);
       }
    }
+
 
    @Override
    public String deploy(String location) throws Exception
@@ -236,15 +229,17 @@ public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRunt
    {
       try
       {
-         // Get the MBeanServerConnection through the JMXConnector
-         String urlString = System.getProperty("jmx.service.url", "service:jmx:rmi:///jndi/rmi://" + getServerHost() + ":1090/jmxrmi");
-         JMXServiceURL serviceURL = new JMXServiceURL(urlString);
-         jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
+         if (jmxConnector == null)
+         {
+            String urlString = System.getProperty("jmx.service.url", "service:jmx:rmi:///jndi/rmi://" + getServerHost() + ":1090/jmxrmi");
+            JMXServiceURL serviceURL = new JMXServiceURL(urlString);
+            jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
+         }
          return jmxConnector.getMBeanServerConnection();
       }
       catch (IOException ex)
       {
-         throw new IllegalStateException("Cannot obtain MBeanServerConnection");
+         throw new IllegalStateException("Cannot obtain MBeanServerConnection", ex);
       }
    }
 
