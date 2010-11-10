@@ -86,6 +86,14 @@ public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRunt
    {
       try
       {
+         MBeanServerConnection mbeanServer = getMBeanServer();
+         ObjectName oname = ObjectNameFactory.create("jboss.internal", "mbean", "ServiceContainer");
+         if (mbeanServer.isRegistered(oname))
+         {
+            Object[] params = new Object[] { "jboss.osgi.context", "ACTIVE" };
+            String[] signature = new String[] { String.class.getName(), String.class.getName() };
+            mbeanServer.invoke(oname, "setMode", params, signature);
+         }
          String location = info.getLocation();
          String streamURL = info.getRoot().getStreamURL().toExternalForm();
          long bundleId = getFrameworkMBean().installBundleFromURL(location, streamURL);
