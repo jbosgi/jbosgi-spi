@@ -96,7 +96,7 @@ public class DeployerClientImpl implements OSGiDeployerClient
          if (uiqueName != null)
          {
             DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
-            DeploymentPlan plan = builder.remove(uiqueName).undeploy(uiqueName).build();
+            DeploymentPlan plan = builder.undeploy(uiqueName).remove(uiqueName).build();
             Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
             future.get();
          }

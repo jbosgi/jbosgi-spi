@@ -65,6 +65,7 @@ public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRunt
    private static final Logger log = Logger.getLogger(RemoteRuntimeImpl.class);
 
    private JMXConnector jmxConnector;
+   private OSGiDeployerClient deployerClient;
 
    public RemoteRuntimeImpl(OSGiRuntimeHelper helper)
    {
@@ -101,16 +102,14 @@ public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRunt
    public void deploy(String location) throws Exception
    {
       URL archiveURL = getTestHelper().getTestArchiveURL(location);
-      OSGiDeployerClient deployer = OSGiDeployerClient.Factory.getDeployerClient();
-      deployer.deploy(archiveURL);
+      getDeployerClient().deploy(archiveURL);
    }
 
    @Override
    public void undeploy(String location) throws Exception
    {
       URL archiveURL = getTestHelper().getTestArchiveURL(location);
-      OSGiDeployerClient deployer = OSGiDeployerClient.Factory.getDeployerClient();
-      deployer.undeploy(archiveURL);
+      getDeployerClient().undeploy(archiveURL);
    }
 
    @Override
@@ -272,5 +271,14 @@ public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRunt
             log.warn("Cannot close JMXConnector", ex);
          }
       }
+   }
+
+   private OSGiDeployerClient getDeployerClient()
+   {
+      if (deployerClient == null)
+      {
+         deployerClient = OSGiDeployerClient.Factory.getDeployerClient();
+      }
+      return deployerClient;
    }
 }
