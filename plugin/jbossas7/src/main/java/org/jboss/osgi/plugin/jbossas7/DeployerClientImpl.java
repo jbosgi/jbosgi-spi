@@ -84,10 +84,13 @@ public class DeployerClientImpl implements OSGiDeployerClient
       ServerDeploymentPlanResult planResult = future.get();
 
       ServerDeploymentActionResult actionResult = planResult.getDeploymentActionResult(deployAction.getId());
-      Exception deploymentException = (Exception)actionResult.getDeploymentException();
-      if (deploymentException != null)
-         throw deploymentException;
-
+      if (actionResult != null)
+      {
+         Exception deploymentException = (Exception)actionResult.getDeploymentException();
+         if (deploymentException != null)
+            throw deploymentException;
+      }
+      
       return deployAction.getDeploymentUnitUniqueName();
    }
 
