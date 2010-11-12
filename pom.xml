@@ -18,7 +18,7 @@
   <artifactId>jboss-osgi-spi-parent</artifactId>
   <packaging>pom</packaging>
 
-  <version>1.0.18-SNAPSHOT</version>
+  <version>1.0.18</version>
   
   <!-- Parent -->
   <parent>
