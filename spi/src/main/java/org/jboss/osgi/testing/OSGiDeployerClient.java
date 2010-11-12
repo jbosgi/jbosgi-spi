@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.testing;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -39,18 +38,18 @@ public interface OSGiDeployerClient
     * Deploys an archive from the given location.
     * @return The unique runtime name for this deployment
     */
-   String deploy(URL url) throws IOException;
+   String deploy(URL url) throws Exception;
 
    /**
     * Deploys an archive from the given input stream.
     * @return The unique runtime name for this deployment
     */
-   String deploy(String name, InputStream input);
+   String deploy(String name, InputStream input) throws Exception;
 
    /**
     * Undeploys the named unique deployment
     */
-   void undeploy(String uniqueName) throws IOException;
+   void undeploy(String uniqueName);
 
    final class Factory
    {

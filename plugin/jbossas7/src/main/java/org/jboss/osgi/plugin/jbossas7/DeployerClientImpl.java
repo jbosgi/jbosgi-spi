@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.jboss.as.standalone.client.api.StandaloneClient;
@@ -60,54 +59,43 @@ public class DeployerClientImpl implements OSGiDeployerClient
    }
 
    @Override
-   public String deploy(URL url) throws IOException
+   public String deploy(URL url) throws Exception
    {
-      try
-      {
-         DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
-         builder = builder.add(url).andDeploy();
-         DeploymentPlan plan = builder.build();
-         DeploymentAction deployAction = builder.getLastAction();
-         return ececuteDeploymentPlan(plan, deployAction);
-      }
-      catch (Throwable ex)
-      {
-         throw new RuntimeException("Cannot deploy: " + url, ex);
-      }
+      DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
+      builder = builder.add(url).andDeploy();
+      DeploymentPlan plan = builder.build();
+      DeploymentAction deployAction = builder.getLastAction();
+      return ececuteDeploymentPlan(plan, deployAction);
    }
 
    @Override
-   public String deploy(String name, InputStream input)
+   public String deploy(String name, InputStream input) throws Exception
    {
-      try
-      {
-         DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
-         builder = builder.add(name, input).andDeploy();
-         DeploymentPlan plan = builder.build();
-         DeploymentAction deployAction = builder.getLastAction();
-         return ececuteDeploymentPlan(plan, deployAction);
-      }
-      catch (Throwable ex)
-      {
-         throw new RuntimeException("Cannot deploy: " + name, ex);
-      }
+      DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
+      builder = builder.add(name, input).andDeploy();
+      DeploymentPlan plan = builder.build();
+      DeploymentAction deployAction = builder.getLastAction();
+      return ececuteDeploymentPlan(plan, deployAction);
    }
 
-   private String ececuteDeploymentPlan(DeploymentPlan plan, DeploymentAction deployAction) throws InterruptedException, ExecutionException, Throwable
+   private String ececuteDeploymentPlan(DeploymentPlan plan, DeploymentAction deployAction) throws Exception
    {
       Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
       ServerDeploymentPlanResult planResult = future.get();
 
       ServerDeploymentActionResult actionResult = planResult.getDeploymentActionResult(deployAction.getId());
-      Throwable deploymentException = actionResult.getDeploymentException();
-      if (deploymentException != null)
-         throw deploymentException;
-
+      if (actionResult != null)
+      {
+         Exception deploymentException = (Exception)actionResult.getDeploymentException();
+         if (deploymentException != null)
+            throw deploymentException;
+      }
+      
       return deployAction.getDeploymentUnitUniqueName();
    }
 
    @Override
-   public void undeploy(String uniqueName) throws IOException
+   public void undeploy(String uniqueName)
    {
       try
       {
