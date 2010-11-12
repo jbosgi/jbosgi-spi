@@ -28,9 +28,6 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.jboss.logging.Logger;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
@@ -42,13 +39,13 @@ import org.osgi.framework.Bundle;
 
 /**
  * An abstract OSGi Test.
- * 
- * A convenience wrapper for the functionality provided by {@link OSGiTestHelper}. 
- * 
+ *
+ * A convenience wrapper for the functionality provided by {@link OSGiTestHelper}.
+ *
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public abstract class OSGiTest 
+public abstract class OSGiTest
 {
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiTest.class);
@@ -57,15 +54,15 @@ public abstract class OSGiTest
 
    /**
     * Get the test helper used by this test
-    * 
+    *
     * Overwrite if you need to supply another helper
-    * i.e. one that you have statically setup 
+    * i.e. one that you have statically setup
     */
    protected OSGiTestHelper getTestHelper()
    {
       if (helper == null)
          helper = new OSGiTestHelper();
-         
+
       return helper;
    }
 
@@ -88,7 +85,7 @@ public abstract class OSGiTest
    }
 
    /**
-    * Get the last token in the FQN of this test class. 
+    * Get the last token in the FQN of this test class.
     */
    protected String getShortName()
    {
@@ -98,7 +95,7 @@ public abstract class OSGiTest
    }
 
    /**
-    * Get the the FQN of this test class. 
+    * Get the the FQN of this test class.
     */
    protected String getLongName()
    {
@@ -144,14 +141,6 @@ public abstract class OSGiTest
    {
       return getTestHelper().getTestArchiveFile(archive);
    }
-   
-   /**
-    * Delegates to {@link OSGiTestHelper#getInitialContext()}
-    */
-   protected InitialContext getInitialContext() throws NamingException
-   {
-      return getTestHelper().getInitialContext();
-   }
 
    /**
     * Delegates to {@link OSGiTestHelper#getServerHost()}
@@ -160,7 +149,7 @@ public abstract class OSGiTest
    {
       return getTestHelper().getServerHost();
    }
-   
+
    /**
     * Delegates to {@link OSGiTestHelper#getTargetContainer()}
     */
@@ -168,7 +157,7 @@ public abstract class OSGiTest
    {
       return getTestHelper().getTargetContainer();
    }
-   
+
    /**
     * Delegates to {@link OSGiTestHelper#getFrameworkName()}
     */
@@ -200,7 +189,7 @@ public abstract class OSGiTest
    {
       return OSGiTestHelper.toVirtualFile(archive);
    }
-   
+
    /**
     * Delegates to {@link OSGiTestHelper#toInputStream(Archive)}
     */
@@ -208,7 +197,7 @@ public abstract class OSGiTest
    {
       return OSGiTestHelper.toInputStream(archive);
    }
-   
+
    /**
     * Delegates to {@link OSGiTestHelper#assertBundleState(int, int)}
     */
@@ -224,7 +213,7 @@ public abstract class OSGiTest
    {
       return getTestHelper().assertLoadClass(bundle, className);
    }
-   
+
    /**
     * Delegates to {@link OSGiTestHelper#assertLoadClassFail(Bundle, String)}
     */
@@ -236,7 +225,7 @@ public abstract class OSGiTest
    /**
     * Delegates to {@link OSGiTestHelper#assertLoadClass(Bundle, String, Bundle)}
     */
-   protected void assertLoadClass(Bundle bundle, String className, Bundle exporter) 
+   protected void assertLoadClass(Bundle bundle, String className, Bundle exporter)
    {
       getTestHelper().assertLoadClass(bundle, className, exporter);
    }

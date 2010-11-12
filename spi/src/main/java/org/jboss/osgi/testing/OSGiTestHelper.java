@@ -29,10 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Hashtable;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.util.ConstantsHelper;
@@ -47,7 +43,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * An OSGi Test Helper
- * 
+ *
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
@@ -55,7 +51,7 @@ public class OSGiTestHelper
 {
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiTestHelper.class);
-   
+
    public static final String SYSPROP_TEST_RESOURCES_DIRECTORY = "test.resources.directory";
    public static final String SYSPROP_TEST_ARCHIVE_DIRECTORY = "test.archive.directory";
 
@@ -140,19 +136,6 @@ public class OSGiTestHelper
          return file;
 
       throw new IllegalArgumentException("Cannot obtain '" + testArchiveDir + "/" + archive + "'.");
-   }
-
-   @SuppressWarnings({ "unchecked", "rawtypes" })
-   public InitialContext getInitialContext() throws NamingException
-   {
-      String port = System.getProperty("jndi.server.port", "1099");
-      Integer jndiPort = new Integer(port);
-
-      Hashtable env = new Hashtable();
-      env.put("java.naming.factory.initial", "org.jnp.interfaces.NamingContextFactory");
-      env.put("java.naming.factory.url.pkgs", "org.jboss.naming:org.jnp.interfaces");
-      env.put("java.naming.provider.url", "jnp://" + getServerHost() + ":" + jndiPort);
-      return new InitialContext(env);
    }
 
    public String getServerHost()
@@ -302,7 +285,7 @@ public class OSGiTestHelper
       }
    }
 
-   public void assertLoadClass(Bundle bundle, String className, Bundle exporter) 
+   public void assertLoadClass(Bundle bundle, String className, Bundle exporter)
    {
       Class<?> importerClazz = assertLoadClass(bundle, className);
       Class<?> exporterClazz = assertLoadClass(exporter, className);

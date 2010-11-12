@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.management.ObjectName;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.capability.Capability;
@@ -52,7 +50,7 @@ import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
  * An abstract implementation of the {@link OSGiRuntime}
- * 
+ *
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
@@ -65,7 +63,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    private OSGiRuntimeHelper helper;
    private Map<String, BundleTuple> bundles = new LinkedHashMap<String, BundleTuple>();
    private List<Capability> capabilities = new ArrayList<Capability>();
-   
+
    public OSGiRuntimeImpl(OSGiRuntimeHelper helper)
    {
       this.helper = helper;
@@ -93,13 +91,13 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       if (srefs == null || srefs.length == 0)
       {
          log.debug("Add capability: " + capability);
-         
-         // Install the capability bundles 
+
+         // Install the capability bundles
          capability.install(this);
-         
-         // Start the capability bundles 
+
+         // Start the capability bundles
          capability.start(this);
-         
+
          capabilities.add(capability);
       }
       else
@@ -115,12 +113,12 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       {
          log.debug("Remove capability : " + capability);
 
-         // Install the capability bundles 
+         // Install the capability bundles
          capability.stop(this);
-         
-         // Start the capability bundles 
+
+         // Start the capability bundles
          capability.uninstall(this);
-         
+
       }
 
       List<Capability> dependencies = new ArrayList<Capability>(capability.getDependencies());
@@ -160,9 +158,9 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
       bundles.put(info.getLocation(), new BundleTuple(info, bundle));
       return bundle;
    }
-   
+
    abstract OSGiBundle installBundleInternal(BundleInfo info) throws BundleException;
-   
+
    @Override
    public void shutdown()
    {
@@ -232,14 +230,8 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    {
       if (jmxSupport == null)
          jmxSupport = new ManagementSupport(getMBeanServer());
-      
+
       return jmxSupport;
-   }
-   
-   @Override
-   public InitialContext getInitialContext() throws NamingException
-   {
-      return helper.getInitialContext();
    }
 
    @Override
@@ -313,7 +305,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    {
       BundleInfo info;
       OSGiBundle bundle;
-      
+
       BundleTuple(BundleInfo info, OSGiBundle bundle)
       {
          this.info = info;
