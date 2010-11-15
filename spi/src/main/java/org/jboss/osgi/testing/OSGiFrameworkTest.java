@@ -72,8 +72,8 @@ import org.osgi.jmx.framework.ServiceStateMBean;
 import org.osgi.service.packageadmin.PackageAdmin;
 
 /**
- * Parent for native framework tests.  
- * 
+ * Parent for native framework tests.
+ *
  * @author Thomas.Diesler@jboss.com
  * @since 10-Mar-2010
  */
@@ -183,7 +183,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       }
       catch (Exception e)
       {
-         location = getTestHelper().getTestArchivePath(location);
+         location = OSGiTestHelper.getTestArchivePath(location);
       }
       return getSystemContext().installBundle(location);
    }
@@ -527,7 +527,7 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
    @SuppressWarnings("rawtypes")
    private void waitForEvent(List events, int type) throws InterruptedException
    {
-      // Timeout for event delivery: 3 sec 
+      // Timeout for event delivery: 3 sec
       int timeout = 30;
 
       boolean eventFound = false;

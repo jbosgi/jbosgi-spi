@@ -27,16 +27,16 @@ import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.osgi.framework.Bundle;
 
 /**
- * A helper for the OSGi runtime abstraction. 
- * 
+ * A helper for the OSGi runtime abstraction.
+ *
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class OSGiRuntimeHelper extends OSGiTestHelper
+public class OSGiRuntimeHelper
 {
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiRuntimeHelper.class);
-   
+
    // The OSGiBootstrapProvider is a lazy property of the helper
    private OSGiBootstrapProvider bootProvider;
    private boolean skipBootstrap;
@@ -77,7 +77,7 @@ public class OSGiRuntimeHelper extends OSGiTestHelper
          }
       }
    }
-   
+
    public static void failsafeUninstall(OSGiBundle bundle)
    {
       if (bundle != null)

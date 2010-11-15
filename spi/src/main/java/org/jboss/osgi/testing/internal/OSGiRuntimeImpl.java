@@ -237,7 +237,7 @@ public abstract class OSGiRuntimeImpl implements OSGiRuntime
    @Override
    public String getServerHost()
    {
-      return helper.getServerHost();
+      return OSGiTestHelper.getServerHost();
    }
 
    @Override

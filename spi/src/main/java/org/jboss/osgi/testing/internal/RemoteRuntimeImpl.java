@@ -105,7 +105,7 @@ public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRunt
    @Override
    public String deploy(String location) throws Exception
    {
-      URL archiveURL = getTestHelper().getTestArchiveURL(location);
+      URL archiveURL = OSGiTestHelper.getTestArchiveURL(location);
       return getDeployerClient().deploy(archiveURL);
    }
 

@@ -57,15 +57,19 @@ public class OSGiTestHelper
 
    private static String testResourcesDir;
    private static String testArchiveDir;
-
-   public OSGiTestHelper()
+   static
    {
       testResourcesDir = System.getProperty(SYSPROP_TEST_RESOURCES_DIRECTORY, "target/test-classes");
       testArchiveDir = System.getProperty(SYSPROP_TEST_ARCHIVE_DIRECTORY, "target/test-libs");
    }
 
+   // Hide ctor
+   private OSGiTestHelper()
+   {
+   }
+
    /** Try to discover the URL for the test resource */
-   public URL getResourceURL(String resource)
+   public static URL getResourceURL(String resource)
    {
       URL resURL = null;
       try
@@ -81,7 +85,7 @@ public class OSGiTestHelper
    }
 
    /** Try to discover the File for the test resource */
-   public File getResourceFile(String resource)
+   public static File getResourceFile(String resource)
    {
       File file = new File(resource);
       if (file.exists())
@@ -95,7 +99,7 @@ public class OSGiTestHelper
    }
 
    /** Try to discover the URL for the deployment archive */
-   public URL getTestArchiveURL(String archive)
+   public static URL getTestArchiveURL(String archive)
    {
       try
       {
@@ -118,14 +122,14 @@ public class OSGiTestHelper
    }
 
    /** Try to discover the absolute path for the deployment archive */
-   public String getTestArchivePath(String archive)
+   public static String getTestArchivePath(String archive)
    {
       File archiveFile = getTestArchiveFile(archive);
       return archiveFile.getAbsolutePath();
    }
 
    /** Try to discover the File for the deployment archive */
-   public File getTestArchiveFile(String archive)
+   public static File getTestArchiveFile(String archive)
    {
       File file = new File(archive);
       if (file.exists())
@@ -138,40 +142,40 @@ public class OSGiTestHelper
       throw new IllegalArgumentException("Cannot obtain '" + testArchiveDir + "/" + archive + "'.");
    }
 
-   public String getServerHost()
+   public static String getServerHost()
    {
       String bindAddress = System.getProperty("jboss.bind.address", "localhost");
       return bindAddress;
    }
 
-   public String getTargetContainer()
+   public static String getTargetContainer()
    {
       String targetContainer = System.getProperty("target.container");
       return targetContainer;
    }
 
-   public String getFrameworkName()
+   public static String getFrameworkName()
    {
       String framework = System.getProperty("framework");
       if (framework == null || framework.length() == 0 || framework.equals("${framework}"))
-         framework = "jbossmc";
+         framework = "jbossmsc";
 
       return framework;
    }
 
-   public JavaArchive assembleArchive(String name, String resource, Class<?>... packages) throws Exception
+   public static JavaArchive assembleArchive(String name, String resource, Class<?>... packages) throws Exception
    {
       return assembleArchive(name, new String[] { resource }, packages);
    }
 
-   public JavaArchive assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException
+   public static JavaArchive assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException
    {
       JavaArchive archive = ShrinkWrap.create(JavaArchive.class, name + ".jar");
       if (resources != null)
       {
          for (String res : resources)
          {
-            URL url = getClass().getResource(res);
+            URL url = OSGiTestHelper.class.getResource(res);
             if (url == null)
                throw new IllegalArgumentException("Cannot load resource: " + res);
 
@@ -215,7 +219,7 @@ public class OSGiTestHelper
       return exporter.exportZip();
    }
 
-   private void addResources(JavaArchive archive, VirtualFile basedir, VirtualFile resdir) throws IOException
+   private static void addResources(JavaArchive archive, VirtualFile basedir, VirtualFile resdir) throws IOException
    {
       String basepath = basedir.getPathName();
       for (final VirtualFile child : resdir.getChildrenRecursively())
@@ -230,7 +234,7 @@ public class OSGiTestHelper
       }
    }
 
-   private void addResource(JavaArchive archive, String path, final VirtualFile file)
+   private static void addResource(JavaArchive archive, String path, final VirtualFile file)
    {
       Asset asset = new Asset()
       {
@@ -249,14 +253,14 @@ public class OSGiTestHelper
       archive.add(asset, path);
    }
 
-   public void assertBundleState(int expState, int wasState)
+   public static void assertBundleState(int expState, int wasState)
    {
       String expstr = ConstantsHelper.bundleState(expState);
       String wasstr = ConstantsHelper.bundleState(wasState);
       assertEquals("Bundle " + expstr, expstr, wasstr);
    }
 
-   public Class<?> assertLoadClass(Bundle bundle, String className)
+   public static Class<?> assertLoadClass(Bundle bundle, String className)
    {
       try
       {
@@ -271,7 +275,7 @@ public class OSGiTestHelper
       }
    }
 
-   public void assertLoadClassFail(Bundle bundle, String className)
+   public static void assertLoadClassFail(Bundle bundle, String className)
    {
       try
       {
@@ -285,7 +289,7 @@ public class OSGiTestHelper
       }
    }
 
-   public void assertLoadClass(Bundle bundle, String className, Bundle exporter)
+   public static void assertLoadClass(Bundle bundle, String className, Bundle exporter)
    {
       Class<?> importerClazz = assertLoadClass(bundle, className);
       Class<?> exporterClazz = assertLoadClass(exporter, className);
