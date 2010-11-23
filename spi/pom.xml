@@ -15,13 +15,13 @@
   <name>JBossOSGi SPI</name>
 
   <groupId>org.jboss.osgi.spi</groupId>
-  <artifactId>jboss-osgi-spi</artifactId>
+  <artifactId>jbosgi-spi</artifactId>
   <packaging>jar</packaging>
 
   <!-- Parent -->
   <parent>
     <groupId>org.jboss.osgi.spi</groupId>
-    <artifactId>jboss-osgi-spi-parent</artifactId>
+    <artifactId>jbosgi-spi-parent</artifactId>
     <version>1.0.19-SNAPSHOT</version>
   </parent>
 

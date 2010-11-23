@@ -15,13 +15,13 @@
   <name>JBossOSGi SPI Plugin JBossAS7</name>
 
   <groupId>org.jboss.osgi.spi</groupId>
-  <artifactId>jboss-osgi-jbossas7</artifactId>
+  <artifactId>jbosgi-spi-plugin-jbossas7</artifactId>
   <packaging>jar</packaging>
 
   <!-- Parent -->
   <parent>
     <groupId>org.jboss.osgi.spi</groupId>
-    <artifactId>jboss-osgi-plugin</artifactId>
+    <artifactId>jbosgi-spi-plugin</artifactId>
     <version>1.0.19-SNAPSHOT</version>
   </parent>
 
@@ -35,12 +35,18 @@
   <dependencies>
     <dependency>
       <groupId>org.jboss.osgi.spi</groupId>
-      <artifactId>jboss-osgi-spi</artifactId>
+      <artifactId>jbosgi-spi</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.as</groupId>
       <artifactId>jboss-as-standalone-client</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.osgi</groupId>
+          <artifactId>jboss-osgi-spi</artifactId>
+        </exclusion>
+      </exclusions>
       <version>${version.jboss.as}</version>
     </dependency>
     <dependency>

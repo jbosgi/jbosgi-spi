@@ -15,7 +15,7 @@
   <name>JBossOSGi SPI Parent</name>
 
   <groupId>org.jboss.osgi.spi</groupId>
-  <artifactId>jboss-osgi-spi-parent</artifactId>
+  <artifactId>jbosgi-spi-parent</artifactId>
   <packaging>pom</packaging>
 
   <version>1.0.19-SNAPSHOT</version>
