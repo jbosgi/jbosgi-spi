@@ -65,7 +65,7 @@ public class DeployerClientImpl implements OSGiDeployerClient
       builder = builder.add(url).andDeploy();
       DeploymentPlan plan = builder.build();
       DeploymentAction deployAction = builder.getLastAction();
-      return ececuteDeploymentPlan(plan, deployAction);
+      return executeDeploymentPlan(plan, deployAction);
    }
 
    @Override
@@ -75,23 +75,7 @@ public class DeployerClientImpl implements OSGiDeployerClient
       builder = builder.add(name, input).andDeploy();
       DeploymentPlan plan = builder.build();
       DeploymentAction deployAction = builder.getLastAction();
-      return ececuteDeploymentPlan(plan, deployAction);
-   }
-
-   private String ececuteDeploymentPlan(DeploymentPlan plan, DeploymentAction deployAction) throws Exception
-   {
-      Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
-      ServerDeploymentPlanResult planResult = future.get();
-
-      ServerDeploymentActionResult actionResult = planResult.getDeploymentActionResult(deployAction.getId());
-      if (actionResult != null)
-      {
-         Exception deploymentException = (Exception)actionResult.getDeploymentException();
-         if (deploymentException != null)
-            throw deploymentException;
-      }
-      
-      return deployAction.getDeploymentUnitUniqueName();
+      return executeDeploymentPlan(plan, deployAction);
    }
 
    @Override
@@ -108,5 +92,21 @@ public class DeployerClientImpl implements OSGiDeployerClient
       {
          log.warn("Cannot undeploy: " + uniqueName, ex);
       }
+   }
+
+   private String executeDeploymentPlan(DeploymentPlan plan, DeploymentAction deployAction) throws Exception
+   {
+      Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
+      ServerDeploymentPlanResult planResult = future.get();
+
+      ServerDeploymentActionResult actionResult = planResult.getDeploymentActionResult(deployAction.getId());
+      if (actionResult != null)
+      {
+         Exception deploymentException = (Exception)actionResult.getDeploymentException();
+         if (deploymentException != null)
+            throw deploymentException;
+      }
+
+      return deployAction.getDeploymentUnitUniqueName();
    }
 }
