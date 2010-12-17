@@ -21,58 +21,83 @@
  */
 package org.jboss.osgi.spi.util;
 
-
+import java.io.Serializable;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
- * An unmodifieable dictionary.
- * 
+ * An unmodifiable dictionary.
+ *
  * @author thomas.diesler@jboss.com
  * @since 02-Dec-2009
  */
-@SuppressWarnings("rawtypes")
-public class UnmodifiableDictionary extends Dictionary
-{
-   private final Dictionary delegate;
+public class UnmodifiableDictionary<K, V> extends Dictionary<K, V> implements Serializable {
 
-   public UnmodifiableDictionary(Dictionary wrapped)
-   {
-      this.delegate = wrapped;
-   }
+    private static final long serialVersionUID = -6793757957920326746L;
 
-   public Enumeration elements()
-   {
-      return delegate.elements();
-   }
+    private final Dictionary<K, V> delegate;
 
-   public Object get(Object key)
-   {
-      return delegate.get(key);
-   }
+    public UnmodifiableDictionary(Dictionary<K, V> props) {
+        if (props == null)
+            throw new IllegalArgumentException("Null props");
 
-   public boolean isEmpty()
-   {
-      return delegate.isEmpty();
-   }
+        delegate = new Hashtable<K, V>();
+        Enumeration<K> keys = props.keys();
+        while(keys.hasMoreElements()) {
+            K key = keys.nextElement();
+            V val = props.get(key);
+            delegate.put(key, val);
+        }
+    }
 
-   public Enumeration keys()
-   {
-      return delegate.keys();
-   }
+    @Override
+    public Enumeration<V> elements() {
+        return delegate.elements();
+    }
 
-   public Object put(Object key, Object value)
-   {
-      throw new UnsupportedOperationException();
-   }
+    @Override
+    public V get(Object key) {
+        return delegate.get(key);
+    }
 
-   public Object remove(Object key)
-   {
-      throw new UnsupportedOperationException();
-   }
+    @Override
+    public boolean isEmpty() {
+        return delegate.isEmpty();
+    }
 
-   public int size()
-   {
-      return delegate.size();
-   }
+    @Override
+    public Enumeration<K> keys() {
+        return delegate.keys();
+    }
+
+    @Override
+    public V put(K key, V value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public V remove(Object key) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int size() {
+        return delegate.size();
+    }
+
+    @Override
+    public int hashCode() {
+        return delegate.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return delegate.equals(obj);
+    }
+
+    @Override
+    public String toString() {
+        return delegate.toString();
+    }
 }

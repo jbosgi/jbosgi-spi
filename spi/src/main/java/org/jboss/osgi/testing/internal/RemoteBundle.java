@@ -103,7 +103,7 @@ class RemoteBundle extends OSGiBundleImpl
          String value = (String)aux.get(JmxConstants.VALUE);
          headers.put(key, value);
       }
-      return new UnmodifiableDictionary(headers);
+      return new UnmodifiableDictionary<String, String>(headers);
    }
 
    @Override
@@ -166,10 +166,9 @@ class RemoteBundle extends OSGiBundleImpl
    }
 
    @Override
-   @SuppressWarnings("unchecked")
    public Dictionary<String, String> getHeaders()
    {
-      return new UnmodifiableDictionary(defaultHeaders);
+      return new UnmodifiableDictionary<String, String>(defaultHeaders);
    }
 
    @Override

@@ -109,6 +109,12 @@ public final class OSGiManifestBuilder implements Asset
       return this;
    }
 
+   public OSGiManifestBuilder addBundleActivationPolicy(String activationPolicy)
+   {
+      append(Constants.BUNDLE_ACTIVATIONPOLICY + ": " + activationPolicy, true);
+      return this;
+   }
+
    public OSGiManifestBuilder addFragmentHost(String fragmentHost)
    {
       append(Constants.FRAGMENT_HOST + ": " + fragmentHost, true);
