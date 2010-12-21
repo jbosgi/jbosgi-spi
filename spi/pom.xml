@@ -43,7 +43,7 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.osgi.vfs</groupId>
-      <artifactId>jboss-osgi-vfs</artifactId>
+      <artifactId>jbosgi-vfs</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.shrinkwrap</groupId>
