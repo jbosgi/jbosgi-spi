@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.jboss.osgi.spi</groupId>
     <artifactId>jbosgi-spi-plugin</artifactId>
-    <version>1.0.20-SNAPSHOT</version>
+    <version>1.0.20</version>
   </parent>
 
   <!-- Properties -->
