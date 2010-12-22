@@ -70,6 +70,7 @@ import org.osgi.jmx.framework.FrameworkMBean;
 import org.osgi.jmx.framework.PackageStateMBean;
 import org.osgi.jmx.framework.ServiceStateMBean;
 import org.osgi.service.packageadmin.PackageAdmin;
+import org.osgi.service.startlevel.StartLevel;
 
 /**
  * Parent for native framework tests.
@@ -163,6 +164,13 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
       BundleContext systemContext = getSystemContext();
       ServiceReference sref = systemContext.getServiceReference(PackageAdmin.class.getName());
       return (PackageAdmin)systemContext.getService(sref);
+   }
+
+   protected StartLevel getStartLevel() throws BundleException
+   {
+      BundleContext systemContext = getSystemContext();
+      ServiceReference sref = systemContext.getServiceReference(StartLevel.class.getName());
+      return (StartLevel)systemContext.getService(sref);
    }
 
    protected Bundle installBundle(Archive<?> archive) throws BundleException, IOException
