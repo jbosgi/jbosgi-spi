@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.framework;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -37,168 +36,138 @@ import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
 
 /**
- * A generic Framework wrapper that delegates all method calls to the underlying 
- * Framework implementation.
+ * A generic Framework wrapper that delegates all method calls to the underlying Framework implementation.
  * 
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
-public class FrameworkWrapper implements Framework
-{
-   protected Framework framework;
+public class FrameworkWrapper implements Framework {
 
-   public FrameworkWrapper(Framework framework)
-   {
-      if (framework == null)
-         throw new IllegalArgumentException("Null framework");
-      
-      this.framework = framework;
-   }
+    protected Framework framework;
 
-   @SuppressWarnings("rawtypes")
-   public Enumeration findEntries(String arg0, String arg1, boolean arg2)
-   {
-      return framework.findEntries(arg0, arg1, arg2);
-   }
+    public FrameworkWrapper(Framework framework) {
+        if (framework == null)
+            throw new IllegalArgumentException("Null framework");
 
-   public BundleContext getBundleContext()
-   {
-      return framework.getBundleContext();
-   }
+        this.framework = framework;
+    }
 
-   public long getBundleId()
-   {
-      return framework.getBundleId();
-   }
+    @SuppressWarnings("rawtypes")
+    public Enumeration findEntries(String arg0, String arg1, boolean arg2) {
+        return framework.findEntries(arg0, arg1, arg2);
+    }
 
-   public URL getEntry(String arg0)
-   {
-      return framework.getEntry(arg0);
-   }
+    public BundleContext getBundleContext() {
+        return framework.getBundleContext();
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Enumeration getEntryPaths(String arg0)
-   {
-      return framework.getEntryPaths(arg0);
-   }
+    public long getBundleId() {
+        return framework.getBundleId();
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Dictionary getHeaders()
-   {
-      return framework.getHeaders();
-   }
+    public URL getEntry(String arg0) {
+        return framework.getEntry(arg0);
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Dictionary getHeaders(String arg0)
-   {
-      return framework.getHeaders(arg0);
-   }
+    @SuppressWarnings("rawtypes")
+    public Enumeration getEntryPaths(String arg0) {
+        return framework.getEntryPaths(arg0);
+    }
 
-   public long getLastModified()
-   {
-      return framework.getLastModified();
-   }
+    @SuppressWarnings("rawtypes")
+    public Dictionary getHeaders() {
+        return framework.getHeaders();
+    }
 
-   public String getLocation()
-   {
-      return framework.getLocation();
-   }
+    @SuppressWarnings("rawtypes")
+    public Dictionary getHeaders(String arg0) {
+        return framework.getHeaders(arg0);
+    }
 
-   public ServiceReference[] getRegisteredServices()
-   {
-      return framework.getRegisteredServices();
-   }
+    public long getLastModified() {
+        return framework.getLastModified();
+    }
 
-   public URL getResource(String arg0)
-   {
-      return framework.getResource(arg0);
-   }
+    public String getLocation() {
+        return framework.getLocation();
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Enumeration getResources(String arg0) throws IOException
-   {
-      return framework.getResources(arg0);
-   }
+    public ServiceReference[] getRegisteredServices() {
+        return framework.getRegisteredServices();
+    }
 
-   public ServiceReference[] getServicesInUse()
-   {
-      return framework.getServicesInUse();
-   }
+    public URL getResource(String arg0) {
+        return framework.getResource(arg0);
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Map getSignerCertificates(int arg0)
-   {
-      return framework.getSignerCertificates(arg0);
-   }
+    @SuppressWarnings("rawtypes")
+    public Enumeration getResources(String arg0) throws IOException {
+        return framework.getResources(arg0);
+    }
 
-   public int getState()
-   {
-      return framework.getState();
-   }
+    public ServiceReference[] getServicesInUse() {
+        return framework.getServicesInUse();
+    }
 
-   public String getSymbolicName()
-   {
-      return framework.getSymbolicName();
-   }
+    @SuppressWarnings("rawtypes")
+    public Map getSignerCertificates(int arg0) {
+        return framework.getSignerCertificates(arg0);
+    }
 
-   public Version getVersion()
-   {
-      return framework.getVersion();
-   }
+    public int getState() {
+        return framework.getState();
+    }
 
-   public boolean hasPermission(Object arg0)
-   {
-      return framework.hasPermission(arg0);
-   }
+    public String getSymbolicName() {
+        return framework.getSymbolicName();
+    }
 
-   public void init() throws BundleException
-   {
-      framework.init();
-   }
+    public Version getVersion() {
+        return framework.getVersion();
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Class loadClass(String arg0) throws ClassNotFoundException
-   {
-      return framework.loadClass(arg0);
-   }
+    public boolean hasPermission(Object arg0) {
+        return framework.hasPermission(arg0);
+    }
 
-   public void start() throws BundleException
-   {
-      framework.start();
-   }
+    public void init() throws BundleException {
+        framework.init();
+    }
 
-   public void start(int arg0) throws BundleException
-   {
-      framework.start(arg0);
-   }
+    @SuppressWarnings("rawtypes")
+    public Class loadClass(String arg0) throws ClassNotFoundException {
+        return framework.loadClass(arg0);
+    }
 
-   public void stop() throws BundleException
-   {
-      framework.stop();
-   }
+    public void start() throws BundleException {
+        framework.start();
+    }
 
-   public void stop(int arg0) throws BundleException
-   {
-      framework.stop(arg0);
-   }
+    public void start(int arg0) throws BundleException {
+        framework.start(arg0);
+    }
 
-   public void uninstall() throws BundleException
-   {
-      framework.uninstall();
-   }
+    public void stop() throws BundleException {
+        framework.stop();
+    }
 
-   public void update() throws BundleException
-   {
-      framework.update();
-   }
+    public void stop(int arg0) throws BundleException {
+        framework.stop(arg0);
+    }
 
-   public void update(InputStream arg0) throws BundleException
-   {
-      framework.update(arg0);
-   }
+    public void uninstall() throws BundleException {
+        framework.uninstall();
+    }
 
-   public FrameworkEvent waitForStop(long arg0) throws InterruptedException
-   {
-      return framework.waitForStop(arg0);
-   }
+    public void update() throws BundleException {
+        framework.update();
+    }
+
+    public void update(InputStream arg0) throws BundleException {
+        framework.update(arg0);
+    }
+
+    public FrameworkEvent waitForStop(long arg0) throws InterruptedException {
+        return framework.waitForStop(arg0);
+    }
 }

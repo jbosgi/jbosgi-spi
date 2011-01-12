@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.testing.internal;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -53,315 +52,253 @@ import org.osgi.jmx.framework.BundleStateMBean;
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-class RemoteBundle extends OSGiBundleImpl
-{
-   // Provide logging
-   private static final Logger log = Logger.getLogger(RemoteBundle.class);
+class RemoteBundle extends OSGiBundleImpl {
 
-   private long bundleId;
-   private String location;
-   private String symbolicName;
-   private BundleStateMBean bundleState;
-   private Dictionary<String, String> defaultHeaders;
-   private Dictionary<String, String> rawHeaders;
-   private Version version;
-   boolean uninstalled;
+    // Provide logging
+    private static final Logger log = Logger.getLogger(RemoteBundle.class);
 
-   RemoteBundle(OSGiRuntime runtime, long bundleId) throws IOException
-   {
-      super(runtime);
-      this.bundleId = bundleId;
+    private long bundleId;
+    private String location;
+    private String symbolicName;
+    private BundleStateMBean bundleState;
+    private Dictionary<String, String> defaultHeaders;
+    private Dictionary<String, String> rawHeaders;
+    private Version version;
+    boolean uninstalled;
 
-      bundleState = runtime.getBundleStateMBean();
+    RemoteBundle(OSGiRuntime runtime, long bundleId) throws IOException {
+        super(runtime);
+        this.bundleId = bundleId;
 
-      symbolicName = bundleState.getSymbolicName(bundleId);
-      location = bundleState.getLocation(bundleId);
+        bundleState = runtime.getBundleStateMBean();
 
-      String versionStr = bundleState.getVersion(bundleId);
-      version = Version.parseVersion(versionStr);
+        symbolicName = bundleState.getSymbolicName(bundleId);
+        location = bundleState.getLocation(bundleId);
 
-      // The getHeaders methods must continue to provide the manifest header
-      // information after the bundle enters the UNINSTALLED state.
-      defaultHeaders = getHeadersInternal(null);
-      if (bundleState instanceof BundleStateMBeanExt)
-         rawHeaders = getHeadersInternal("");
-   }
+        String versionStr = bundleState.getVersion(bundleId);
+        version = Version.parseVersion(versionStr);
 
-   @SuppressWarnings("unchecked")
-   private Dictionary<String, String> getHeadersInternal(String locale) throws IOException
-   {
-      Dictionary<String, String> headers = new Hashtable<String, String>();
-      TabularData headerData;
-      if (locale == null)
-         headerData = bundleState.getHeaders(bundleId);
-      else
-         headerData = assertBundleStateMBeanExt().getHeaders(bundleId, locale);
+        // The getHeaders methods must continue to provide the manifest header
+        // information after the bundle enters the UNINSTALLED state.
+        defaultHeaders = getHeadersInternal(null);
+        if (bundleState instanceof BundleStateMBeanExt)
+            rawHeaders = getHeadersInternal("");
+    }
 
-      for (CompositeData aux : (Collection<CompositeData>)headerData.values())
-      {
-         String key = (String)aux.get(JmxConstants.KEY);
-         String value = (String)aux.get(JmxConstants.VALUE);
-         headers.put(key, value);
-      }
-      return new UnmodifiableDictionary<String, String>(headers);
-   }
+    @SuppressWarnings("unchecked")
+    private Dictionary<String, String> getHeadersInternal(String locale) throws IOException {
+        Dictionary<String, String> headers = new Hashtable<String, String>();
+        TabularData headerData;
+        if (locale == null)
+            headerData = bundleState.getHeaders(bundleId);
+        else
+            headerData = assertBundleStateMBeanExt().getHeaders(bundleId, locale);
 
-   @Override
-   public int getState()
-   {
-      if (uninstalled == true)
-         return Bundle.UNINSTALLED;
+        for (CompositeData aux : (Collection<CompositeData>) headerData.values()) {
+            String key = (String) aux.get(JmxConstants.KEY);
+            String value = (String) aux.get(JmxConstants.VALUE);
+            headers.put(key, value);
+        }
+        return new UnmodifiableDictionary<String, String>(headers);
+    }
 
-      try
-      {
-         BundleStateMBean bundleState = getRuntime().getBundleStateMBean();
-         String state = bundleState.getState(bundleId);
-         if ("INSTALLED".equals(state))
-            return Bundle.INSTALLED;
-         if ("RESOLVED".equals(state))
-            return Bundle.RESOLVED;
-         if ("STARTING".equals(state))
-            return Bundle.STARTING;
-         if ("ACTIVE".equals(state))
-            return Bundle.ACTIVE;
-         if ("STOPPING".equals(state))
-            return Bundle.STOPPING;
-         if ("UNINSTALLED".equals(state))
+    @Override
+    public int getState() {
+        if (uninstalled == true)
             return Bundle.UNINSTALLED;
-         else
-            throw new IllegalStateException("Unsupported state: " + state);
-      }
-      catch (Exception rte)
-      {
-         Throwable cause = rte.getCause() != null ? rte.getCause() : rte;
-         if (cause instanceof InstanceNotFoundException == false)
-            log.warn("Cannot get state for bundle: " + this, cause);
 
-         return Bundle.UNINSTALLED;
-      }
-   }
+        try {
+            BundleStateMBean bundleState = getRuntime().getBundleStateMBean();
+            String state = bundleState.getState(bundleId);
+            if ("INSTALLED".equals(state))
+                return Bundle.INSTALLED;
+            if ("RESOLVED".equals(state))
+                return Bundle.RESOLVED;
+            if ("STARTING".equals(state))
+                return Bundle.STARTING;
+            if ("ACTIVE".equals(state))
+                return Bundle.ACTIVE;
+            if ("STOPPING".equals(state))
+                return Bundle.STOPPING;
+            if ("UNINSTALLED".equals(state))
+                return Bundle.UNINSTALLED;
+            else
+                throw new IllegalStateException("Unsupported state: " + state);
+        } catch (Exception rte) {
+            Throwable cause = rte.getCause() != null ? rte.getCause() : rte;
+            if (cause instanceof InstanceNotFoundException == false)
+                log.warn("Cannot get state for bundle: " + this, cause);
 
-   @Override
-   public long getBundleId()
-   {
-      return bundleId;
-   }
+            return Bundle.UNINSTALLED;
+        }
+    }
 
-   @Override
-   public String getSymbolicName()
-   {
-      return symbolicName;
-   }
+    @Override
+    public long getBundleId() {
+        return bundleId;
+    }
 
-   @Override
-   public Version getVersion()
-   {
-      return version;
-   }
+    @Override
+    public String getSymbolicName() {
+        return symbolicName;
+    }
 
-   @Override
-   public String getLocation()
-   {
-      return location;
-   }
+    @Override
+    public Version getVersion() {
+        return version;
+    }
 
-   @Override
-   public Dictionary<String, String> getHeaders()
-   {
-      return new UnmodifiableDictionary<String, String>(defaultHeaders);
-   }
+    @Override
+    public String getLocation() {
+        return location;
+    }
 
-   @Override
-   public Dictionary<String, String> getHeaders(String locale)
-   {
-      if (locale == null)
-      {
-         return defaultHeaders;
-      }
-      else if (locale.length() == 0)
-      {
-         return rawHeaders;
-      }
-      else
-      {
-         try
-         {
-            return getHeadersInternal(locale);
-         }
-         catch (IOException ex)
-         {
-            throw new IllegalStateException("Cannot obtain headers for locale: " + locale, ex);
-         }
-      }
-   }
+    @Override
+    public Dictionary<String, String> getHeaders() {
+        return new UnmodifiableDictionary<String, String>(defaultHeaders);
+    }
 
-   @Override
-   public String getProperty(String key)
-   {
-      assertNotUninstalled();
-      try
-      {
-         CompositeData propData = assertBundleStateMBeanExt().getProperty(bundleId, key);
-         if (propData == null)
+    @Override
+    public Dictionary<String, String> getHeaders(String locale) {
+        if (locale == null) {
+            return defaultHeaders;
+        } else if (locale.length() == 0) {
+            return rawHeaders;
+        } else {
+            try {
+                return getHeadersInternal(locale);
+            } catch (IOException ex) {
+                throw new IllegalStateException("Cannot obtain headers for locale: " + locale, ex);
+            }
+        }
+    }
+
+    @Override
+    public String getProperty(String key) {
+        assertNotUninstalled();
+        try {
+            CompositeData propData = assertBundleStateMBeanExt().getProperty(bundleId, key);
+            if (propData == null)
+                return null;
+
+            return (String) propData.get(JmxConstants.VALUE);
+        } catch (IOException ex) {
+            throw new IllegalStateException("Cannot obtain property: " + key, ex);
+        }
+    }
+
+    @Override
+    public URL getEntry(String path) {
+        assertNotUninstalled();
+        try {
+            return toURL(assertBundleStateMBeanExt().getEntry(bundleId, path), null);
+        } catch (IOException ex) {
+            throw new IllegalStateException("Cannot getEntry: " + path, ex);
+        }
+    }
+
+    @Override
+    public URL getResource(String name) {
+        assertNotUninstalled();
+        try {
+            return toURL(assertBundleStateMBeanExt().getResource(bundleId, name), null);
+        } catch (IOException ex) {
+            throw new IllegalStateException("Cannot getResource: " + name, ex);
+        }
+    }
+
+    @Override
+    public File getDataFile(String filename) {
+        assertNotUninstalled();
+        try {
+            String filepath = assertBundleStateMBeanExt().getDataFile(bundleId, filename);
+            return filepath != null ? new File(filepath) : null;
+        } catch (IOException ex) {
+            throw new IllegalStateException("Cannot getDataFile: " + filename, ex);
+        }
+    }
+
+    @Override
+    public OSGiBundle loadClass(String name) throws ClassNotFoundException {
+        assertNotUninstalled();
+        try {
+            long exporterId = assertBundleStateMBeanExt().loadClass(bundleId, name);
+            return getRuntime().getBundle(new Long(exporterId));
+        } catch (IOException ex) {
+            throw new IllegalStateException("Cannot loadClass: " + name, ex);
+        }
+    }
+
+    @Override
+    protected void startInternal() throws BundleException {
+        assertNotUninstalled();
+        try {
+            getRuntime().getFrameworkMBean().startBundle(bundleId);
+        } catch (IOException ex) {
+            Throwable cause = ex.getCause();
+            if (cause instanceof BundleException)
+                throw (BundleException) cause;
+
+            throw new BundleException("Cannot start bundle: " + this, ex);
+        }
+    }
+
+    @Override
+    protected void stopInternal() throws BundleException {
+        assertNotUninstalled();
+        try {
+            getRuntime().getFrameworkMBean().stopBundle(bundleId);
+        } catch (IOException ex) {
+            Throwable cause = ex.getCause();
+            if (cause instanceof BundleException)
+                throw (BundleException) cause;
+
+            throw new BundleException("Cannot stop bundle: " + this, ex);
+        }
+    }
+
+    @Override
+    protected void uninstallInternal() throws BundleException {
+        assertNotUninstalled();
+        try {
+            getRuntime().getFrameworkMBean().uninstallBundle(bundleId);
+            OSGiRuntimeImpl runtimeImpl = (OSGiRuntimeImpl) getRuntime();
+            runtimeImpl.unregisterBundle(this);
+            uninstalled = true;
+        } catch (RuntimeException rte) {
+            throw rte;
+        } catch (Exception ex) {
+            log.error("Cannot uninstall: " + getLocation(), ex);
+        }
+    }
+
+    private BundleStateMBeanExt assertBundleStateMBeanExt() {
+        if (bundleState instanceof BundleStateMBeanExt)
+            return (BundleStateMBeanExt) bundleState;
+
+        throw new IllegalStateException("BundleStateMBean extension not installed");
+    }
+
+    private URL toURL(String urlstr, URLStreamHandler sh) {
+        if (urlstr == null)
             return null;
 
-         return (String)propData.get(JmxConstants.VALUE);
-      }
-      catch (IOException ex)
-      {
-         throw new IllegalStateException("Cannot obtain property: " + key, ex);
-      }
-   }
+        try {
+            return sh == null ? new URL(urlstr) : new URL(null, urlstr, sh);
+        } catch (MalformedURLException ex) {
+            // In case of the 'bundle' and 'bundleentry' protocol, use a dummy URLStreamHandler
+            // Access to remote content via the bundle URL is invalid anyway
+            if (sh == null && urlstr.startsWith("bundle")) {
+                sh = new URLStreamHandler() {
 
-   @Override
-   public URL getEntry(String path)
-   {
-      assertNotUninstalled();
-      try
-      {
-         return toURL(assertBundleStateMBeanExt().getEntry(bundleId, path), null);
-      }
-      catch (IOException ex)
-      {
-         throw new IllegalStateException("Cannot getEntry: " + path, ex);
-      }
-   }
-
-   @Override
-   public URL getResource(String name)
-   {
-      assertNotUninstalled();
-      try
-      {
-         return toURL(assertBundleStateMBeanExt().getResource(bundleId, name), null);
-      }
-      catch (IOException ex)
-      {
-         throw new IllegalStateException("Cannot getResource: " + name, ex);
-      }
-   }
-
-   @Override
-   public File getDataFile(String filename)
-   {
-      assertNotUninstalled();
-      try
-      {
-         String filepath = assertBundleStateMBeanExt().getDataFile(bundleId, filename);
-         return filepath != null ? new File(filepath) : null;
-      }
-      catch (IOException ex)
-      {
-         throw new IllegalStateException("Cannot getDataFile: " + filename, ex);
-      }
-   }
-
-   @Override
-   public OSGiBundle loadClass(String name) throws ClassNotFoundException
-   {
-      assertNotUninstalled();
-      try
-      {
-         long exporterId = assertBundleStateMBeanExt().loadClass(bundleId, name);
-         return getRuntime().getBundle(new Long(exporterId));
-      }
-      catch (IOException ex)
-      {
-         throw new IllegalStateException("Cannot loadClass: " + name, ex);
-      }
-   }
-
-   @Override
-   protected void startInternal() throws BundleException
-   {
-      assertNotUninstalled();
-      try
-      {
-         getRuntime().getFrameworkMBean().startBundle(bundleId);
-      }
-      catch (IOException ex)
-      {
-         Throwable cause = ex.getCause();
-         if (cause instanceof BundleException)
-            throw (BundleException)cause;
-
-         throw new BundleException("Cannot start bundle: " + this, ex);
-      }
-   }
-
-   @Override
-   protected void stopInternal() throws BundleException
-   {
-      assertNotUninstalled();
-      try
-      {
-         getRuntime().getFrameworkMBean().stopBundle(bundleId);
-      }
-      catch (IOException ex)
-      {
-         Throwable cause = ex.getCause();
-         if (cause instanceof BundleException)
-            throw (BundleException)cause;
-
-         throw new BundleException("Cannot stop bundle: " + this, ex);
-      }
-   }
-
-   @Override
-   protected void uninstallInternal() throws BundleException
-   {
-      assertNotUninstalled();
-      try
-      {
-         getRuntime().getFrameworkMBean().uninstallBundle(bundleId);
-         OSGiRuntimeImpl runtimeImpl = (OSGiRuntimeImpl)getRuntime();
-         runtimeImpl.unregisterBundle(this);
-         uninstalled = true;
-      }
-      catch (RuntimeException rte)
-      {
-         throw rte;
-      }
-      catch (Exception ex)
-      {
-         log.error("Cannot uninstall: " + getLocation(), ex);
-      }
-   }
-
-   private BundleStateMBeanExt assertBundleStateMBeanExt()
-   {
-      if (bundleState instanceof BundleStateMBeanExt)
-         return (BundleStateMBeanExt)bundleState;
-
-      throw new IllegalStateException("BundleStateMBean extension not installed");
-   }
-
-   private URL toURL(String urlstr, URLStreamHandler sh)
-   {
-      if (urlstr == null)
-         return null;
-
-      try
-      {
-         return sh == null ? new URL(urlstr) : new URL(null, urlstr, sh);
-      }
-      catch (MalformedURLException ex)
-      {
-         // In case of the 'bundle' and 'bundleentry' protocol, use a dummy URLStreamHandler
-         // Access to remote content via the bundle URL is invalid anyway
-         if (sh == null && urlstr.startsWith("bundle"))
-         {
-            sh = new URLStreamHandler()
-            {
-               @Override
-               protected URLConnection openConnection(URL url) throws IOException
-               {
-                  return null;
-               }
-            };
-            return toURL(urlstr, sh);
-         }
-         throw new IllegalArgumentException("Invalid URL: " + urlstr);
-      }
-   }
+                    @Override
+                    protected URLConnection openConnection(URL url) throws IOException {
+                        return null;
+                    }
+                };
+                return toURL(urlstr, sh);
+            }
+            throw new IllegalArgumentException("Invalid URL: " + urlstr);
+        }
+    }
 }

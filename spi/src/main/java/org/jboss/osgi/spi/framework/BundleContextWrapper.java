@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.framework;
 
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.Dictionary;
@@ -38,132 +37,108 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 /**
- * A generic BundleContext wrapper that delegates all method calls to the underlying 
- * BundleContext implementation.
+ * A generic BundleContext wrapper that delegates all method calls to the underlying BundleContext implementation.
  * 
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
-public class BundleContextWrapper implements BundleContext
-{
-   protected BundleContext context;
+public class BundleContextWrapper implements BundleContext {
 
-   public BundleContextWrapper(BundleContext context)
-   {
-      if (context == null)
-         throw new IllegalArgumentException("Null framework");
-      this.context = context;
-   }
-   
-   public void addBundleListener(BundleListener listener)
-   {
-      context.addBundleListener(listener);
-   }
+    protected BundleContext context;
 
-   public void addFrameworkListener(FrameworkListener listener)
-   {
-      context.addFrameworkListener(listener);
-   }
+    public BundleContextWrapper(BundleContext context) {
+        if (context == null)
+            throw new IllegalArgumentException("Null framework");
+        this.context = context;
+    }
 
-   public void addServiceListener(ServiceListener listener, String filter) throws InvalidSyntaxException
-   {
-      context.addServiceListener(listener, filter);
-   }
+    public void addBundleListener(BundleListener listener) {
+        context.addBundleListener(listener);
+    }
 
-   public void addServiceListener(ServiceListener listener)
-   {
-      context.addServiceListener(listener);
-   }
+    public void addFrameworkListener(FrameworkListener listener) {
+        context.addFrameworkListener(listener);
+    }
 
-   public Filter createFilter(String filter) throws InvalidSyntaxException
-   {
-      return context.createFilter(filter);
-   }
+    public void addServiceListener(ServiceListener listener, String filter) throws InvalidSyntaxException {
+        context.addServiceListener(listener, filter);
+    }
 
-   public ServiceReference[] getAllServiceReferences(String clazz, String filter) throws InvalidSyntaxException
-   {
-      return context.getAllServiceReferences(clazz, filter);
-   }
+    public void addServiceListener(ServiceListener listener) {
+        context.addServiceListener(listener);
+    }
 
-   public Bundle getBundle()
-   {
-      return context.getBundle();
-   }
+    public Filter createFilter(String filter) throws InvalidSyntaxException {
+        return context.createFilter(filter);
+    }
 
-   public Bundle getBundle(long id)
-   {
-      return context.getBundle(id);
-   }
+    public ServiceReference[] getAllServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+        return context.getAllServiceReferences(clazz, filter);
+    }
 
-   public Bundle[] getBundles()
-   {
-      return context.getBundles();
-   }
+    public Bundle getBundle() {
+        return context.getBundle();
+    }
 
-   public File getDataFile(String filename)
-   {
-      return context.getDataFile(filename);
-   }
+    public Bundle getBundle(long id) {
+        return context.getBundle(id);
+    }
 
-   public String getProperty(String key)
-   {
-      return context.getProperty(key);
-   }
+    public Bundle[] getBundles() {
+        return context.getBundles();
+    }
 
-   public Object getService(ServiceReference reference)
-   {
-      return context.getService(reference);
-   }
+    public File getDataFile(String filename) {
+        return context.getDataFile(filename);
+    }
 
-   public ServiceReference getServiceReference(String clazz)
-   {
-      return context.getServiceReference(clazz);
-   }
+    public String getProperty(String key) {
+        return context.getProperty(key);
+    }
 
-   public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException
-   {
-      return context.getServiceReferences(clazz, filter);
-   }
+    public Object getService(ServiceReference reference) {
+        return context.getService(reference);
+    }
 
-   public Bundle installBundle(String location, InputStream input) throws BundleException
-   {
-      return context.installBundle(location, input);
-   }
+    public ServiceReference getServiceReference(String clazz) {
+        return context.getServiceReference(clazz);
+    }
 
-   public Bundle installBundle(String location) throws BundleException
-   {
-      return context.installBundle(location);
-   }
+    public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
+        return context.getServiceReferences(clazz, filter);
+    }
 
-   @SuppressWarnings("rawtypes")
-   public ServiceRegistration registerService(String clazz, Object service, Dictionary properties)
-   {
-      return context.registerService(clazz, service, properties);
-   }
+    public Bundle installBundle(String location, InputStream input) throws BundleException {
+        return context.installBundle(location, input);
+    }
 
-   @SuppressWarnings("rawtypes")
-   public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties)
-   {
-      return context.registerService(clazzes, service, properties);
-   }
+    public Bundle installBundle(String location) throws BundleException {
+        return context.installBundle(location);
+    }
 
-   public void removeBundleListener(BundleListener listener)
-   {
-      context.removeBundleListener(listener);
-   }
+    @SuppressWarnings("rawtypes")
+    public ServiceRegistration registerService(String clazz, Object service, Dictionary properties) {
+        return context.registerService(clazz, service, properties);
+    }
 
-   public void removeFrameworkListener(FrameworkListener listener)
-   {
-      context.removeFrameworkListener(listener);
-   }
+    @SuppressWarnings("rawtypes")
+    public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
+        return context.registerService(clazzes, service, properties);
+    }
 
-   public void removeServiceListener(ServiceListener listener)
-   {
-      context.removeServiceListener(listener);
-   }
+    public void removeBundleListener(BundleListener listener) {
+        context.removeBundleListener(listener);
+    }
 
-   public boolean ungetService(ServiceReference reference)
-   {
-      return context.ungetService(reference);
-   }
+    public void removeFrameworkListener(FrameworkListener listener) {
+        context.removeFrameworkListener(listener);
+    }
+
+    public void removeServiceListener(ServiceListener listener) {
+        context.removeServiceListener(listener);
+    }
+
+    public boolean ungetService(ServiceReference reference) {
+        return context.ungetService(reference);
+    }
 }

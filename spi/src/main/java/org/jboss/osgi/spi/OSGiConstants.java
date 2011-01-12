@@ -21,39 +21,38 @@
  */
 package org.jboss.osgi.spi;
 
-
 /**
  * JBossOSGi Constants
  * 
  * @author thomas.diesler@jboss.com
  * @since 04-Mar-2009
  */
-public interface OSGiConstants
-{
-   /** The JBossOSGi domain 'jboss.osgi' */
-   String DOMAIN_NAME = "jboss.osgi";
-   
-   /**
-    * If set to 'true' bundles can be deployed in any order. Deployed bundle will get started when their dependencies can be resolved.
-    * If set to 'false' bundles must be deployed in the order that is required to start them.
-    * 
-    * The default is 'true' 
-    */
-   String PROPERTY_DEFERRED_START = "org.jboss.osgi.deferred.start";
+public interface OSGiConstants {
 
-   /**
-    * The JBossOSGi runtime system property that denotes the path to the runtime
-    */
-   String OSGI_HOME = "osgi.home";
+    /** The JBossOSGi domain 'jboss.osgi' */
+    String DOMAIN_NAME = "jboss.osgi";
 
-   /**
-    * The JBossOSGi runtime system property that denotes the path to the active runtime profile
-    */
-   String OSGI_SERVER_HOME = "osgi.server.home";
+    /**
+     * If set to 'true' bundles can be deployed in any order. Deployed bundle will get started when their dependencies can be
+     * resolved. If set to 'false' bundles must be deployed in the order that is required to start them.
+     * 
+     * The default is 'true'
+     */
+    String PROPERTY_DEFERRED_START = "org.jboss.osgi.deferred.start";
 
-   /**
-    * A JBossOSGi deployment unit attachment key that containe the bundle's symbolic name. 
-    */
-   String KEY_BUNDLE_SYMBOLIC_NAME = "org.jboss.osgi.bundle.symbolic.name";
+    /**
+     * The JBossOSGi runtime system property that denotes the path to the runtime
+     */
+    String OSGI_HOME = "osgi.home";
+
+    /**
+     * The JBossOSGi runtime system property that denotes the path to the active runtime profile
+     */
+    String OSGI_SERVER_HOME = "osgi.server.home";
+
+    /**
+     * A JBossOSGi deployment unit attachment key that containe the bundle's symbolic name.
+     */
+    String KEY_BUNDLE_SYMBOLIC_NAME = "org.jboss.osgi.bundle.symbolic.name";
 
 }

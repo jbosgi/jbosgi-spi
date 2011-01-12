@@ -25,26 +25,28 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
 /**
  * A remote extension to the {@link OSGiRuntime}
- *
+ * 
  * @author Thomas.Diesler@jboss.org
  * @since 09-Nov-2010
  */
-public interface OSGiRemoteRuntime extends OSGiRuntime
-{
-   /**
-    * Deploys an archive from the given location string
-    * @return The unique runtime name for this deployment
-    */
-   String deploy(String location) throws Exception;
+public interface OSGiRemoteRuntime extends OSGiRuntime {
 
-   /**
-    * Deploys the given archive
-    * @return The unique runtime name for this deployment
-    */
-   String deploy(JavaArchive archive) throws Exception;
+    /**
+     * Deploys an archive from the given location string
+     * 
+     * @return The unique runtime name for this deployment
+     */
+    String deploy(String location) throws Exception;
 
-   /**
-    * Undeploys the named unique deployment
-    */
-   void undeploy(String uniqueName) throws Exception;
+    /**
+     * Deploys the given archive
+     * 
+     * @return The unique runtime name for this deployment
+     */
+    String deploy(JavaArchive archive) throws Exception;
+
+    /**
+     * Undeploys the named unique deployment
+     */
+    void undeploy(String uniqueName) throws Exception;
 }

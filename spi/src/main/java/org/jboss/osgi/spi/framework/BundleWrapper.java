@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.framework;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -36,157 +35,129 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 
 /**
- * A generic Bundle wrapper that delegates all method calls to the underlying 
- * Bundle implementation.
+ * A generic Bundle wrapper that delegates all method calls to the underlying Bundle implementation.
  * 
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
-public class BundleWrapper implements Bundle
-{
-   protected Bundle bundle;
+public class BundleWrapper implements Bundle {
 
-   public BundleWrapper(Bundle bundle)
-   {
-      if (bundle == null)
-         throw new IllegalArgumentException("Null bundle");
-      this.bundle = bundle;
-   }
+    protected Bundle bundle;
 
-   @SuppressWarnings("rawtypes")
-   public Enumeration findEntries(String path, String filePattern, boolean recurse)
-   {
-      return bundle.findEntries(path, filePattern, recurse);
-   }
+    public BundleWrapper(Bundle bundle) {
+        if (bundle == null)
+            throw new IllegalArgumentException("Null bundle");
+        this.bundle = bundle;
+    }
 
-   public BundleContext getBundleContext()
-   {
-      return bundle.getBundleContext();
-   }
+    @SuppressWarnings("rawtypes")
+    public Enumeration findEntries(String path, String filePattern, boolean recurse) {
+        return bundle.findEntries(path, filePattern, recurse);
+    }
 
-   public long getBundleId()
-   {
-      return bundle.getBundleId();
-   }
+    public BundleContext getBundleContext() {
+        return bundle.getBundleContext();
+    }
 
-   public URL getEntry(String path)
-   {
-      return bundle.getEntry(path);
-   }
+    public long getBundleId() {
+        return bundle.getBundleId();
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Enumeration getEntryPaths(String path)
-   {
-      return bundle.getEntryPaths(path);
-   }
+    public URL getEntry(String path) {
+        return bundle.getEntry(path);
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Dictionary getHeaders()
-   {
-      return bundle.getHeaders();
-   }
+    @SuppressWarnings("rawtypes")
+    public Enumeration getEntryPaths(String path) {
+        return bundle.getEntryPaths(path);
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Dictionary getHeaders(String locale)
-   {
-      return bundle.getHeaders(locale);
-   }
+    @SuppressWarnings("rawtypes")
+    public Dictionary getHeaders() {
+        return bundle.getHeaders();
+    }
 
-   public long getLastModified()
-   {
-      return bundle.getLastModified();
-   }
+    @SuppressWarnings("rawtypes")
+    public Dictionary getHeaders(String locale) {
+        return bundle.getHeaders(locale);
+    }
 
-   public String getLocation()
-   {
-      return bundle.getLocation();
-   }
+    public long getLastModified() {
+        return bundle.getLastModified();
+    }
 
-   public ServiceReference[] getRegisteredServices()
-   {
-      return bundle.getRegisteredServices();
-   }
+    public String getLocation() {
+        return bundle.getLocation();
+    }
 
-   public URL getResource(String name)
-   {
-      return bundle.getResource(name);
-   }
+    public ServiceReference[] getRegisteredServices() {
+        return bundle.getRegisteredServices();
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Enumeration getResources(String name) throws IOException
-   {
-      return bundle.getResources(name);
-   }
+    public URL getResource(String name) {
+        return bundle.getResource(name);
+    }
 
-   public ServiceReference[] getServicesInUse()
-   {
-      return bundle.getServicesInUse();
-   }
+    @SuppressWarnings("rawtypes")
+    public Enumeration getResources(String name) throws IOException {
+        return bundle.getResources(name);
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Map getSignerCertificates(int signersType)
-   {
-      return bundle.getSignerCertificates(signersType);
-   }
+    public ServiceReference[] getServicesInUse() {
+        return bundle.getServicesInUse();
+    }
 
-   public int getState()
-   {
-      return bundle.getState();
-   }
+    @SuppressWarnings("rawtypes")
+    public Map getSignerCertificates(int signersType) {
+        return bundle.getSignerCertificates(signersType);
+    }
 
-   public String getSymbolicName()
-   {
-      return bundle.getSymbolicName();
-   }
+    public int getState() {
+        return bundle.getState();
+    }
 
-   public Version getVersion()
-   {
-      return bundle.getVersion();
-   }
+    public String getSymbolicName() {
+        return bundle.getSymbolicName();
+    }
 
-   public boolean hasPermission(Object permission)
-   {
-      return bundle.hasPermission(permission);
-   }
+    public Version getVersion() {
+        return bundle.getVersion();
+    }
 
-   @SuppressWarnings("rawtypes")
-   public Class loadClass(String name) throws ClassNotFoundException
-   {
-      return bundle.loadClass(name);
-   }
+    public boolean hasPermission(Object permission) {
+        return bundle.hasPermission(permission);
+    }
 
-   public void start() throws BundleException
-   {
-      bundle.start();
-   }
+    @SuppressWarnings("rawtypes")
+    public Class loadClass(String name) throws ClassNotFoundException {
+        return bundle.loadClass(name);
+    }
 
-   public void start(int options) throws BundleException
-   {
-      bundle.start(options);
-   }
+    public void start() throws BundleException {
+        bundle.start();
+    }
 
-   public void stop() throws BundleException
-   {
-      bundle.stop();
-   }
+    public void start(int options) throws BundleException {
+        bundle.start(options);
+    }
 
-   public void stop(int options) throws BundleException
-   {
-      bundle.stop(options);
-   }
+    public void stop() throws BundleException {
+        bundle.stop();
+    }
 
-   public void uninstall() throws BundleException
-   {
-      bundle.uninstall();
-   }
+    public void stop(int options) throws BundleException {
+        bundle.stop(options);
+    }
 
-   public void update() throws BundleException
-   {
-      bundle.update();
-   }
+    public void uninstall() throws BundleException {
+        bundle.uninstall();
+    }
 
-   public void update(InputStream input) throws BundleException
-   {
-      bundle.update(input);
-   }
+    public void update() throws BundleException {
+        bundle.update();
+    }
+
+    public void update(InputStream input) throws BundleException {
+        bundle.update(input);
+    }
 }

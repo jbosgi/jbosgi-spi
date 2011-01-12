@@ -50,271 +50,233 @@ import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
  * An abstract implementation of the {@link OSGiRuntime}
- *
+ * 
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public abstract class OSGiRuntimeImpl implements OSGiRuntime
-{
-   // Provide logging
-   private static final Logger log = Logger.getLogger(OSGiRuntimeImpl.class);
+public abstract class OSGiRuntimeImpl implements OSGiRuntime {
 
-   private ManagementSupport jmxSupport;
-   private OSGiRuntimeHelper helper;
-   private Map<String, BundleTuple> bundles = new LinkedHashMap<String, BundleTuple>();
-   private List<Capability> capabilities = new ArrayList<Capability>();
+    // Provide logging
+    private static final Logger log = Logger.getLogger(OSGiRuntimeImpl.class);
 
-   public OSGiRuntimeImpl(OSGiRuntimeHelper helper)
-   {
-      this.helper = helper;
-   }
+    private ManagementSupport jmxSupport;
+    private OSGiRuntimeHelper helper;
+    private Map<String, BundleTuple> bundles = new LinkedHashMap<String, BundleTuple>();
+    private List<Capability> capabilities = new ArrayList<Capability>();
 
-   public OSGiRuntimeHelper getTestHelper()
-   {
-      return helper;
-   }
+    public OSGiRuntimeImpl(OSGiRuntimeHelper helper) {
+        this.helper = helper;
+    }
 
-   @Override
-   public void addCapability(Capability capability) throws BundleException
-   {
-      // Add dependent capabilies
-      for (Capability dependency : capability.getDependencies())
-         addCapability(dependency);
+    public OSGiRuntimeHelper getTestHelper() {
+        return helper;
+    }
 
-      OSGiServiceReference[] srefs = null;
+    @Override
+    public void addCapability(Capability capability) throws BundleException {
+        // Add dependent capabilies
+        for (Capability dependency : capability.getDependencies())
+            addCapability(dependency);
 
-      // Check if the service provided by the capability exists already
-      String serviceName = capability.getServiceName();
-      if (serviceName != null)
-         srefs = getServiceReferences(serviceName, capability.getFilter());
+        OSGiServiceReference[] srefs = null;
 
-      if (srefs == null || srefs.length == 0)
-      {
-         log.debug("Add capability: " + capability);
+        // Check if the service provided by the capability exists already
+        String serviceName = capability.getServiceName();
+        if (serviceName != null)
+            srefs = getServiceReferences(serviceName, capability.getFilter());
 
-         // Install the capability bundles
-         capability.install(this);
+        if (srefs == null || srefs.length == 0) {
+            log.debug("Add capability: " + capability);
 
-         // Start the capability bundles
-         capability.start(this);
+            // Install the capability bundles
+            capability.install(this);
 
-         capabilities.add(capability);
-      }
-      else
-      {
-         log.debug("Skip capability: " + capability);
-      }
-   }
+            // Start the capability bundles
+            capability.start(this);
 
-   @Override
-   public void removeCapability(Capability capability)
-   {
-      if (capabilities.remove(capability))
-      {
-         log.debug("Remove capability : " + capability);
+            capabilities.add(capability);
+        } else {
+            log.debug("Skip capability: " + capability);
+        }
+    }
 
-         // Install the capability bundles
-         capability.stop(this);
+    @Override
+    public void removeCapability(Capability capability) {
+        if (capabilities.remove(capability)) {
+            log.debug("Remove capability : " + capability);
 
-         // Start the capability bundles
-         capability.uninstall(this);
+            // Install the capability bundles
+            capability.stop(this);
 
-      }
+            // Start the capability bundles
+            capability.uninstall(this);
 
-      List<Capability> dependencies = new ArrayList<Capability>(capability.getDependencies());
-      Collections.reverse(dependencies);
+        }
 
-      // Remove dependent capabilities
-      for (Capability dependency : dependencies)
-         removeCapability(dependency);
-   }
+        List<Capability> dependencies = new ArrayList<Capability>(capability.getDependencies());
+        Collections.reverse(dependencies);
 
-   @Override
-   public OSGiBundle installBundle(String location) throws BundleException
-   {
-      BundleInfo info = BundleInfo.createBundleInfo(location);
-      return installBundle(info);
-   }
+        // Remove dependent capabilities
+        for (Capability dependency : dependencies)
+            removeCapability(dependency);
+    }
 
-   @Override
-   public OSGiBundle installBundle(Archive<?> archive) throws BundleException, IOException
-   {
-      VirtualFile virtualFile = OSGiTestHelper.toVirtualFile(archive);
-      BundleInfo info = BundleInfo.createBundleInfo(virtualFile);
-      return installBundle(info);
-   }
+    @Override
+    public OSGiBundle installBundle(String location) throws BundleException {
+        BundleInfo info = BundleInfo.createBundleInfo(location);
+        return installBundle(info);
+    }
 
-   @Override
-   public OSGiBundle installBundle(VirtualFile virtualFile) throws BundleException
-   {
-      BundleInfo info = BundleInfo.createBundleInfo(virtualFile);
-      return installBundle(info);
-   }
+    @Override
+    public OSGiBundle installBundle(Archive<?> archive) throws BundleException, IOException {
+        VirtualFile virtualFile = OSGiTestHelper.toVirtualFile(archive);
+        BundleInfo info = BundleInfo.createBundleInfo(virtualFile);
+        return installBundle(info);
+    }
 
-   private OSGiBundle installBundle(BundleInfo info) throws BundleException
-   {
-      log.debug("Install bundle: " + info);
-      OSGiBundle bundle = installBundleInternal(info);
-      bundles.put(info.getLocation(), new BundleTuple(info, bundle));
-      return bundle;
-   }
+    @Override
+    public OSGiBundle installBundle(VirtualFile virtualFile) throws BundleException {
+        BundleInfo info = BundleInfo.createBundleInfo(virtualFile);
+        return installBundle(info);
+    }
 
-   abstract OSGiBundle installBundleInternal(BundleInfo info) throws BundleException;
+    private OSGiBundle installBundle(BundleInfo info) throws BundleException {
+        log.debug("Install bundle: " + info);
+        OSGiBundle bundle = installBundleInternal(info);
+        bundles.put(info.getLocation(), new BundleTuple(info, bundle));
+        return bundle;
+    }
 
-   @Override
-   public void shutdown()
-   {
-      log.debug("Start Shutdown");
+    abstract OSGiBundle installBundleInternal(BundleInfo info) throws BundleException;
 
-      // Uninstall the registered bundles
-      ArrayList<String> locations = new ArrayList<String>(bundles.keySet());
-      Collections.reverse(locations);
+    @Override
+    public void shutdown() {
+        log.debug("Start Shutdown");
 
-      while (locations.size() > 0)
-      {
-         String location = locations.remove(0);
-         BundleTuple tuple = bundles.get(location);
-         OSGiBundle bundle = tuple.bundle;
-         try
-         {
-            bundle.uninstall();
-         }
-         catch (BundleException e)
-         {
-            log.error("Cannot unintall bundle: " + bundle);
-         }
-      }
+        // Uninstall the registered bundles
+        ArrayList<String> locations = new ArrayList<String>(bundles.keySet());
+        Collections.reverse(locations);
 
-      // Uninstall the capabilities
-      Collections.reverse(capabilities);
-      while (capabilities.size() > 0)
-      {
-         Capability capability = capabilities.get(0);
-         removeCapability(capability);
-      }
-
-      log.debug("End Shutdown");
-   }
-
-   @Override
-   public <T> T getMBeanProxy(ObjectName name, Class<T> interf)
-   {
-      return getJMXSupport().getMBeanProxy(name, interf);
-   }
-
-   @Override
-   public FrameworkMBean getFrameworkMBean() throws IOException
-   {
-      return getJMXSupport().getFrameworkMBean();
-   }
-
-   @Override
-   public BundleStateMBean getBundleStateMBean() throws IOException
-   {
-      return getJMXSupport().getBundleStateMBean();
-   }
-
-   @Override
-   public PackageStateMBean getPackageStateMBean() throws IOException
-   {
-      return getJMXSupport().getPackageStateMBean();
-   }
-
-   @Override
-   public ServiceStateMBean getServiceStateMBean() throws IOException
-   {
-      return getJMXSupport().getServiceStateMBean();
-   }
-
-   private ManagementSupport getJMXSupport()
-   {
-      if (jmxSupport == null)
-         jmxSupport = new ManagementSupport(getMBeanServer());
-
-      return jmxSupport;
-   }
-
-   @Override
-   public String getServerHost()
-   {
-      return OSGiTestHelper.getServerHost();
-   }
-
-   @Override
-   public OSGiBundle getBundle(String symbolicName, Version version)
-   {
-      OSGiBundle bundle = getBundle(symbolicName, version, false);
-      return bundle;
-   }
-
-   @Override
-   public OSGiServiceReference getServiceReference(String clazz, long timeout)
-   {
-      int fraction = 200;
-      timeout = timeout / fraction;
-      OSGiServiceReference sref = getServiceReference(clazz);
-      while (sref == null && 0 < timeout--)
-      {
-         try
-         {
-            Thread.sleep(fraction);
-         }
-         catch (InterruptedException e)
-         {
-            // ignore
-         }
-         sref = getServiceReference(clazz);
-      }
-      return sref;
-   }
-
-   private OSGiBundle getBundle(String symbolicName, Version version, boolean mustExist)
-   {
-      OSGiBundle bundle = null;
-      List<OSGiBundle> bundles = Arrays.asList(getBundles());
-      for (OSGiBundle aux : bundles)
-      {
-         if (aux.getSymbolicName().equals(symbolicName))
-         {
-            if (version == null || version.equals(aux.getVersion()))
-            {
-               bundle = aux;
-               break;
+        while (locations.size() > 0) {
+            String location = locations.remove(0);
+            BundleTuple tuple = bundles.get(location);
+            OSGiBundle bundle = tuple.bundle;
+            try {
+                bundle.uninstall();
+            } catch (BundleException e) {
+                log.error("Cannot unintall bundle: " + bundle);
             }
-         }
-      }
+        }
 
-      if (bundle == null && mustExist == true)
-         throw new IllegalStateException("Cannot obtain bundle: " + symbolicName + "-" + version + ". We have " + bundles);
+        // Uninstall the capabilities
+        Collections.reverse(capabilities);
+        while (capabilities.size() > 0) {
+            Capability capability = capabilities.get(0);
+            removeCapability(capability);
+        }
 
-      return bundle;
-   }
+        log.debug("End Shutdown");
+    }
 
-   void unregisterBundle(OSGiBundle bundle)
-   {
-      if (bundle == null)
-         throw new IllegalArgumentException("Cannot unregister null bundle");
+    @Override
+    public <T> T getMBeanProxy(ObjectName name, Class<T> interf) {
+        return getJMXSupport().getMBeanProxy(name, interf);
+    }
 
-      String location = bundle.getLocation();
-      BundleTuple tuple = bundles.remove(location);
-      if (tuple != null)
-         tuple.close();
-   }
+    @Override
+    public FrameworkMBean getFrameworkMBean() throws IOException {
+        return getJMXSupport().getFrameworkMBean();
+    }
 
-   class BundleTuple
-   {
-      BundleInfo info;
-      OSGiBundle bundle;
+    @Override
+    public BundleStateMBean getBundleStateMBean() throws IOException {
+        return getJMXSupport().getBundleStateMBean();
+    }
 
-      BundleTuple(BundleInfo info, OSGiBundle bundle)
-      {
-         this.info = info;
-         this.bundle = bundle;
-      }
+    @Override
+    public PackageStateMBean getPackageStateMBean() throws IOException {
+        return getJMXSupport().getPackageStateMBean();
+    }
 
-      public void close()
-      {
-         info.close();
-      }
-   }
+    @Override
+    public ServiceStateMBean getServiceStateMBean() throws IOException {
+        return getJMXSupport().getServiceStateMBean();
+    }
+
+    private ManagementSupport getJMXSupport() {
+        if (jmxSupport == null)
+            jmxSupport = new ManagementSupport(getMBeanServer());
+
+        return jmxSupport;
+    }
+
+    @Override
+    public String getServerHost() {
+        return OSGiTestHelper.getServerHost();
+    }
+
+    @Override
+    public OSGiBundle getBundle(String symbolicName, Version version) {
+        OSGiBundle bundle = getBundle(symbolicName, version, false);
+        return bundle;
+    }
+
+    @Override
+    public OSGiServiceReference getServiceReference(String clazz, long timeout) {
+        int fraction = 200;
+        timeout = timeout / fraction;
+        OSGiServiceReference sref = getServiceReference(clazz);
+        while (sref == null && 0 < timeout--) {
+            try {
+                Thread.sleep(fraction);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+            sref = getServiceReference(clazz);
+        }
+        return sref;
+    }
+
+    private OSGiBundle getBundle(String symbolicName, Version version, boolean mustExist) {
+        OSGiBundle bundle = null;
+        List<OSGiBundle> bundles = Arrays.asList(getBundles());
+        for (OSGiBundle aux : bundles) {
+            if (aux.getSymbolicName().equals(symbolicName)) {
+                if (version == null || version.equals(aux.getVersion())) {
+                    bundle = aux;
+                    break;
+                }
+            }
+        }
+
+        if (bundle == null && mustExist == true)
+            throw new IllegalStateException("Cannot obtain bundle: " + symbolicName + "-" + version + ". We have " + bundles);
+
+        return bundle;
+    }
+
+    void unregisterBundle(OSGiBundle bundle) {
+        if (bundle == null)
+            throw new IllegalArgumentException("Cannot unregister null bundle");
+
+        String location = bundle.getLocation();
+        BundleTuple tuple = bundles.remove(location);
+        if (tuple != null)
+            tuple.close();
+    }
+
+    class BundleTuple {
+
+        BundleInfo info;
+        OSGiBundle bundle;
+
+        BundleTuple(BundleInfo info, OSGiBundle bundle) {
+            this.info = info;
+            this.bundle = bundle;
+        }
+
+        public void close() {
+            info.close();
+        }
+    }
 }

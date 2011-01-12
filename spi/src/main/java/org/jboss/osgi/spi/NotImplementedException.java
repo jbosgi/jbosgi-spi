@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi;
 
-
 /**
  * A RuntimeException that should be thrown for unimplemented features
  * 
@@ -29,19 +28,16 @@ package org.jboss.osgi.spi;
  * @since 18-Jun-2008
  */
 @SuppressWarnings("serial")
-public class NotImplementedException extends RuntimeException
-{
-  public NotImplementedException()
-  {
-  }
-  
-  public NotImplementedException(String message)
-  {
-    super(message);
-  }
-  
-  public NotImplementedException(String jiraIssue, String message)
-  {
-    super("[" + jiraIssue + "] " + message);
-  }
+public class NotImplementedException extends RuntimeException {
+
+    public NotImplementedException() {
+    }
+
+    public NotImplementedException(String message) {
+        super(message);
+    }
+
+    public NotImplementedException(String jiraIssue, String message) {
+        super("[" + jiraIssue + "] " + message);
+    }
 }

@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.testing.internal;
 
-
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -62,214 +61,174 @@ import org.osgi.service.packageadmin.PackageAdmin;
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class EmbeddedRuntimeImpl extends OSGiRuntimeImpl implements OSGiEmbeddedRuntime
-{
-   // Provide logging
-   private static final Logger log = Logger.getLogger(EmbeddedRuntimeImpl.class);
-   
-   public EmbeddedRuntimeImpl(OSGiRuntimeHelper helper)
-   {
-      super(helper);
-      OSGiBootstrapProvider bootProvider = helper.getBootstrapProvider();
-      Framework framework = bootProvider.getFramework();
-      try
-      {
-         log.debug("Framework start: " + framework);
-         framework.start();
-      }
-      catch (BundleException ex)
-      {
-         throw new IllegalStateException("Cannot start framework", ex);
-      }
-   }
+public class EmbeddedRuntimeImpl extends OSGiRuntimeImpl implements OSGiEmbeddedRuntime {
 
-   public static MBeanServer getLocalMBeanServer()
-   {
-      MBeanServer mbeanServer = null;
-   
-      ArrayList<MBeanServer> serverArr = MBeanServerFactory.findMBeanServer(null);
-      if (serverArr.size() > 1)
-         log.warn("Multiple MBeanServer instances: " + serverArr);
-   
-      if (serverArr.size() > 0)
-      {
-         mbeanServer = serverArr.get(0);
-         log.debug("Found MBeanServer: " + mbeanServer);
-      }
-   
-      if (mbeanServer == null)
-      {
-         log.debug("No MBeanServer, create one ...");
-         mbeanServer = MBeanServerFactory.createMBeanServer();
-         log.debug("Created MBeanServer: " + mbeanServer);
-      }
-      return mbeanServer;
-   }
-   
-   @Override
-   OSGiBundle installBundleInternal(BundleInfo info) throws BundleException
-   {
-      try
-      {
-         VirtualFile rootFile = info.getRoot();
-         BundleContext context = getSystemContext();
-         Bundle auxBundle = context.installBundle(info.getLocation(), rootFile.openStream());
-         return new EmbeddedBundle(this, auxBundle);
-     }
-      catch (IOException ex)
-      {
-         throw new BundleException("Cannot install bundle: " + info, ex);
-      }
-   }
+    // Provide logging
+    private static final Logger log = Logger.getLogger(EmbeddedRuntimeImpl.class);
 
-   @Override
-   public OSGiBundle[] getBundles()
-   {
-      List<OSGiBundle> absBundles = new ArrayList<OSGiBundle>();
-      for (Bundle bundle : getSystemContext().getBundles())
-      {
-         absBundles.add(new EmbeddedBundle(this, bundle));
-      }
-      OSGiBundle[] bundleArr = new OSGiBundle[absBundles.size()];
-      absBundles.toArray(bundleArr);
-      return bundleArr;
-   }
+    public EmbeddedRuntimeImpl(OSGiRuntimeHelper helper) {
+        super(helper);
+        OSGiBootstrapProvider bootProvider = helper.getBootstrapProvider();
+        Framework framework = bootProvider.getFramework();
+        try {
+            log.debug("Framework start: " + framework);
+            framework.start();
+        } catch (BundleException ex) {
+            throw new IllegalStateException("Cannot start framework", ex);
+        }
+    }
 
-   @Override
-   public OSGiBundle getBundle(long bundleId)
-   {
-      Bundle bundle = getSystemContext().getBundle(bundleId);
-      return bundle != null ? new EmbeddedBundle(this, bundle) : null;
-   }
+    public static MBeanServer getLocalMBeanServer() {
+        MBeanServer mbeanServer = null;
 
-   @Override
-   public OSGiServiceReference getServiceReference(String clazz)
-   {
-      ServiceReference sref = getSystemContext().getServiceReference(clazz);
-      return (sref != null ? new EmbeddedServiceReference(sref) : null);
-   }
+        ArrayList<MBeanServer> serverArr = MBeanServerFactory.findMBeanServer(null);
+        if (serverArr.size() > 1)
+            log.warn("Multiple MBeanServer instances: " + serverArr);
 
-   @Override
-   public OSGiServiceReference[] getServiceReferences(String clazz, String filter)
-   {
-      OSGiServiceReference[] retRefs = null;
+        if (serverArr.size() > 0) {
+            mbeanServer = serverArr.get(0);
+            log.debug("Found MBeanServer: " + mbeanServer);
+        }
 
-      ServiceReference[] srefs;
-      try
-      {
-         srefs = getSystemContext().getServiceReferences(clazz, filter);
-      }
-      catch (InvalidSyntaxException e)
-      {
-         throw new IllegalArgumentException("Invalid filter syntax: " + filter);
-      }
+        if (mbeanServer == null) {
+            log.debug("No MBeanServer, create one ...");
+            mbeanServer = MBeanServerFactory.createMBeanServer();
+            log.debug("Created MBeanServer: " + mbeanServer);
+        }
+        return mbeanServer;
+    }
 
-      if (srefs != null)
-      {
-         retRefs = new OSGiServiceReference[srefs.length];
-         for (int i = 0; i < srefs.length; i++)
-            retRefs[i] = new EmbeddedServiceReference(srefs[i]);
-      }
-      return retRefs;
-   }
+    @Override
+    OSGiBundle installBundleInternal(BundleInfo info) throws BundleException {
+        try {
+            VirtualFile rootFile = info.getRoot();
+            BundleContext context = getSystemContext();
+            Bundle auxBundle = context.installBundle(info.getLocation(), rootFile.openStream());
+            return new EmbeddedBundle(this, auxBundle);
+        } catch (IOException ex) {
+            throw new BundleException("Cannot install bundle: " + info, ex);
+        }
+    }
 
-   @Override
-   public void addCapability(Capability capability) throws BundleException
-   {
-      // Copy the properties to the System props
-      Map<String, String> props = capability.getSystemProperties();
-      for (Entry<String, String> entry : props.entrySet())
-      {
-         String value = System.getProperty(entry.getKey());
-         if (value == null)
-            System.setProperty(entry.getKey(), entry.getValue());
-      }
-      super.addCapability(capability);
-   }
+    @Override
+    public OSGiBundle[] getBundles() {
+        List<OSGiBundle> absBundles = new ArrayList<OSGiBundle>();
+        for (Bundle bundle : getSystemContext().getBundles()) {
+            absBundles.add(new EmbeddedBundle(this, bundle));
+        }
+        OSGiBundle[] bundleArr = new OSGiBundle[absBundles.size()];
+        absBundles.toArray(bundleArr);
+        return bundleArr;
+    }
 
-   @Override
-   public void refreshPackages(OSGiBundle[] bundles) throws IOException
-   {
-      BundleContext sysContext = getSystemContext();
-      ServiceReference sref = sysContext.getServiceReference(PackageAdmin.class.getName());
-      PackageAdmin packageAdmin = (PackageAdmin)sysContext.getService(sref);
-      
-      Bundle[] bundleArr = null;
-      if (bundles != null)
-      {
-         bundleArr = new Bundle[bundles.length];
-         for (int i = 0; i < bundles.length ; i++)
-            bundleArr[i] = ((EmbeddedBundle)bundles[i]).getBundle();
-      }
-   
-      final CountDownLatch latch = new CountDownLatch(1);
-      FrameworkListener fl = new FrameworkListener()
-      {
-         @Override
-         public void frameworkEvent(FrameworkEvent event)
-         {
-            if (event.getType() == FrameworkEvent.PACKAGES_REFRESHED)
-               latch.countDown();
-         }
-      };
+    @Override
+    public OSGiBundle getBundle(long bundleId) {
+        Bundle bundle = getSystemContext().getBundle(bundleId);
+        return bundle != null ? new EmbeddedBundle(this, bundle) : null;
+    }
 
-      try
-      {
-         sysContext.addFrameworkListener(fl);
-         packageAdmin.refreshPackages(bundleArr);
-         assertTrue(latch.await(10, TimeUnit.SECONDS));
-      }
-      catch (InterruptedException ex)
-      {
-         // ignore
-      }
-      finally
-      {
-         sysContext.removeFrameworkListener(fl);
-      }
-   }
+    @Override
+    public OSGiServiceReference getServiceReference(String clazz) {
+        ServiceReference sref = getSystemContext().getServiceReference(clazz);
+        return (sref != null ? new EmbeddedServiceReference(sref) : null);
+    }
 
-   @Override
-   public void shutdown()
-   {
-      OSGiBootstrapProvider bootProvider = getTestHelper().getBootstrapProvider();
-      if (bootProvider != null)
-      {
-         super.shutdown();
-         try
-         {
-            Framework framework = bootProvider.getFramework();
-            log.debug("Framework stop: " + framework);
-            framework.stop();
-            framework.waitForStop(5000);
-         }
-         catch (Exception ex)
-         {
-            log.error("Cannot stop the framework", ex);
-         }
-         finally
-         {
-            getTestHelper().ungetBootstrapProvider();
-         }
-      }
-   }
+    @Override
+    public OSGiServiceReference[] getServiceReferences(String clazz, String filter) {
+        OSGiServiceReference[] retRefs = null;
 
-   @Override
-   public MBeanServerConnection getMBeanServer()
-   {
-      return EmbeddedRuntimeImpl.getLocalMBeanServer();
-   }
+        ServiceReference[] srefs;
+        try {
+            srefs = getSystemContext().getServiceReferences(clazz, filter);
+        } catch (InvalidSyntaxException e) {
+            throw new IllegalArgumentException("Invalid filter syntax: " + filter);
+        }
 
-   @Override
-   public boolean isRemoteRuntime()
-   {
-      return false;
-   }
-   
-   BundleContext getSystemContext()
-   {
-      OSGiBootstrapProvider bootProvider = getTestHelper().getBootstrapProvider();
-      Framework framework = bootProvider.getFramework();
-      return framework.getBundleContext();
-   }
+        if (srefs != null) {
+            retRefs = new OSGiServiceReference[srefs.length];
+            for (int i = 0; i < srefs.length; i++)
+                retRefs[i] = new EmbeddedServiceReference(srefs[i]);
+        }
+        return retRefs;
+    }
+
+    @Override
+    public void addCapability(Capability capability) throws BundleException {
+        // Copy the properties to the System props
+        Map<String, String> props = capability.getSystemProperties();
+        for (Entry<String, String> entry : props.entrySet()) {
+            String value = System.getProperty(entry.getKey());
+            if (value == null)
+                System.setProperty(entry.getKey(), entry.getValue());
+        }
+        super.addCapability(capability);
+    }
+
+    @Override
+    public void refreshPackages(OSGiBundle[] bundles) throws IOException {
+        BundleContext sysContext = getSystemContext();
+        ServiceReference sref = sysContext.getServiceReference(PackageAdmin.class.getName());
+        PackageAdmin packageAdmin = (PackageAdmin) sysContext.getService(sref);
+
+        Bundle[] bundleArr = null;
+        if (bundles != null) {
+            bundleArr = new Bundle[bundles.length];
+            for (int i = 0; i < bundles.length; i++)
+                bundleArr[i] = ((EmbeddedBundle) bundles[i]).getBundle();
+        }
+
+        final CountDownLatch latch = new CountDownLatch(1);
+        FrameworkListener fl = new FrameworkListener() {
+
+            @Override
+            public void frameworkEvent(FrameworkEvent event) {
+                if (event.getType() == FrameworkEvent.PACKAGES_REFRESHED)
+                    latch.countDown();
+            }
+        };
+
+        try {
+            sysContext.addFrameworkListener(fl);
+            packageAdmin.refreshPackages(bundleArr);
+            assertTrue(latch.await(10, TimeUnit.SECONDS));
+        } catch (InterruptedException ex) {
+            // ignore
+        } finally {
+            sysContext.removeFrameworkListener(fl);
+        }
+    }
+
+    @Override
+    public void shutdown() {
+        OSGiBootstrapProvider bootProvider = getTestHelper().getBootstrapProvider();
+        if (bootProvider != null) {
+            super.shutdown();
+            try {
+                Framework framework = bootProvider.getFramework();
+                log.debug("Framework stop: " + framework);
+                framework.stop();
+                framework.waitForStop(5000);
+            } catch (Exception ex) {
+                log.error("Cannot stop the framework", ex);
+            } finally {
+                getTestHelper().ungetBootstrapProvider();
+            }
+        }
+    }
+
+    @Override
+    public MBeanServerConnection getMBeanServer() {
+        return EmbeddedRuntimeImpl.getLocalMBeanServer();
+    }
+
+    @Override
+    public boolean isRemoteRuntime() {
+        return false;
+    }
+
+    BundleContext getSystemContext() {
+        OSGiBootstrapProvider bootProvider = getTestHelper().getBootstrapProvider();
+        Framework framework = bootProvider.getFramework();
+        return framework.getBundleContext();
+    }
 }

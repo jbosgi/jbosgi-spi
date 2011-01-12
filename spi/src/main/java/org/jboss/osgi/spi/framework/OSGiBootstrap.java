@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.framework;
 
-
 import org.jboss.osgi.spi.internal.OSGiBootstrapBean;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -41,32 +40,27 @@ import org.kohsuke.args4j.CmdLineParser;
  * @author thomas.diesler@jboss.com
  * @since 18-Jun-2008
  */
-public class OSGiBootstrap
-{
-   /**
-    * The main entry point
-    */
-   public static void main(String[] args)
-   {
-      OSGiBootstrapBean bean = new OSGiBootstrapBean();
-      CmdLineParser parser = new CmdLineParser(bean);
-      try
-      {
-         parser.parseArgument(args);
-         bean.run();
-      }
-      catch (CmdLineException ex)
-      {
-         System.err.println("Invalid OSGiBootstrap options");
-         parser.printUsage(System.err);
-      }
-   }
+public class OSGiBootstrap {
 
-   /**
-    * Get an instance of an OSGiBootstrapProvider.
-    */
-   public static OSGiBootstrapProvider getBootstrapProvider()
-   {
-      return OSGiBootstrapBean.getBootstrapProvider();
-   }
+    /**
+     * The main entry point
+     */
+    public static void main(String[] args) {
+        OSGiBootstrapBean bean = new OSGiBootstrapBean();
+        CmdLineParser parser = new CmdLineParser(bean);
+        try {
+            parser.parseArgument(args);
+            bean.run();
+        } catch (CmdLineException ex) {
+            System.err.println("Invalid OSGiBootstrap options");
+            parser.printUsage(System.err);
+        }
+    }
+
+    /**
+     * Get an instance of an OSGiBootstrapProvider.
+     */
+    public static OSGiBootstrapProvider getBootstrapProvider() {
+        return OSGiBootstrapBean.getBootstrapProvider();
+    }
 }

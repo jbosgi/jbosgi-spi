@@ -39,125 +39,107 @@ import org.osgi.service.packageadmin.PackageAdmin;
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class EmbeddedBundle extends OSGiBundleImpl
-{
-   private Bundle bundle;
+public class EmbeddedBundle extends OSGiBundleImpl {
 
-   public EmbeddedBundle(OSGiRuntimeImpl runtime, Bundle bundle)
-   {
-      super(runtime);
-      this.bundle = bundle;
-   }
+    private Bundle bundle;
 
-   public Bundle getBundle()
-   {
-      return bundle;
-   }
+    public EmbeddedBundle(OSGiRuntimeImpl runtime, Bundle bundle) {
+        super(runtime);
+        this.bundle = bundle;
+    }
 
-   @Override
-   public int getState()
-   {
-      return bundle.getState();
-   }
+    public Bundle getBundle() {
+        return bundle;
+    }
 
-   @Override
-   public String getSymbolicName()
-   {
-      return bundle.getSymbolicName();
-   }
+    @Override
+    public int getState() {
+        return bundle.getState();
+    }
 
-   @Override
-   public Version getVersion()
-   {
-      return bundle.getVersion();
-   }
+    @Override
+    public String getSymbolicName() {
+        return bundle.getSymbolicName();
+    }
 
-   @Override
-   public String getLocation()
-   {
-      return bundle.getLocation();
-   }
+    @Override
+    public Version getVersion() {
+        return bundle.getVersion();
+    }
 
-   @Override
-   @SuppressWarnings("unchecked")
-   public Dictionary<String, String> getHeaders()
-   {
-      return bundle.getHeaders();
-   }
+    @Override
+    public String getLocation() {
+        return bundle.getLocation();
+    }
 
-   @Override
-   @SuppressWarnings("unchecked")
-   public Dictionary<String, String> getHeaders(String locale)
-   {
-      return bundle.getHeaders(locale);
-   }
+    @Override
+    @SuppressWarnings("unchecked")
+    public Dictionary<String, String> getHeaders() {
+        return bundle.getHeaders();
+    }
 
-   @Override
-   public long getBundleId()
-   {
-      return bundle.getBundleId();
-   }
+    @Override
+    @SuppressWarnings("unchecked")
+    public Dictionary<String, String> getHeaders(String locale) {
+        return bundle.getHeaders(locale);
+    }
 
-   @Override
-   public String getProperty(String key)
-   {
-      return bundle.getBundleContext().getProperty(key);
-   }
+    @Override
+    public long getBundleId() {
+        return bundle.getBundleId();
+    }
 
-   @Override
-   public URL getEntry(String path)
-   {
-      return bundle.getEntry(path);
-   }
+    @Override
+    public String getProperty(String key) {
+        return bundle.getBundleContext().getProperty(key);
+    }
 
-   @Override
-   public URL getResource(String name)
-   {
-      return bundle.getResource(name);
-   }
+    @Override
+    public URL getEntry(String path) {
+        return bundle.getEntry(path);
+    }
 
-   @Override
-   public File getDataFile(String filename)
-   {
-      return bundle.getBundleContext().getDataFile(filename);
-   }
+    @Override
+    public URL getResource(String name) {
+        return bundle.getResource(name);
+    }
 
-   @Override
-   public OSGiBundle loadClass(String name) throws ClassNotFoundException
-   {
-      Class<?> clazz = bundle.loadClass(name);
-      Bundle providerBundle = getPackageAdmin().getBundle(clazz);
-      if (providerBundle == null)
-         return null;
-      
-      return getRuntime().getBundle(providerBundle.getBundleId());
-   }
+    @Override
+    public File getDataFile(String filename) {
+        return bundle.getBundleContext().getDataFile(filename);
+    }
 
-   @Override
-   protected void startInternal() throws BundleException
-   {
-      bundle.start();
-   }
+    @Override
+    public OSGiBundle loadClass(String name) throws ClassNotFoundException {
+        Class<?> clazz = bundle.loadClass(name);
+        Bundle providerBundle = getPackageAdmin().getBundle(clazz);
+        if (providerBundle == null)
+            return null;
 
-   @Override
-   protected void stopInternal() throws BundleException
-   {
-      bundle.stop();
-   }
+        return getRuntime().getBundle(providerBundle.getBundleId());
+    }
 
-   @Override
-   protected void uninstallInternal() throws BundleException
-   {
-      assertNotUninstalled();
-      bundle.uninstall();
-      OSGiRuntimeImpl runtimeImpl = (OSGiRuntimeImpl)getRuntime();
-      runtimeImpl.unregisterBundle(this);
-   }
+    @Override
+    protected void startInternal() throws BundleException {
+        bundle.start();
+    }
 
-   private PackageAdmin getPackageAdmin()
-   {
-      BundleContext context = ((EmbeddedRuntimeImpl)getRuntime()).getSystemContext();
-      ServiceReference sref = context.getServiceReference(PackageAdmin.class.getName());
-      return (PackageAdmin)context.getService(sref);
-   }
+    @Override
+    protected void stopInternal() throws BundleException {
+        bundle.stop();
+    }
+
+    @Override
+    protected void uninstallInternal() throws BundleException {
+        assertNotUninstalled();
+        bundle.uninstall();
+        OSGiRuntimeImpl runtimeImpl = (OSGiRuntimeImpl) getRuntime();
+        runtimeImpl.unregisterBundle(this);
+    }
+
+    private PackageAdmin getPackageAdmin() {
+        BundleContext context = ((EmbeddedRuntimeImpl) getRuntime()).getSystemContext();
+        ServiceReference sref = context.getServiceReference(PackageAdmin.class.getName());
+        return (PackageAdmin) context.getService(sref);
+    }
 }

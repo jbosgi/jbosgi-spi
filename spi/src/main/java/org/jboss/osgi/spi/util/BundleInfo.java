@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.util;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -39,382 +38,328 @@ import org.osgi.framework.Version;
 
 /**
  * Primitive access to bundle meta data and root virtual file.
- *
- * The bundle info can be constructed from various locations.
- * If that succeeds, there is a valid OSGi Manifest.
- *
+ * 
+ * The bundle info can be constructed from various locations. If that succeeds, there is a valid OSGi Manifest.
+ * 
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
-public class BundleInfo implements Serializable
-{
-   /** The fallback {@link Constants#BUNDLE_SYMBOLICNAME} for a v4.1 bundle */
-   final String ANONYMOUS_BUNDLE_SYMBOLIC_NAME = "anonymous-bundle-symbolic-name";
+public class BundleInfo implements Serializable {
 
-   private static final long serialVersionUID = -2363297020450715134L;
+    /** The fallback {@link Constants#BUNDLE_SYMBOLICNAME} for a v4.1 bundle */
+    final String ANONYMOUS_BUNDLE_SYMBOLIC_NAME = "anonymous-bundle-symbolic-name";
 
-   private URL rootURL;
-   private String location;
-   private String symbolicName;
-   private String bundleVersion;
+    private static final long serialVersionUID = -2363297020450715134L;
 
-   private transient VirtualFile rootFile;
-   private transient Manifest manifest;
+    private URL rootURL;
+    private String location;
+    private String symbolicName;
+    private String bundleVersion;
 
-   public static BundleInfo createBundleInfo(String location) throws BundleException
-   {
-      if (location == null)
-         throw new IllegalArgumentException("Location cannot be null");
+    private transient VirtualFile rootFile;
+    private transient Manifest manifest;
 
-      URL url = getRealLocation(location);
-      if (url == null)
-         throw new IllegalArgumentException("Cannot obtain real location for: " + location);
+    public static BundleInfo createBundleInfo(String location) throws BundleException {
+        if (location == null)
+            throw new IllegalArgumentException("Location cannot be null");
 
-      return new BundleInfo(toVirtualFile(url), url.toExternalForm());
-   }
+        URL url = getRealLocation(location);
+        if (url == null)
+            throw new IllegalArgumentException("Cannot obtain real location for: " + location);
 
-   public static BundleInfo createBundleInfo(URL url) throws BundleException
-   {
-      if (url == null)
-         throw new IllegalArgumentException("Null root url");
+        return new BundleInfo(toVirtualFile(url), url.toExternalForm());
+    }
 
-      return new BundleInfo(toVirtualFile(url), url.toExternalForm());
-   }
+    public static BundleInfo createBundleInfo(URL url) throws BundleException {
+        if (url == null)
+            throw new IllegalArgumentException("Null root url");
 
-   public static BundleInfo createBundleInfo(VirtualFile root) throws BundleException
-   {
-      return new BundleInfo(root, null);
-   }
+        return new BundleInfo(toVirtualFile(url), url.toExternalForm());
+    }
 
-   public static BundleInfo createBundleInfo(VirtualFile root, String location) throws BundleException
-   {
-      return new BundleInfo(root, location);
-   }
+    public static BundleInfo createBundleInfo(VirtualFile root) throws BundleException {
+        return new BundleInfo(root, null);
+    }
 
-   private BundleInfo(VirtualFile rootFile, String location) throws BundleException
-   {
-      if (rootFile == null)
-         throw new IllegalArgumentException("Root file cannot be null");
+    public static BundleInfo createBundleInfo(VirtualFile root, String location) throws BundleException {
+        return new BundleInfo(root, location);
+    }
 
-      this.rootFile = rootFile;
-      this.rootURL = toURL(rootFile);
+    private BundleInfo(VirtualFile rootFile, String location) throws BundleException {
+        if (rootFile == null)
+            throw new IllegalArgumentException("Root file cannot be null");
 
-      // Derive the location from the root
-      if (location == null)
-         location = rootURL.toExternalForm();
+        this.rootFile = rootFile;
+        this.rootURL = toURL(rootFile);
 
-      this.location = location;
+        // Derive the location from the root
+        if (location == null)
+            location = rootURL.toExternalForm();
 
-      // Initialize the manifest
-      try
-      {
-         manifest = VFSUtils.getManifest(rootFile);
-         if (manifest == null)
-            throw new BundleException("Cannot get manifest from: " + rootURL);
-      }
-      catch (IOException ex)
-      {
-         throw new BundleException("Cannot get manifest from: " + rootURL, ex);
-      }
+        this.location = location;
 
-      // Validate the manifest
-      validateBundleManifest(manifest);
+        // Initialize the manifest
+        try {
+            manifest = VFSUtils.getManifest(rootFile);
+            if (manifest == null)
+                throw new BundleException("Cannot get manifest from: " + rootURL);
+        } catch (IOException ex) {
+            throw new BundleException("Cannot get manifest from: " + rootURL, ex);
+        }
 
-      int manifestVersion = getBundleManifestVersion(manifest);
-      symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
-      bundleVersion = getManifestHeader(Constants.BUNDLE_VERSION);
+        // Validate the manifest
+        validateBundleManifest(manifest);
 
-      // R3 Framework
-      if (manifestVersion == 1)
-      {
-         // Generate default symbolic name
-         symbolicName = ANONYMOUS_BUNDLE_SYMBOLIC_NAME;
+        int manifestVersion = getBundleManifestVersion(manifest);
+        symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
+        bundleVersion = getManifestHeader(Constants.BUNDLE_VERSION);
 
-         // Parse the Bundle-Version string
-         try
-         {
-            bundleVersion = Version.parseVersion(bundleVersion).toString();
-         }
-         catch (NumberFormatException ex)
-         {
-            // Install expected to succeed on invalid Bundle-Version
-            // https://www.osgi.org/members/bugzilla/show_bug.cgi?id=1503
-            bundleVersion = Version.emptyVersion.toString();
-         }
-      }
-   }
+        // R3 Framework
+        if (manifestVersion == 1) {
+            // Generate default symbolic name
+            symbolicName = ANONYMOUS_BUNDLE_SYMBOLIC_NAME;
 
-   /**
-    * Validate manifest from the given virtual file.
-    * @param virtualFile The virtualFile that is checked for a valid manifest
-    * @return True if the virtualFile conatains a valid manifest
-    */
-   public static boolean isValidBundle(VirtualFile virtualFile)
-   {
-      try
-      {
-         Manifest manifest = VFSUtils.getManifest(virtualFile);
-         return isValidateBundleManifest(manifest);
-      }
-      catch (IOException e)
-      {
-         return false;
-      }
-   }
+            // Parse the Bundle-Version string
+            try {
+                bundleVersion = Version.parseVersion(bundleVersion).toString();
+            } catch (NumberFormatException ex) {
+                // Install expected to succeed on invalid Bundle-Version
+                // https://www.osgi.org/members/bugzilla/show_bug.cgi?id=1503
+                bundleVersion = Version.emptyVersion.toString();
+            }
+        }
+    }
 
-   /**
-    * Validate a given bundle manifest.
-    * @param manifest The given manifest
-    * @return True if the manifest is valid
-    */
-   public static boolean isValidateBundleManifest(Manifest manifest)
-   {
-      if (manifest == null)
-         return false;
+    /**
+     * Validate manifest from the given virtual file.
+     * 
+     * @param virtualFile The virtualFile that is checked for a valid manifest
+     * @return True if the virtualFile conatains a valid manifest
+     */
+    public static boolean isValidBundle(VirtualFile virtualFile) {
+        try {
+            Manifest manifest = VFSUtils.getManifest(virtualFile);
+            return isValidateBundleManifest(manifest);
+        } catch (IOException e) {
+            return false;
+        }
+    }
 
-      try
-      {
-         validateBundleManifest(manifest);
-         return true;
-      }
-      catch (BundleException e)
-      {
-         return false;
-      }
-   }
+    /**
+     * Validate a given bundle manifest.
+     * 
+     * @param manifest The given manifest
+     * @return True if the manifest is valid
+     */
+    public static boolean isValidateBundleManifest(Manifest manifest) {
+        if (manifest == null)
+            return false;
 
-   /**
-    * Validate a given bundle manifest.
-    * @param manifest The given manifest
-    * @throws BundleException if this is not a valid bundle manifest
-    */
-   public static void validateBundleManifest(Manifest manifest) throws BundleException
-   {
-      // A bundle manifest must express the version of the OSGi manifest header
-      // syntax in the Bundle-ManifestVersion header. Bundles exploiting this version
-      // of the Framework specification (or later) must specify this header.
-      // The Framework version 1.3 (or later) bundle manifest version must be ’2’.
-      // Bundle manifests written to previous specifications’ manifest syntax are
-      // taken to have a bundle manifest version of '1', although there is no way to
-      // express this in such manifests.
-      int manifestVersion = getBundleManifestVersion(manifest);
-      if (manifestVersion < 0)
-         throw new BundleException("Cannot determine Bundle-ManifestVersion");
-      if (manifestVersion > 2)
-         throw new BundleException("Unsupported Bundle-ManifestVersion: " + manifestVersion);
+        try {
+            validateBundleManifest(manifest);
+            return true;
+        } catch (BundleException e) {
+            return false;
+        }
+    }
 
-      String symbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
-      String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
+    /**
+     * Validate a given bundle manifest.
+     * 
+     * @param manifest The given manifest
+     * @throws BundleException if this is not a valid bundle manifest
+     */
+    public static void validateBundleManifest(Manifest manifest) throws BundleException {
+        // A bundle manifest must express the version of the OSGi manifest header
+        // syntax in the Bundle-ManifestVersion header. Bundles exploiting this version
+        // of the Framework specification (or later) must specify this header.
+        // The Framework version 1.3 (or later) bundle manifest version must be ’2’.
+        // Bundle manifests written to previous specifications’ manifest syntax are
+        // taken to have a bundle manifest version of '1', although there is no way to
+        // express this in such manifests.
+        int manifestVersion = getBundleManifestVersion(manifest);
+        if (manifestVersion < 0)
+            throw new BundleException("Cannot determine Bundle-ManifestVersion");
+        if (manifestVersion > 2)
+            throw new BundleException("Unsupported Bundle-ManifestVersion: " + manifestVersion);
 
-      // R3 Framework
-      if (manifestVersion == 1 && symbolicName != null)
-         throw new BundleException("Invalid Bundle-ManifestVersion:=1 for " + symbolicName);
+        String symbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
+        String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
 
-      // R4 Framework
-      if (manifestVersion == 2)
-      {
-         if (symbolicName == null)
-            throw new BundleException("Cannot obtain Bundle-SymbolicName");
+        // R3 Framework
+        if (manifestVersion == 1 && symbolicName != null)
+            throw new BundleException("Invalid Bundle-ManifestVersion:=1 for " + symbolicName);
 
-         // Parse the Bundle-Version string
-         Version.parseVersion(bundleVersion).toString();
-      }
-   }
+        // R4 Framework
+        if (manifestVersion == 2) {
+            if (symbolicName == null)
+                throw new BundleException("Cannot obtain Bundle-SymbolicName");
 
-   /**
-    * Get the bundle manifest version.
-    * @param manifest The given manifest
-    * @return The value of the Bundle-ManifestVersion header, or -1 for a non OSGi manifest
-    */
-   public static int getBundleManifestVersion(Manifest manifest)
-   {
-      if (manifest == null)
-         throw new IllegalArgumentException("Null manifest");
+            // Parse the Bundle-Version string
+            Version.parseVersion(bundleVersion).toString();
+        }
+    }
 
-      // At least one of these manifest headers must be there
-      // Note, in R3 and R4 there is no common mandatory header
-      String bundleName = getManifestHeaderInternal(manifest, Constants.BUNDLE_NAME);
-      String bundleSymbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
-      String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
+    /**
+     * Get the bundle manifest version.
+     * 
+     * @param manifest The given manifest
+     * @return The value of the Bundle-ManifestVersion header, or -1 for a non OSGi manifest
+     */
+    public static int getBundleManifestVersion(Manifest manifest) {
+        if (manifest == null)
+            throw new IllegalArgumentException("Null manifest");
 
-      if (bundleName == null && bundleSymbolicName == null && bundleVersion == null)
-         return -1;
+        // At least one of these manifest headers must be there
+        // Note, in R3 and R4 there is no common mandatory header
+        String bundleName = getManifestHeaderInternal(manifest, Constants.BUNDLE_NAME);
+        String bundleSymbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
+        String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
 
-      String manifestVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_MANIFESTVERSION);
-      return manifestVersion != null ? Integer.parseInt(manifestVersion) : 1;
-   }
+        if (bundleName == null && bundleSymbolicName == null && bundleVersion == null)
+            return -1;
 
-   /**
-    * Get the manifest header for the given key.
-    */
-   public String getManifestHeader(String key)
-   {
-      String value = getManifestHeaderInternal(getManifest(), key);
-      return value;
-   }
+        String manifestVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_MANIFESTVERSION);
+        return manifestVersion != null ? Integer.parseInt(manifestVersion) : 1;
+    }
 
-   /**
-    * Get the bundle location
-    */
-   public String getLocation()
-   {
-      return location;
-   }
+    /**
+     * Get the manifest header for the given key.
+     */
+    public String getManifestHeader(String key) {
+        String value = getManifestHeaderInternal(getManifest(), key);
+        return value;
+    }
 
-   /**
-    * Get the bundle root file
-    */
-   public VirtualFile getRoot()
-   {
-      if (rootFile == null)
-         rootFile = toVirtualFile(rootURL);
+    /**
+     * Get the bundle location
+     */
+    public String getLocation() {
+        return location;
+    }
 
-      return rootFile;
-   }
+    /**
+     * Get the bundle root file
+     */
+    public VirtualFile getRoot() {
+        if (rootFile == null)
+            rootFile = toVirtualFile(rootURL);
 
-   /**
-    * Get the bundle root url
-    */
-   public URL getRootURL()
-   {
-      return toURL(getRoot());
-   }
+        return rootFile;
+    }
 
-   /**
-    * Get the bundle symbolic name
-    */
-   public String getSymbolicName()
-   {
-      return symbolicName;
-   }
+    /**
+     * Get the bundle root url
+     */
+    public URL getRootURL() {
+        return toURL(getRoot());
+    }
 
-   /**
-    * Get the bundle version
-    */
-   public Version getVersion()
-   {
-      return Version.parseVersion(bundleVersion);
-   }
+    /**
+     * Get the bundle symbolic name
+     */
+    public String getSymbolicName() {
+        return symbolicName;
+    }
 
-   /**
-    * Closes the accociated resources.
-    */
-   public void close()
-   {
-      if (rootFile != null)
-         VFSUtils.safeClose(rootFile);
-   }
+    /**
+     * Get the bundle version
+     */
+    public Version getVersion() {
+        return Version.parseVersion(bundleVersion);
+    }
 
-   public Manifest getManifest()
-   {
-      if (manifest == null)
-      {
-         try
-         {
-            manifest = VFSUtils.getManifest(getRoot());
-         }
-         catch (Exception ex)
-         {
-            throw new IllegalStateException("Cannot get manifest from: " + rootURL, ex);
-         }
-      }
-      return manifest;
-   }
+    /**
+     * Closes the accociated resources.
+     */
+    public void close() {
+        if (rootFile != null)
+            VFSUtils.safeClose(rootFile);
+    }
 
-   private static VirtualFile toVirtualFile(URL url)
-   {
-      try
-      {
-         return AbstractVFS.toVirtualFile(url);
-      }
-      catch (IOException e)
-      {
-         throw new IllegalArgumentException("Invalid root url: " + url, e);
-      }
-   }
+    public Manifest getManifest() {
+        if (manifest == null) {
+            try {
+                manifest = VFSUtils.getManifest(getRoot());
+            } catch (Exception ex) {
+                throw new IllegalStateException("Cannot get manifest from: " + rootURL, ex);
+            }
+        }
+        return manifest;
+    }
 
-   private static URL getRealLocation(String location)
-   {
-      // Try location as URL
-      URL url = null;
-      try
-      {
-         url = new URL(location);
-      }
-      catch (MalformedURLException ex)
-      {
-         // ignore
-      }
+    private static VirtualFile toVirtualFile(URL url) {
+        try {
+            return AbstractVFS.toVirtualFile(url);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Invalid root url: " + url, e);
+        }
+    }
 
-      // Try location as File
-      if (url == null)
-      {
-         try
-         {
-            File file = new File(location);
-            if (file.exists())
-               url = file.toURI().toURL();
-         }
-         catch (MalformedURLException e)
-         {
+    private static URL getRealLocation(String location) {
+        // Try location as URL
+        URL url = null;
+        try {
+            url = new URL(location);
+        } catch (MalformedURLException ex) {
             // ignore
-         }
-      }
+        }
 
-      // Try to prefix the location with the test archive directory
-      if (url == null)
-      {
-         String prefix = System.getProperty("test.archive.directory", "target/test-libs");
-         if (location.startsWith(prefix) == false && new File(prefix).exists())
-            return getRealLocation(prefix + File.separator + location);
-      }
+        // Try location as File
+        if (url == null) {
+            try {
+                File file = new File(location);
+                if (file.exists())
+                    url = file.toURI().toURL();
+            } catch (MalformedURLException e) {
+                // ignore
+            }
+        }
 
-      return url;
-   }
+        // Try to prefix the location with the test archive directory
+        if (url == null) {
+            String prefix = System.getProperty("test.archive.directory", "target/test-libs");
+            if (location.startsWith(prefix) == false && new File(prefix).exists())
+                return getRealLocation(prefix + File.separator + location);
+        }
 
-   private static URL toURL(VirtualFile file)
-   {
-      try
-      {
-         return file.toURL();
-      }
-      catch (Exception e)
-      {
-         throw new IllegalArgumentException("Invalid root file: " + file);
-      }
-   }
+        return url;
+    }
 
-   private String toEqualString()
-   {
-      return "[" + symbolicName + ":" + bundleVersion + ",url=" + rootURL + "]";
-   }
+    private static URL toURL(VirtualFile file) {
+        try {
+            return file.toURL();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid root file: " + file);
+        }
+    }
 
-   private static String getManifestHeaderInternal(Manifest manifest, String key)
-   {
-      Attributes attribs = manifest.getMainAttributes();
-      String value = attribs.getValue(key);
-      return value;
-   }
+    private String toEqualString() {
+        return "[" + symbolicName + ":" + bundleVersion + ",url=" + rootURL + "]";
+    }
 
-   @Override
-   public boolean equals(Object obj)
-   {
-      if (!(obj instanceof BundleInfo))
-         return false;
+    private static String getManifestHeaderInternal(Manifest manifest, String key) {
+        Attributes attribs = manifest.getMainAttributes();
+        String value = attribs.getValue(key);
+        return value;
+    }
 
-      BundleInfo other = (BundleInfo)obj;
-      return toEqualString().equals(other.toEqualString());
-   }
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BundleInfo))
+            return false;
 
-   @Override
-   public int hashCode()
-   {
-      return toEqualString().hashCode();
-   }
+        BundleInfo other = (BundleInfo) obj;
+        return toEqualString().equals(other.toEqualString());
+    }
 
-   @Override
-   public String toString()
-   {
-      return toEqualString();
-   }
+    @Override
+    public int hashCode() {
+        return toEqualString().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return toEqualString();
+    }
 }

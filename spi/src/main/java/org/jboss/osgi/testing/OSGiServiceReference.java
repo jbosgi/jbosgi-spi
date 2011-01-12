@@ -23,25 +23,23 @@ package org.jboss.osgi.testing;
 
 import org.osgi.framework.ServiceReference;
 
-
 /**
  * An abstraction of the OSGi {@link ServiceReference}
  * 
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public interface OSGiServiceReference
-{
-   /**
-    * Returns the property value to which the specified property key is mapped 
-    * in the properties Dictionary object of the service referenced by this 
-    * ServiceReference object.
-    */
-   Object getProperty(String key);
-   
-   /**
-    * Returns an array of the keys in the properties Dictionary 
-    * object of the service referenced by this ServiceReference  object. 
-    */
-   String[] getPropertyKeys();
+public interface OSGiServiceReference {
+
+    /**
+     * Returns the property value to which the specified property key is mapped in the properties Dictionary object of the
+     * service referenced by this ServiceReference object.
+     */
+    Object getProperty(String key);
+
+    /**
+     * Returns an array of the keys in the properties Dictionary object of the service referenced by this ServiceReference
+     * object.
+     */
+    String[] getPropertyKeys();
 }

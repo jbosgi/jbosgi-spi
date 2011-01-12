@@ -58,239 +58,188 @@ import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
  * A remote implementation of the {@link OSGiRuntime}
- *
+ * 
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRuntime
-{
-   // Provide logging
-   private static final Logger log = Logger.getLogger(RemoteRuntimeImpl.class);
+public class RemoteRuntimeImpl extends OSGiRuntimeImpl implements OSGiRemoteRuntime {
 
-   private JMXConnector jmxConnector;
-   private OSGiDeployerClient deployerClient;
+    // Provide logging
+    private static final Logger log = Logger.getLogger(RemoteRuntimeImpl.class);
 
-   public RemoteRuntimeImpl(OSGiRuntimeHelper helper)
-   {
-      super(helper);
-   }
+    private JMXConnector jmxConnector;
+    private OSGiDeployerClient deployerClient;
 
-   @Override
-   public boolean isRemoteRuntime()
-   {
-      return true;
-   }
+    public RemoteRuntimeImpl(OSGiRuntimeHelper helper) {
+        super(helper);
+    }
 
-   @Override
-   OSGiBundle installBundleInternal(BundleInfo info) throws BundleException
-   {
-      try
-      {
-         String location = info.getLocation();
-         String streamURL = info.getRoot().getStreamURL().toExternalForm();
-         long bundleId = getFrameworkMBean().installBundleFromURL(location, streamURL);
-         return new RemoteBundle(this, bundleId);
-      }
-      catch (RuntimeException rte)
-      {
-         throw rte;
-      }
-      catch (Exception ex)
-      {
-         throw new BundleException("Cannot install: " + info, ex);
-      }
-   }
+    @Override
+    public boolean isRemoteRuntime() {
+        return true;
+    }
 
+    @Override
+    OSGiBundle installBundleInternal(BundleInfo info) throws BundleException {
+        try {
+            String location = info.getLocation();
+            String streamURL = info.getRoot().getStreamURL().toExternalForm();
+            long bundleId = getFrameworkMBean().installBundleFromURL(location, streamURL);
+            return new RemoteBundle(this, bundleId);
+        } catch (RuntimeException rte) {
+            throw rte;
+        } catch (Exception ex) {
+            throw new BundleException("Cannot install: " + info, ex);
+        }
+    }
 
-   @Override
-   public String deploy(String location) throws Exception
-   {
-      URL archiveURL = OSGiTestHelper.getTestArchiveURL(location);
-      return getDeployerClient().deploy(archiveURL);
-   }
+    @Override
+    public String deploy(String location) throws Exception {
+        URL archiveURL = OSGiTestHelper.getTestArchiveURL(location);
+        return getDeployerClient().deploy(archiveURL);
+    }
 
-   @Override
-   public String deploy(JavaArchive archive) throws Exception
-   {
-      InputStream input = OSGiTestHelper.toInputStream(archive);
-      return getDeployerClient().deploy(archive.getName(), input);
-   }
+    @Override
+    public String deploy(JavaArchive archive) throws Exception {
+        InputStream input = OSGiTestHelper.toInputStream(archive);
+        return getDeployerClient().deploy(archive.getName(), input);
+    }
 
-   @Override
-   public void undeploy(String uniqueName) throws Exception
-   {
-      getDeployerClient().undeploy(uniqueName);
-   }
+    @Override
+    public void undeploy(String uniqueName) throws Exception {
+        getDeployerClient().undeploy(uniqueName);
+    }
 
-   @Override
-   public OSGiBundle[] getBundles()
-   {
-      Set<OSGiBundle> bundles = new HashSet<OSGiBundle>();
-      try
-      {
-         TabularData listBundles = getBundleStateMBean().listBundles();
-         Iterator<?> iterator = listBundles.values().iterator();
-         while (iterator.hasNext())
-         {
-            CompositeData bundleType = (CompositeData)iterator.next();
-            Long bundleId = (Long)bundleType.get(BundleStateMBean.IDENTIFIER);
-            try
-            {
-               bundles.add(new RemoteBundle(this, bundleId));
+    @Override
+    public OSGiBundle[] getBundles() {
+        Set<OSGiBundle> bundles = new HashSet<OSGiBundle>();
+        try {
+            TabularData listBundles = getBundleStateMBean().listBundles();
+            Iterator<?> iterator = listBundles.values().iterator();
+            while (iterator.hasNext()) {
+                CompositeData bundleType = (CompositeData) iterator.next();
+                Long bundleId = (Long) bundleType.get(BundleStateMBean.IDENTIFIER);
+                try {
+                    bundles.add(new RemoteBundle(this, bundleId));
+                } catch (IOException ex) {
+                    log.warn("Cannot initialize remote bundle: [" + bundleId + "] - " + ex.getMessage());
+                }
             }
-            catch (IOException ex)
-            {
-               log.warn("Cannot initialize remote bundle: [" + bundleId + "] - " + ex.getMessage());
+            OSGiBundle[] bundleArr = new OSGiBundle[bundles.size()];
+            bundles.toArray(bundleArr);
+            return bundleArr;
+        } catch (RuntimeException rte) {
+            throw rte;
+        } catch (Exception ex) {
+            throw new IllegalStateException("Cannot obtain remote bundles", ex);
+        }
+    }
+
+    @Override
+    public OSGiBundle getBundle(long bundleId) {
+        for (OSGiBundle bundle : getBundles()) {
+            if (bundleId == bundle.getBundleId())
+                return bundle;
+        }
+        return null;
+    }
+
+    @Override
+    public OSGiServiceReference getServiceReference(String clazz) {
+        CompositeData serviceData;
+        TabularData propertiesData;
+        try {
+            ServiceStateMBeanExt serviceState = getServiceStateMBeanExt();
+            serviceData = serviceState.getService(clazz);
+            if (serviceData == null)
+                return null;
+
+            Long serviceId = (Long) serviceData.get(ServiceStateMBean.IDENTIFIER);
+            propertiesData = serviceState.getProperties(serviceId);
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        }
+        return new RemoteServiceReference(serviceData, propertiesData);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public OSGiServiceReference[] getServiceReferences(String clazz, String filter) {
+        TabularData servicesData;
+        List<OSGiServiceReference> srefs;
+        try {
+            ServiceStateMBeanExt serviceState = getServiceStateMBeanExt();
+            servicesData = serviceState.getServices(clazz, filter);
+            if (servicesData == null)
+                return null;
+
+            srefs = new ArrayList<OSGiServiceReference>();
+            for (CompositeData serviceData : (Collection<CompositeData>) servicesData.values()) {
+                Long serviceId = (Long) serviceData.get(ServiceStateMBean.IDENTIFIER);
+                TabularData propertiesData = serviceState.getProperties(serviceId);
+                srefs.add(new RemoteServiceReference(serviceData, propertiesData));
             }
-         }
-         OSGiBundle[] bundleArr = new OSGiBundle[bundles.size()];
-         bundles.toArray(bundleArr);
-         return bundleArr;
-      }
-      catch (RuntimeException rte)
-      {
-         throw rte;
-      }
-      catch (Exception ex)
-      {
-         throw new IllegalStateException("Cannot obtain remote bundles", ex);
-      }
-   }
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        }
+        return srefs.toArray(new OSGiServiceReference[servicesData.size()]);
+    }
 
-   @Override
-   public OSGiBundle getBundle(long bundleId)
-   {
-      for (OSGiBundle bundle : getBundles())
-      {
-         if (bundleId == bundle.getBundleId())
-            return bundle;
-      }
-      return null;
-   }
+    private ServiceStateMBeanExt getServiceStateMBeanExt() {
+        ObjectName objectName = ObjectNameFactory.create(ServiceStateMBeanExt.OBJECTNAME);
+        return MBeanProxy.get(getMBeanServer(), objectName, ServiceStateMBeanExt.class);
+    }
 
-   @Override
-   public OSGiServiceReference getServiceReference(String clazz)
-   {
-      CompositeData serviceData;
-      TabularData propertiesData;
-      try
-      {
-         ServiceStateMBeanExt serviceState = getServiceStateMBeanExt();
-         serviceData = serviceState.getService(clazz);
-         if (serviceData == null)
-            return null;
+    @Override
+    public MBeanServerConnection getMBeanServer() {
+        try {
+            if (jmxConnector == null) {
+                String urlString = System.getProperty("jmx.service.url", "service:jmx:rmi:///jndi/rmi://" + getServerHost() + ":1090/jmxrmi");
+                JMXServiceURL serviceURL = new JMXServiceURL(urlString);
+                jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
+            }
+            return jmxConnector.getMBeanServerConnection();
+        } catch (IOException ex) {
+            throw new IllegalStateException("Cannot obtain MBeanServerConnection", ex);
+        }
+    }
 
-         Long serviceId = (Long)serviceData.get(ServiceStateMBean.IDENTIFIER);
-         propertiesData = serviceState.getProperties(serviceId);
-      }
-      catch (IOException ex)
-      {
-         throw new IllegalStateException(ex);
-      }
-      return new RemoteServiceReference(serviceData, propertiesData);
-   }
+    @Override
+    public void refreshPackages(OSGiBundle[] bundles) throws IOException {
+        long[] bundleIds = null;
+        if (bundles != null) {
+            bundleIds = new long[bundles.length];
+            for (int i = 0; i < bundles.length; i++)
+                bundleIds[i] = bundles[i].getBundleId();
+        }
+        try {
+            // This is an asynchronous opertation. Give it some time
+            // [JBOSGI-381] Make it possible to listen to remote framework events
+            getFrameworkMBean().refreshBundles(bundleIds);
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+            // ignore
+        }
+    }
 
-   @Override
-   @SuppressWarnings("unchecked")
-   public OSGiServiceReference[] getServiceReferences(String clazz, String filter)
-   {
-      TabularData servicesData;
-      List<OSGiServiceReference> srefs;
-      try
-      {
-         ServiceStateMBeanExt serviceState = getServiceStateMBeanExt();
-         servicesData = serviceState.getServices(clazz, filter);
-         if (servicesData == null)
-            return null;
+    @Override
+    public void shutdown() {
+        super.shutdown();
 
-         srefs = new ArrayList<OSGiServiceReference>();
-         for (CompositeData serviceData : (Collection<CompositeData>)servicesData.values())
-         {
-            Long serviceId = (Long)serviceData.get(ServiceStateMBean.IDENTIFIER);
-            TabularData propertiesData = serviceState.getProperties(serviceId);
-            srefs.add(new RemoteServiceReference(serviceData, propertiesData));
-         }
-      }
-      catch (IOException ex)
-      {
-         throw new IllegalStateException(ex);
-      }
-      return srefs.toArray(new OSGiServiceReference[servicesData.size()]);
-   }
+        // Close the JMXConnector
+        if (jmxConnector != null) {
+            try {
+                jmxConnector.close();
+            } catch (IOException ex) {
+                log.warn("Cannot close JMXConnector", ex);
+            }
+        }
+    }
 
-   private ServiceStateMBeanExt getServiceStateMBeanExt()
-   {
-      ObjectName objectName = ObjectNameFactory.create(ServiceStateMBeanExt.OBJECTNAME);
-      return MBeanProxy.get(getMBeanServer(), objectName, ServiceStateMBeanExt.class);
-   }
-
-   @Override
-   public MBeanServerConnection getMBeanServer()
-   {
-      try
-      {
-         if (jmxConnector == null)
-         {
-            String urlString = System.getProperty("jmx.service.url", "service:jmx:rmi:///jndi/rmi://" + getServerHost() + ":1090/jmxrmi");
-            JMXServiceURL serviceURL = new JMXServiceURL(urlString);
-            jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
-         }
-         return jmxConnector.getMBeanServerConnection();
-      }
-      catch (IOException ex)
-      {
-         throw new IllegalStateException("Cannot obtain MBeanServerConnection", ex);
-      }
-   }
-
-   @Override
-   public void refreshPackages(OSGiBundle[] bundles) throws IOException
-   {
-      long[] bundleIds = null;
-      if (bundles != null)
-      {
-         bundleIds = new long[bundles.length];
-         for (int i = 0; i < bundles.length; i++)
-            bundleIds[i] = bundles[i].getBundleId();
-      }
-      try
-      {
-         // This is an asynchronous opertation. Give it some time
-         // [JBOSGI-381] Make it possible to listen to remote framework events
-         getFrameworkMBean().refreshBundles(bundleIds);
-         Thread.sleep(2000);
-      }
-      catch (InterruptedException ex)
-      {
-         // ignore
-      }
-   }
-
-   @Override
-   public void shutdown()
-   {
-      super.shutdown();
-
-      // Close the JMXConnector
-      if (jmxConnector != null)
-      {
-         try
-         {
-            jmxConnector.close();
-         }
-         catch (IOException ex)
-         {
-            log.warn("Cannot close JMXConnector", ex);
-         }
-      }
-   }
-
-   private OSGiDeployerClient getDeployerClient()
-   {
-      if (deployerClient == null)
-      {
-         deployerClient = OSGiDeployerClient.Factory.getDeployerClient();
-      }
-      return deployerClient;
-   }
+    private OSGiDeployerClient getDeployerClient() {
+        if (deployerClient == null) {
+            deployerClient = OSGiDeployerClient.Factory.getDeployerClient();
+        }
+        return deployerClient;
+    }
 }

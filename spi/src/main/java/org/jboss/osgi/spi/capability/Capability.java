@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.capability;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,211 +39,182 @@ import org.osgi.framework.Version;
 /**
  * An abstract OSGi capability that can be installed in an OSGiRuntime.
  * 
- * The capability is only installed if the service name given in the constructor is not already registered with the OSGi framework.
+ * The capability is only installed if the service name given in the constructor is not already registered with the OSGi
+ * framework.
  * 
- * It maintains an ordered set of dependent capabilities and bundles that must be installed to provide the functionality advertised by this capability.
+ * It maintains an ordered set of dependent capabilities and bundles that must be installed to provide the functionality
+ * advertised by this capability.
  * 
  * @author thomas.diesler@jboss.com
  * @since 05-May-2009
  */
-public abstract class Capability
-{
-   // Provide logging
-   private static final Logger log = Logger.getLogger(Capability.class);
+public abstract class Capability {
 
-   private String serviceName;
-   private String filter;
-   private Map<String, String> systemProperties;
+    // Provide logging
+    private static final Logger log = Logger.getLogger(Capability.class);
 
-   private List<Capability> dependencies;
-   private List<BundleInfo> bundles;
-   private List<OSGiBundle> installed = new ArrayList<OSGiBundle>();
+    private String serviceName;
+    private String filter;
+    private Map<String, String> systemProperties;
 
-   /**
-    * Construct a capability that is identified by the given service name. 
-    * 
-    * If the service name is already registered with the OSGiRuntime adding this capability
-    * does nothing.
-    * 
-    * If the service name is null the capability will install each associated bundle unless a bundle with the 
-    * same symbolic name is already installed. 
-    * 
-    * @param serviceName The service that would be registered by this capability.  
-    */
-   public Capability(String serviceName)
-   {
-      this(serviceName, null);
-   }
+    private List<Capability> dependencies;
+    private List<BundleInfo> bundles;
+    private List<OSGiBundle> installed = new ArrayList<OSGiBundle>();
 
-   /**
-    * Construct a capability that is identified by the given service name and filter string.
-    * 
-    * If the service is already registered with the OSGiRuntime adding this capability
-    * does nothing.
-    */
-   public Capability(String serviceName, String filter)
-   {
-      this.serviceName = serviceName;
-      this.filter = filter;
-   }
+    /**
+     * Construct a capability that is identified by the given service name.
+     * 
+     * If the service name is already registered with the OSGiRuntime adding this capability does nothing.
+     * 
+     * If the service name is null the capability will install each associated bundle unless a bundle with the same symbolic
+     * name is already installed.
+     * 
+     * @param serviceName The service that would be registered by this capability.
+     */
+    public Capability(String serviceName) {
+        this(serviceName, null);
+    }
 
-   /**
-    * Get the service name associated with this capability.
-    */
-   public String getServiceName()
-   {
-      return serviceName;
-   }
+    /**
+     * Construct a capability that is identified by the given service name and filter string.
+     * 
+     * If the service is already registered with the OSGiRuntime adding this capability does nothing.
+     */
+    public Capability(String serviceName, String filter) {
+        this.serviceName = serviceName;
+        this.filter = filter;
+    }
 
-   /**
-    * Get the filter that is used for service lookup.
-    */
-   public String getFilter()
-   {
-      return filter;
-   }
+    /**
+     * Get the service name associated with this capability.
+     */
+    public String getServiceName() {
+        return serviceName;
+    }
 
-   /**
-    * Set the filter that is used for service lookup.
-    */
-   public void setFilter(String filter)
-   {
-      this.filter = filter;
-   }
+    /**
+     * Get the filter that is used for service lookup.
+     */
+    public String getFilter() {
+        return filter;
+    }
 
-   /**
-    * Add a system property provided by this capability.
-    * 
-    * Adding this capability will set the associated system properties if a propperty is not set already.
-    */
-   public void addSystemProperty(String key, String value)
-   {
-      getPropertiesInternal().put(key, value);
-   }
+    /**
+     * Set the filter that is used for service lookup.
+     */
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
 
-   /**
-    * Get the system properties for this capability.
-    */
-   public Map<String, String> getSystemProperties()
-   {
-      return Collections.unmodifiableMap(getPropertiesInternal());
-   }
+    /**
+     * Add a system property provided by this capability.
+     * 
+     * Adding this capability will set the associated system properties if a propperty is not set already.
+     */
+    public void addSystemProperty(String key, String value) {
+        getPropertiesInternal().put(key, value);
+    }
 
-   public List<Capability> getDependencies()
-   {
-      return Collections.unmodifiableList(getDependenciesInternal());
-   }
+    /**
+     * Get the system properties for this capability.
+     */
+    public Map<String, String> getSystemProperties() {
+        return Collections.unmodifiableMap(getPropertiesInternal());
+    }
 
-   protected void addDependency(Capability dependency)
-   {
-      getDependenciesInternal().add(dependency);
-   }
+    public List<Capability> getDependencies() {
+        return Collections.unmodifiableList(getDependenciesInternal());
+    }
 
-   public List<BundleInfo> getBundles()
-   {
-      return Collections.unmodifiableList(getBundlesInternal());
-   }
+    protected void addDependency(Capability dependency) {
+        getDependenciesInternal().add(dependency);
+    }
 
-   protected void addBundle(String location)
-   {
-      BundleInfo info;
-      try
-      {
-         info = BundleInfo.createBundleInfo(location);
-      }
-      catch (BundleException ex)
-      {
-         Throwable cause = ex.getCause();
-         if (cause instanceof RuntimeException)
-            throw (RuntimeException)cause;
+    public List<BundleInfo> getBundles() {
+        return Collections.unmodifiableList(getBundlesInternal());
+    }
 
-         throw new IllegalArgumentException("Cannot create bundle info for: " + location, ex);
-      }
-      getBundlesInternal().add(info);
-   }
+    protected void addBundle(String location) {
+        BundleInfo info;
+        try {
+            info = BundleInfo.createBundleInfo(location);
+        } catch (BundleException ex) {
+            Throwable cause = ex.getCause();
+            if (cause instanceof RuntimeException)
+                throw (RuntimeException) cause;
 
-   private Map<String, String> getPropertiesInternal()
-   {
-      if (systemProperties == null)
-         systemProperties = new HashMap<String, String>();
+            throw new IllegalArgumentException("Cannot create bundle info for: " + location, ex);
+        }
+        getBundlesInternal().add(info);
+    }
 
-      return systemProperties;
-   }
+    private Map<String, String> getPropertiesInternal() {
+        if (systemProperties == null)
+            systemProperties = new HashMap<String, String>();
 
-   private List<Capability> getDependenciesInternal()
-   {
-      if (dependencies == null)
-         dependencies = new ArrayList<Capability>();
+        return systemProperties;
+    }
 
-      return dependencies;
-   }
+    private List<Capability> getDependenciesInternal() {
+        if (dependencies == null)
+            dependencies = new ArrayList<Capability>();
 
-   private List<BundleInfo> getBundlesInternal()
-   {
-      if (bundles == null)
-         bundles = new ArrayList<BundleInfo>();
+        return dependencies;
+    }
 
-      return bundles;
-   }
+    private List<BundleInfo> getBundlesInternal() {
+        if (bundles == null)
+            bundles = new ArrayList<BundleInfo>();
 
-   public List<OSGiBundle> getInstalledBundles()
-   {
-      return Collections.unmodifiableList(installed);
-   }
+        return bundles;
+    }
 
-   public void install(OSGiRuntime runtime) throws BundleException
-   {
-      log.debug("Install capability: " + this);
-      for (BundleInfo info : getBundles())
-      {
-         String location = info.getLocation();
-         String symName = info.getSymbolicName();
-         Version version = info.getVersion();
-         if (runtime.getBundle(symName, version) == null)
-         {
-            OSGiBundle bundle = runtime.installBundle(location);
-            installed.add(bundle);
-         }
-         else
-         {
-            log.debug("Skip bundle: " + location);
-         }
-      }
-   }
+    public List<OSGiBundle> getInstalledBundles() {
+        return Collections.unmodifiableList(installed);
+    }
 
-   public void start(OSGiRuntime runtime) throws BundleException
-   {
-      log.debug("Start capability: " + this);
-      for (OSGiBundle bundle : getInstalledBundles())
-      {
-         bundle.start();
-      }
-   }
+    public void install(OSGiRuntime runtime) throws BundleException {
+        log.debug("Install capability: " + this);
+        for (BundleInfo info : getBundles()) {
+            String location = info.getLocation();
+            String symName = info.getSymbolicName();
+            Version version = info.getVersion();
+            if (runtime.getBundle(symName, version) == null) {
+                OSGiBundle bundle = runtime.installBundle(location);
+                installed.add(bundle);
+            } else {
+                log.debug("Skip bundle: " + location);
+            }
+        }
+    }
 
-   public void stop(OSGiRuntime runtime)
-   {
-      log.debug("Stop capability: " + this);
-      List<OSGiBundle> installedReverse = new ArrayList<OSGiBundle>(getInstalledBundles());
-      Collections.reverse(installedReverse);
+    public void start(OSGiRuntime runtime) throws BundleException {
+        log.debug("Start capability: " + this);
+        for (OSGiBundle bundle : getInstalledBundles()) {
+            bundle.start();
+        }
+    }
 
-      for (OSGiBundle bundle : installedReverse)
-      {
-         if (bundle.getState() != Bundle.UNINSTALLED)
-            OSGiRuntimeHelper.failsafeStop(bundle);
-      }
-   }
+    public void stop(OSGiRuntime runtime) {
+        log.debug("Stop capability: " + this);
+        List<OSGiBundle> installedReverse = new ArrayList<OSGiBundle>(getInstalledBundles());
+        Collections.reverse(installedReverse);
 
-   public void uninstall(OSGiRuntime runtime)
-   {
-      log.debug("Uninstall capability: " + this);
-      List<OSGiBundle> installedReverse = new ArrayList<OSGiBundle>(getInstalledBundles());
-      Collections.reverse(installedReverse);
+        for (OSGiBundle bundle : installedReverse) {
+            if (bundle.getState() != Bundle.UNINSTALLED)
+                OSGiRuntimeHelper.failsafeStop(bundle);
+        }
+    }
 
-      for (OSGiBundle bundle : installedReverse)
-      {
-         if (bundle.getState() != Bundle.UNINSTALLED)
-            OSGiRuntimeHelper.failsafeUninstall(bundle);
-         installed.remove(bundle);
-      }
-   }
+    public void uninstall(OSGiRuntime runtime) {
+        log.debug("Uninstall capability: " + this);
+        List<OSGiBundle> installedReverse = new ArrayList<OSGiBundle>(getInstalledBundles());
+        Collections.reverse(installedReverse);
+
+        for (OSGiBundle bundle : installedReverse) {
+            if (bundle.getState() != Bundle.UNINSTALLED)
+                OSGiRuntimeHelper.failsafeUninstall(bundle);
+            installed.remove(bundle);
+        }
+    }
 }

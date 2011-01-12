@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.framework;
 
-
 /**
  * An OSGi Framework Exception that should be thrown on unrecoverable errors.
  * 
@@ -29,20 +28,17 @@ package org.jboss.osgi.spi.framework;
  * @since 18-Jan-2009
  */
 @SuppressWarnings("serial")
-public class FrameworkException extends RuntimeException
-{
-  public FrameworkException(String message)
-  {
-    super(message);
-  }
-  
-  public FrameworkException(String message, Throwable cause)
-  {
-    super(message, cause);
-  }
-  
-  public FrameworkException(Throwable cause)
-  {
-    super(cause);
-  }
+public class FrameworkException extends RuntimeException {
+
+    public FrameworkException(String message) {
+        super(message);
+    }
+
+    public FrameworkException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public FrameworkException(Throwable cause) {
+        super(cause);
+    }
 }

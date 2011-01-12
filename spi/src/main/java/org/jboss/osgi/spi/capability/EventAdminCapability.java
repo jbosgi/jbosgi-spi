@@ -21,11 +21,10 @@
  */
 package org.jboss.osgi.spi.capability;
 
-
 import org.osgi.service.event.EventAdmin;
 
 /**
- * Adds the OSGi compedium EventAdmin capability. 
+ * Adds the OSGi compedium EventAdmin capability.
  * 
  * It is ignored if the {@link EventAdmin} is already registered.
  * 
@@ -36,14 +35,13 @@ import org.osgi.service.event.EventAdmin;
  * @author thomas.diesler@jboss.com
  * @since 08-Dec-2009
  */
-public class EventAdminCapability extends Capability
-{
-   public EventAdminCapability()
-   {
-      super(EventAdmin.class.getName());
-      
-      addDependency(new LogServiceCapability());
-      
-      addBundle("bundles/org.apache.felix.eventadmin.jar");
-   }
+public class EventAdminCapability extends Capability {
+
+    public EventAdminCapability() {
+        super(EventAdmin.class.getName());
+
+        addDependency(new LogServiceCapability());
+
+        addBundle("bundles/org.apache.felix.eventadmin.jar");
+    }
 }

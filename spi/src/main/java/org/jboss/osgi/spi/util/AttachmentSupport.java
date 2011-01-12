@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.util;
 
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,79 +33,66 @@ import org.jboss.osgi.spi.Attachments;
  * @author Thomas.Diesler@jboss.com
  * @since 20-Apr-2007
  */
-public abstract class AttachmentSupport implements Attachments
-{
-   private Map<Key, Object> attachments = new HashMap<Key, Object>();
+public abstract class AttachmentSupport implements Attachments {
 
-   /** Construct with no attachments */
-   public AttachmentSupport()
-   {
-   }
+    private Map<Key, Object> attachments = new HashMap<Key, Object>();
 
-   /** Construct with given attachments */
-   public AttachmentSupport(AttachmentSupport att)
-   {
-      attachments = att.attachments;
-   }
+    /** Construct with no attachments */
+    public AttachmentSupport() {
+    }
 
-   public Collection<Key> getAttachmentKeys()
-   {
-      return attachments.keySet();
-   }
+    /** Construct with given attachments */
+    public AttachmentSupport(AttachmentSupport att) {
+        attachments = att.attachments;
+    }
 
-   @SuppressWarnings("unchecked")
-   public <T> T getAttachment(Class<T> clazz)
-   {
-      return (T)attachments.get(new Key(null, clazz));
-   }
+    public Collection<Key> getAttachmentKeys() {
+        return attachments.keySet();
+    }
 
-   @SuppressWarnings("unchecked")
-   public <T> T getAttachment(String name, Class<T> clazz)
-   {
-      return (T)attachments.get(new Key(name, clazz));
-   }
+    @SuppressWarnings("unchecked")
+    public <T> T getAttachment(Class<T> clazz) {
+        return (T) attachments.get(new Key(null, clazz));
+    }
 
-   public Object getAttachment(String name)
-   {
-      return attachments.get(new Key(name, null));
-   }
+    @SuppressWarnings("unchecked")
+    public <T> T getAttachment(String name, Class<T> clazz) {
+        return (T) attachments.get(new Key(name, clazz));
+    }
 
-   @SuppressWarnings("unchecked")
-   public <T> T addAttachment(Class<T> clazz, T obj)
-   {
-      return (T)attachments.put(new Key(null, clazz), obj);
-   }
+    public Object getAttachment(String name) {
+        return attachments.get(new Key(name, null));
+    }
 
-   @SuppressWarnings("unchecked")
-   public <T> T addAttachment(String name, T obj, Class<T> clazz)
-   {
-      return (T)attachments.put(new Key(name, clazz), obj);
-   }
+    @SuppressWarnings("unchecked")
+    public <T> T addAttachment(Class<T> clazz, T obj) {
+        return (T) attachments.put(new Key(null, clazz), obj);
+    }
 
-   public Object addAttachment(String name, Object obj)
-   {
-      return attachments.put(new Key(name, null), obj);
-   }
+    @SuppressWarnings("unchecked")
+    public <T> T addAttachment(String name, T obj, Class<T> clazz) {
+        return (T) attachments.put(new Key(name, clazz), obj);
+    }
 
-   @SuppressWarnings("unchecked")
-   public <T> T removeAttachment(Class<T> clazz)
-   {
-      return (T)attachments.remove(new Key(null, clazz));
-   }
+    public Object addAttachment(String name, Object obj) {
+        return attachments.put(new Key(name, null), obj);
+    }
 
-   @SuppressWarnings("unchecked")
-   public <T> T removeAttachment(Class<T> clazz, String name)
-   {
-      return (T)attachments.remove(new Key(name, clazz));
-   }
+    @SuppressWarnings("unchecked")
+    public <T> T removeAttachment(Class<T> clazz) {
+        return (T) attachments.remove(new Key(null, clazz));
+    }
 
-   public Object removeAttachment(String name)
-   {
-      return attachments.remove(new Key(name, null));
-   }
+    @SuppressWarnings("unchecked")
+    public <T> T removeAttachment(Class<T> clazz, String name) {
+        return (T) attachments.remove(new Key(name, clazz));
+    }
 
-   public String toString()
-   {
-      return attachments.toString();
-   }
+    public Object removeAttachment(String name) {
+        return attachments.remove(new Key(name, null));
+    }
+
+    public String toString() {
+        return attachments.toString();
+    }
 }

@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.testing.internal;
 
-
 /**
  * A remote OSGi Framework exception that should be thrown on unrecoverable errors.
  * 
@@ -29,20 +28,17 @@ package org.jboss.osgi.testing.internal;
  * @since 18-Jan-2009
  */
 @SuppressWarnings("serial")
-public class RemoteFrameworkException extends RuntimeException
-{
-  public RemoteFrameworkException(String message)
-  {
-    super(message);
-  }
-  
-  public RemoteFrameworkException(String message, Throwable cause)
-  {
-    super(message, cause);
-  }
-  
-  public RemoteFrameworkException(Throwable cause)
-  {
-    super(cause);
-  }
+public class RemoteFrameworkException extends RuntimeException {
+
+    public RemoteFrameworkException(String message) {
+        super(message);
+    }
+
+    public RemoteFrameworkException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public RemoteFrameworkException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -23,11 +23,10 @@ package org.jboss.osgi.testing;
 
 /**
  * A local extension to the {@link OSGiRuntime}
- *
+ * 
  * @author Thomas.Diesler@jboss.org
  * @since 09-Nov-2010
  */
-public interface OSGiEmbeddedRuntime extends OSGiRuntime
-{
+public interface OSGiEmbeddedRuntime extends OSGiRuntime {
 
 }

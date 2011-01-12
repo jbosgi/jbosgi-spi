@@ -28,69 +28,53 @@ import org.osgi.framework.Bundle;
 
 /**
  * A helper for the OSGi runtime abstraction.
- *
+ * 
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class OSGiRuntimeHelper
-{
-   // Provide logging
-   private static final Logger log = Logger.getLogger(OSGiRuntimeHelper.class);
+public class OSGiRuntimeHelper {
 
-   // The OSGiBootstrapProvider is a lazy property of the helper
-   private OSGiBootstrapProvider bootProvider;
-   private boolean skipBootstrap;
+    // Provide logging
+    private static final Logger log = Logger.getLogger(OSGiRuntimeHelper.class);
 
-   public OSGiBootstrapProvider getBootstrapProvider()
-   {
-      if (bootProvider == null && skipBootstrap == false)
-      {
-         try
-         {
-            bootProvider = OSGiBootstrap.getBootstrapProvider();
-         }
-         catch (RuntimeException rte)
-         {
-            skipBootstrap = true;
-            throw rte;
-         }
-      }
-      return bootProvider;
-   }
+    // The OSGiBootstrapProvider is a lazy property of the helper
+    private OSGiBootstrapProvider bootProvider;
+    private boolean skipBootstrap;
 
-   public void ungetBootstrapProvider()
-   {
-      bootProvider = null;
-   }
+    public OSGiBootstrapProvider getBootstrapProvider() {
+        if (bootProvider == null && skipBootstrap == false) {
+            try {
+                bootProvider = OSGiBootstrap.getBootstrapProvider();
+            } catch (RuntimeException rte) {
+                skipBootstrap = true;
+                throw rte;
+            }
+        }
+        return bootProvider;
+    }
 
-   public static void failsafeStop(OSGiBundle bundle)
-   {
-      if (bundle != null)
-      {
-         try
-         {
-            bundle.stop();
-         }
-         catch (Exception ex)
-         {
-            log.warn("Cannot stop bundle: " + bundle, ex);
-         }
-      }
-   }
+    public void ungetBootstrapProvider() {
+        bootProvider = null;
+    }
 
-   public static void failsafeUninstall(OSGiBundle bundle)
-   {
-      if (bundle != null)
-      {
-         try
-         {
-            if (bundle.getState() != Bundle.UNINSTALLED)
-               bundle.uninstall();
-         }
-         catch (Exception ex)
-         {
-            log.warn("Cannot uninstall bundle: " + bundle, ex);
-         }
-      }
-   }
+    public static void failsafeStop(OSGiBundle bundle) {
+        if (bundle != null) {
+            try {
+                bundle.stop();
+            } catch (Exception ex) {
+                log.warn("Cannot stop bundle: " + bundle, ex);
+            }
+        }
+    }
+
+    public static void failsafeUninstall(OSGiBundle bundle) {
+        if (bundle != null) {
+            try {
+                if (bundle.getState() != Bundle.UNINSTALLED)
+                    bundle.uninstall();
+            } catch (Exception ex) {
+                log.warn("Cannot uninstall bundle: " + bundle, ex);
+            }
+        }
+    }
 }

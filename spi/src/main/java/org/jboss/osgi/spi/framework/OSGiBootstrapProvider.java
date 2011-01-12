@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.framework;
 
-
 import java.io.InputStream;
 import java.net.URL;
 
@@ -35,32 +34,32 @@ import org.osgi.framework.launch.Framework;
  * @author thomas.diesler@jboss.com
  * @since 18-Jun-2008
  */
-public interface OSGiBootstrapProvider
-{
-   /**
-    * Get the configured OSGi Framework
-    * 
-    * @return The configured instance of a Framework
-    */
-   Framework getFramework();
+public interface OSGiBootstrapProvider {
 
-   /**
-    * Configure this provider with the default configuration
-    */
-   void configure();
+    /**
+     * Get the configured OSGi Framework
+     * 
+     * @return The configured instance of a Framework
+     */
+    Framework getFramework();
 
-   /**
-    * Configure this provider from the given URL
-    */
-   void configure(URL urlConfig);
+    /**
+     * Configure this provider with the default configuration
+     */
+    void configure();
 
-   /**
-    * Configure this provider from a given resource
-    */
-   void configure(String resourceConfig);
+    /**
+     * Configure this provider from the given URL
+     */
+    void configure(URL urlConfig);
 
-   /**
-    * Configure this provider from a given input stream
-    */
-   void configure(InputStream streamConfig);
+    /**
+     * Configure this provider from a given resource
+     */
+    void configure(String resourceConfig);
+
+    /**
+     * Configure this provider from a given input stream
+     */
+    void configure(InputStream streamConfig);
 }

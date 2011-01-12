@@ -21,49 +21,37 @@
  */
 package org.jboss.osgi.spi.capability;
 
-
-
 /**
- * Adds the OSGi compedium capability to the OSGiRuntime
- * under test. 
+ * Adds the OSGi compedium capability to the OSGiRuntime under test.
  * 
  * Installed bundle: org.osgi.compendium.jar
  * 
  * @author thomas.diesler@jboss.com
  * @since 16-Sep-2009
  */
-public class CompendiumCapability extends Capability
-{
-   public CompendiumCapability()
-   {
-      super(null);
-      
-      if (isFrameworkEquinox())
-      {
-         addBundle("bundles/org.eclipse.osgi.services.jar");
-         addBundle("bundles/org.eclipse.osgi.util.jar");
-      }
-      else
-      {
-         addBundle("bundles/org.osgi.compendium.jar");
-      }
-   }
+public class CompendiumCapability extends Capability {
 
-   private boolean isFrameworkEquinox()
-   {
-      boolean isEquinox = "equinox".equals(System.getProperty("framework"));
-      if (isEquinox == false)
-      {
-         try
-         {
-            getClass().getClassLoader().loadClass("org.jboss.osgi.equinox.EquinoxBootstrapProvider");
-            isEquinox = true;
-         }
-         catch (ClassNotFoundException e)
-         {
-            // ignore
-         }
-      }
-      return isEquinox;
-   }
+    public CompendiumCapability() {
+        super(null);
+
+        if (isFrameworkEquinox()) {
+            addBundle("bundles/org.eclipse.osgi.services.jar");
+            addBundle("bundles/org.eclipse.osgi.util.jar");
+        } else {
+            addBundle("bundles/org.osgi.compendium.jar");
+        }
+    }
+
+    private boolean isFrameworkEquinox() {
+        boolean isEquinox = "equinox".equals(System.getProperty("framework"));
+        if (isEquinox == false) {
+            try {
+                getClass().getClassLoader().loadClass("org.jboss.osgi.equinox.EquinoxBootstrapProvider");
+                isEquinox = true;
+            } catch (ClassNotFoundException e) {
+                // ignore
+            }
+        }
+        return isEquinox;
+    }
 }

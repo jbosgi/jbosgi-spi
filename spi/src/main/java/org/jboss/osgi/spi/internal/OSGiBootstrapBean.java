@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.spi.internal;
 
-
 import static org.jboss.osgi.spi.OSGiConstants.OSGI_HOME;
 import static org.jboss.osgi.spi.OSGiConstants.OSGI_SERVER_HOME;
 
@@ -51,187 +50,158 @@ import org.osgi.framework.launch.Framework;
  * @author thomas.diesler@jboss.com
  * @since 04-Nov-2008
  */
-public class OSGiBootstrapBean
-{
-   private static Logger log;
+public class OSGiBootstrapBean {
 
-   private static final String JAVA_PROTOCOL_HANDLERS = "java.protocol.handler.pkgs";
-   private static final String DEFAULT_JAVA_PROTOCOL_HANDLERS = "org.jboss.net.protocol|org.jboss.virtual.protocol|org.jboss.vfs.protocol";
-   private static final String JBOSS_BIND_ADDRESS = "jboss.bind.address";
-   private static final String OSGI_SERVER_NAME = "osgi.server.name";
+    private static Logger log;
 
-   @Option(name = "-c", aliases = { "--server-name" }, usage = "The runtime profile to start. (-c minimal)", required = false)
-   public String serverName = "default";
+    private static final String JAVA_PROTOCOL_HANDLERS = "java.protocol.handler.pkgs";
+    private static final String DEFAULT_JAVA_PROTOCOL_HANDLERS = "org.jboss.net.protocol|org.jboss.virtual.protocol|org.jboss.vfs.protocol";
+    private static final String JBOSS_BIND_ADDRESS = "jboss.bind.address";
+    private static final String OSGI_SERVER_NAME = "osgi.server.name";
 
-   @Option(name = "-b", aliases = { "--bind-address" }, usage = "The network address various services can bind to (-b 127.0.0.1)", required = false)
-   public String bindAddress = "localhost";
+    @Option(name = "-c", aliases = { "--server-name" }, usage = "The runtime profile to start. (-c minimal)", required = false)
+    public String serverName = "default";
 
-   private String osgiHome;
-   private String osgiServerHome;
+    @Option(name = "-b", aliases = { "--bind-address" }, usage = "The network address various services can bind to (-b 127.0.0.1)", required = false)
+    public String bindAddress = "localhost";
 
-   public void run()
-   {
-      initBootstrap();
+    private String osgiHome;
+    private String osgiServerHome;
 
-      OSGiBootstrapProvider bootProvider = getBootstrapProvider();
-      Framework framework = bootProvider.getFramework();
+    public void run() {
+        initBootstrap();
 
-      Runtime runtime = Runtime.getRuntime();
-      runtime.addShutdownHook(new ShutdownThread(framework));
+        OSGiBootstrapProvider bootProvider = getBootstrapProvider();
+        Framework framework = bootProvider.getFramework();
 
-      Thread thread = new StartupThread(framework);
-      thread.start();
-   }
+        Runtime runtime = Runtime.getRuntime();
+        runtime.addShutdownHook(new ShutdownThread(framework));
 
-   private void initBootstrap()
-   {
-      osgiHome = System.getProperty(OSGI_HOME);
-      if (osgiHome == null)
-         throw new IllegalStateException("Cannot obtain system property: '" + OSGI_HOME + "'");
+        Thread thread = new StartupThread(framework);
+        thread.start();
+    }
 
-      osgiServerHome = osgiHome + "/server/" + serverName;
+    private void initBootstrap() {
+        osgiHome = System.getProperty(OSGI_HOME);
+        if (osgiHome == null)
+            throw new IllegalStateException("Cannot obtain system property: '" + OSGI_HOME + "'");
 
-      // Replace the context class loader with one that contains the server conf dir 
-      File serverConfDir = new File(osgiServerHome + "/conf");
-      if (serverConfDir.exists())
-      {
-         ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
-         URLClassLoader confLoader = new URLClassLoader(new URL[] { toURL(serverConfDir) }, ctxLoader);
-         Thread.currentThread().setContextClassLoader(confLoader);
-      }
+        osgiServerHome = osgiHome + "/server/" + serverName;
 
-      // This property must be set before the logger is obtained
-      System.setProperty(OSGI_SERVER_HOME, osgiServerHome);
-      log = Logger.getLogger(OSGiBootstrapBean.class);
+        // Replace the context class loader with one that contains the server conf dir
+        File serverConfDir = new File(osgiServerHome + "/conf");
+        if (serverConfDir.exists()) {
+            ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
+            URLClassLoader confLoader = new URLClassLoader(new URL[] { toURL(serverConfDir) }, ctxLoader);
+            Thread.currentThread().setContextClassLoader(confLoader);
+        }
 
-      Properties defaults = new Properties();
-      defaults.setProperty(OSGI_SERVER_NAME, serverName);
-      defaults.setProperty(OSGI_SERVER_HOME, osgiServerHome);
-      defaults.setProperty(JBOSS_BIND_ADDRESS, bindAddress);
-      defaults.setProperty(JAVA_PROTOCOL_HANDLERS, DEFAULT_JAVA_PROTOCOL_HANDLERS);
+        // This property must be set before the logger is obtained
+        System.setProperty(OSGI_SERVER_HOME, osgiServerHome);
+        log = Logger.getLogger(OSGiBootstrapBean.class);
 
-      log.debug("JBoss OSGi System Properties");
-      log.debug("   " + OSGI_SERVER_HOME + "=" + osgiServerHome);
+        Properties defaults = new Properties();
+        defaults.setProperty(OSGI_SERVER_NAME, serverName);
+        defaults.setProperty(OSGI_SERVER_HOME, osgiServerHome);
+        defaults.setProperty(JBOSS_BIND_ADDRESS, bindAddress);
+        defaults.setProperty(JAVA_PROTOCOL_HANDLERS, DEFAULT_JAVA_PROTOCOL_HANDLERS);
 
-      Enumeration<?> defaultNames = defaults.propertyNames();
-      while (defaultNames.hasMoreElements())
-      {
-         String propName = (String)defaultNames.nextElement();
-         String sysValue = System.getProperty(propName);
-         if (sysValue == null)
-         {
-            String propValue = defaults.getProperty(propName);
-            System.setProperty(propName, propValue);
-            log.debug("   " + propName + "=" + propValue);
-         }
-      }
-   }
+        log.debug("JBoss OSGi System Properties");
+        log.debug("   " + OSGI_SERVER_HOME + "=" + osgiServerHome);
 
-   public static OSGiBootstrapProvider getBootstrapProvider()
-   {
-      if (log == null)
-         log = Logger.getLogger(OSGiBootstrap.class);
-      
-      OSGiBootstrapProvider provider = null;
-
-      List<OSGiBootstrapProvider> providers = ServiceLoader.loadServices(OSGiBootstrapProvider.class);
-      for (OSGiBootstrapProvider aux : providers)
-      {
-         try
-         {
-            aux.configure();
-            provider = aux;
-            break;
-         }
-         catch (Exception ex)
-         {
-            log.debug("Cannot configure [" + aux.getClass().getName() + "]", ex);
-         }
-      }
-
-      if (provider == null)
-      {
-         provider = new PropertiesBootstrapProvider();
-         log.debug("Using default: " + PropertiesBootstrapProvider.class.getName());
-      }
-
-      return provider;
-   }
-   
-   private URL toURL(File file)
-   {
-      try
-      {
-         return file.toURI().toURL();
-      }
-      catch (MalformedURLException e)
-      {
-         throw new IllegalArgumentException("Invalid file: " + file);
-      }
-   }
-
-   class StartupThread extends Thread
-   {
-      private Framework framework;
-
-      public StartupThread(Framework framework)
-      {
-         this.framework = framework;
-      }
-
-      public void run()
-      {
-         // Start the framework
-         long beforeStart = System.currentTimeMillis();
-         try
-         {
-            framework.start();
-         }
-         catch (BundleException ex)
-         {
-            throw new IllegalStateException("Cannot start framework", ex);
-         }
-         
-         float diff = (System.currentTimeMillis() - beforeStart) / 1000f;
-         log.info("JBossOSGi Runtime booted in " + diff + "sec");
-         
-         Reader br = new InputStreamReader(System.in);
-         try
-         {
-            int inByte = br.read();
-            while (inByte != -1)
-            {
-               inByte = br.read();
+        Enumeration<?> defaultNames = defaults.propertyNames();
+        while (defaultNames.hasMoreElements()) {
+            String propName = (String) defaultNames.nextElement();
+            String sysValue = System.getProperty(propName);
+            if (sysValue == null) {
+                String propValue = defaults.getProperty(propName);
+                System.setProperty(propName, propValue);
+                log.debug("   " + propName + "=" + propValue);
             }
-         }
-         catch (IOException ioe)
-         {
-            // ignore user input
-         }
-      }
-   }
+        }
+    }
 
-   class ShutdownThread extends Thread
-   {
-      private Framework framework;
+    public static OSGiBootstrapProvider getBootstrapProvider() {
+        if (log == null)
+            log = Logger.getLogger(OSGiBootstrap.class);
 
-      public ShutdownThread(Framework framework)
-      {
-         this.framework = framework;
-      }
+        OSGiBootstrapProvider provider = null;
 
-      public void run()
-      {
-         log.info("Initiating shutdown ...");
-         try
-         {
-            framework.stop();
-         }
-         catch (BundleException ex)
-         {
-            log.error("Cannot stop framework", ex);
-         }
-         log.info("Shutdown complete");
-      }
-   }
+        List<OSGiBootstrapProvider> providers = ServiceLoader.loadServices(OSGiBootstrapProvider.class);
+        for (OSGiBootstrapProvider aux : providers) {
+            try {
+                aux.configure();
+                provider = aux;
+                break;
+            } catch (Exception ex) {
+                log.debug("Cannot configure [" + aux.getClass().getName() + "]", ex);
+            }
+        }
+
+        if (provider == null) {
+            provider = new PropertiesBootstrapProvider();
+            log.debug("Using default: " + PropertiesBootstrapProvider.class.getName());
+        }
+
+        return provider;
+    }
+
+    private URL toURL(File file) {
+        try {
+            return file.toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Invalid file: " + file);
+        }
+    }
+
+    class StartupThread extends Thread {
+
+        private Framework framework;
+
+        public StartupThread(Framework framework) {
+            this.framework = framework;
+        }
+
+        public void run() {
+            // Start the framework
+            long beforeStart = System.currentTimeMillis();
+            try {
+                framework.start();
+            } catch (BundleException ex) {
+                throw new IllegalStateException("Cannot start framework", ex);
+            }
+
+            float diff = (System.currentTimeMillis() - beforeStart) / 1000f;
+            log.info("JBossOSGi Runtime booted in " + diff + "sec");
+
+            Reader br = new InputStreamReader(System.in);
+            try {
+                int inByte = br.read();
+                while (inByte != -1) {
+                    inByte = br.read();
+                }
+            } catch (IOException ioe) {
+                // ignore user input
+            }
+        }
+    }
+
+    class ShutdownThread extends Thread {
+
+        private Framework framework;
+
+        public ShutdownThread(Framework framework) {
+            this.framework = framework;
+        }
+
+        public void run() {
+            log.info("Initiating shutdown ...");
+            try {
+                framework.stop();
+            } catch (BundleException ex) {
+                log.error("Cannot stop framework", ex);
+            }
+            log.info("Shutdown complete");
+        }
+    }
 }

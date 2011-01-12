@@ -36,32 +36,29 @@ import org.osgi.jmx.JmxConstants;
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class RemoteServiceReference implements OSGiServiceReference
-{
-   private TabularData propsData;
-   
-   public RemoteServiceReference(CompositeData serviceData, TabularData propData)
-   {
-      this.propsData = propData;
-   }
+public class RemoteServiceReference implements OSGiServiceReference {
 
-   public Object getProperty(String key)
-   {
-      CompositeData propData = propsData.get(new Object[] { key });
-      if (propData == null)
-         return null;
-      
-      // [TODO] decode value
-      Object value = propData.get(JmxConstants.VALUE);
-      return value;
-   }
+    private TabularData propsData;
 
-   public String[] getPropertyKeys()
-   {
-      List<String> keys = new ArrayList<String>();
-      for(Object key : propsData.keySet())
-         keys.add((String)key);
-      
-      return keys.toArray(new String[keys.size()]);
-   }
+    public RemoteServiceReference(CompositeData serviceData, TabularData propData) {
+        this.propsData = propData;
+    }
+
+    public Object getProperty(String key) {
+        CompositeData propData = propsData.get(new Object[] { key });
+        if (propData == null)
+            return null;
+
+        // [TODO] decode value
+        Object value = propData.get(JmxConstants.VALUE);
+        return value;
+    }
+
+    public String[] getPropertyKeys() {
+        List<String> keys = new ArrayList<String>();
+        for (Object key : propsData.keySet())
+            keys.add((String) key);
+
+        return keys.toArray(new String[keys.size()]);
+    }
 }

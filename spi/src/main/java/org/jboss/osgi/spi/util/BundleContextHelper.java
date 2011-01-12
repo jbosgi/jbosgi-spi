@@ -30,42 +30,36 @@ import org.osgi.framework.ServiceReference;
  * @author thomas.Diesler@jboss.org
  * @since 28-Apr-2010
  */
-public class BundleContextHelper
-{
-   private BundleContext context;
-   
-   public BundleContextHelper(BundleContext context)
-   {
-      if (context == null)
-         throw new IllegalArgumentException("Null context");
-      
-      this.context = context;
-   }
+public class BundleContextHelper {
 
-   /**
-    * Get a ServiceReference with a given timeout.
-    * @return The service ref, or null if the service was not registered in time. 
-    */
-   public ServiceReference getServiceReference(String serviceName, int timeout)
-   {
-      int step = 200;
-      ServiceReference sref = null;
-      while (sref == null && 0 < timeout)
-      {
-         sref = context.getServiceReference(serviceName);
-         if (sref == null)
-         {
-            try
-            {
-               Thread.sleep(step);
+    private BundleContext context;
+
+    public BundleContextHelper(BundleContext context) {
+        if (context == null)
+            throw new IllegalArgumentException("Null context");
+
+        this.context = context;
+    }
+
+    /**
+     * Get a ServiceReference with a given timeout.
+     * 
+     * @return The service ref, or null if the service was not registered in time.
+     */
+    public ServiceReference getServiceReference(String serviceName, int timeout) {
+        int step = 200;
+        ServiceReference sref = null;
+        while (sref == null && 0 < timeout) {
+            sref = context.getServiceReference(serviceName);
+            if (sref == null) {
+                try {
+                    Thread.sleep(step);
+                } catch (InterruptedException ex) {
+                    // ignore
+                }
+                timeout -= step;
             }
-            catch (InterruptedException ex)
-            {
-               // ignore
-            }
-            timeout -= step;
-         }
-      }
-      return sref;
-   }
+        }
+        return sref;
+    }
 }

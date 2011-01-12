@@ -28,7 +28,7 @@ import java.util.Hashtable;
 
 /**
  * An unmodifiable dictionary.
- *
+ * 
  * @author thomas.diesler@jboss.com
  * @since 02-Dec-2009
  */
@@ -44,7 +44,7 @@ public class UnmodifiableDictionary<K, V> extends Dictionary<K, V> implements Se
 
         delegate = new Hashtable<K, V>();
         Enumeration<K> keys = props.keys();
-        while(keys.hasMoreElements()) {
+        while (keys.hasMoreElements()) {
             K key = keys.nextElement();
             V val = props.get(key);
             delegate.put(key, val);

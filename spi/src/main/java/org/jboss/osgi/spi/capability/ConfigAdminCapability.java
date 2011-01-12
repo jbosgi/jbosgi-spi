@@ -21,12 +21,10 @@
  */
 package org.jboss.osgi.spi.capability;
 
-
 import org.osgi.service.cm.ConfigurationAdmin;
 
 /**
- * Adds the OSGi compedium ConfigAdmin capability to the OSGiRuntime
- * under test. 
+ * Adds the OSGi compedium ConfigAdmin capability to the OSGiRuntime under test.
  * 
  * It is ignored if the {@link ConfigurationAdmin} is already registered.
  * 
@@ -35,15 +33,14 @@ import org.osgi.service.cm.ConfigurationAdmin;
  * @author thomas.diesler@jboss.com
  * @since 05-May-2009
  */
-public class ConfigAdminCapability extends Capability
-{
-   public ConfigAdminCapability()
-   {
-      super(ConfigurationAdmin.class.getName());
-      
-      addDependency(new CompendiumCapability());
-      
-      addBundle("bundles/org.apache.felix.metatype.jar");
-      addBundle("bundles/org.apache.felix.configadmin.jar");
-   }
+public class ConfigAdminCapability extends Capability {
+
+    public ConfigAdminCapability() {
+        super(ConfigurationAdmin.class.getName());
+
+        addDependency(new CompendiumCapability());
+
+        addBundle("bundles/org.apache.felix.metatype.jar");
+        addBundle("bundles/org.apache.felix.configadmin.jar");
+    }
 }

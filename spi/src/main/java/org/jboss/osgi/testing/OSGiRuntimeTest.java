@@ -30,86 +30,74 @@ import org.junit.Before;
 /**
  * An abstract OSGi runtime test.
  * 
- * A convenience wrapper for the functionality provided by {@link OSGiRuntimeHelper}. 
+ * A convenience wrapper for the functionality provided by {@link OSGiRuntimeHelper}.
  * 
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public abstract class OSGiRuntimeTest extends OSGiTest
-{
-   private static OSGiRuntime runtime;
+public abstract class OSGiRuntimeTest extends OSGiTest {
 
-   @Before
-   public void setUp() throws Exception
-   {
-      super.setUp();
+    private static OSGiRuntime runtime;
 
-      if (runtime == null && isBeforeClassPresent() == false)
-         runtime = createDefaultRuntime();
-   }
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
 
-   @After
-   public void tearDown() throws Exception
-   {
-      //getRuntime().refreshPackages(null);
-      super.tearDown();
-   }
-   
-   @AfterClass
-   public static void afterClass() throws Exception
-   {
-      shutdownRuntime();
-   }
+        if (runtime == null && isBeforeClassPresent() == false)
+            runtime = createDefaultRuntime();
+    }
 
-   public static void shutdownRuntime()
-   {
-      // Nothing to do if the runtime was not created
-      if (runtime != null)
-      {
-         runtime.shutdown();
-         runtime = null;
-      }
-   }
-   
-   public static OSGiRuntime getRuntime() 
-   {
-      if (runtime == null)
-         throw new IllegalStateException("OSGiRuntime not available. Use createRuntime()");
+    @After
+    public void tearDown() throws Exception {
+        // getRuntime().refreshPackages(null);
+        super.tearDown();
+    }
 
-      return runtime;
-   }
+    @AfterClass
+    public static void afterClass() throws Exception {
+        shutdownRuntime();
+    }
 
-   /**
-    * Delegates to {@link OSGiRuntimeHelper#getDefaultRuntime()}
-    */
-   public static OSGiRuntime createDefaultRuntime()
-   {
-      String target = System.getProperty("target.container");
-      if (target == null)
-      {
-         return createEmbeddedRuntime();
-      }
-      else
-      {
-         return createRemoteRuntime();
-      }
-   }
+    public static void shutdownRuntime() {
+        // Nothing to do if the runtime was not created
+        if (runtime != null) {
+            runtime.shutdown();
+            runtime = null;
+        }
+    }
 
-   /**
-    * Delegates to {@link OSGiRuntimeHelper#getEmbeddedRuntime()}
-    */
-   public static OSGiRuntime createEmbeddedRuntime()
-   {
-      runtime = new EmbeddedRuntimeImpl(new OSGiRuntimeHelper());
-      return runtime;
-   }
+    public static OSGiRuntime getRuntime() {
+        if (runtime == null)
+            throw new IllegalStateException("OSGiRuntime not available. Use createRuntime()");
 
-   /**
-    * Delegates to {@link OSGiRuntimeHelper#getRemoteRuntime()}
-    */
-   public static OSGiRuntime createRemoteRuntime()
-   {
-      runtime = new RemoteRuntimeImpl(new OSGiRuntimeHelper());
-      return runtime;
-   }
+        return runtime;
+    }
+
+    /**
+     * Delegates to {@link OSGiRuntimeHelper#getDefaultRuntime()}
+     */
+    public static OSGiRuntime createDefaultRuntime() {
+        String target = System.getProperty("target.container");
+        if (target == null) {
+            return createEmbeddedRuntime();
+        } else {
+            return createRemoteRuntime();
+        }
+    }
+
+    /**
+     * Delegates to {@link OSGiRuntimeHelper#getEmbeddedRuntime()}
+     */
+    public static OSGiRuntime createEmbeddedRuntime() {
+        runtime = new EmbeddedRuntimeImpl(new OSGiRuntimeHelper());
+        return runtime;
+    }
+
+    /**
+     * Delegates to {@link OSGiRuntimeHelper#getRemoteRuntime()}
+     */
+    public static OSGiRuntime createRemoteRuntime() {
+        runtime = new RemoteRuntimeImpl(new OSGiRuntimeHelper());
+        return runtime;
+    }
 }

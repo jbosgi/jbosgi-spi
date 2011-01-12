@@ -28,37 +28,38 @@ import org.jboss.osgi.spi.util.ServiceLoader;
 
 /**
  * An abstract deployer for the {@link OSGiRuntime}
- *
+ * 
  * @author Thomas.Diesler@jboss.org
  * @since 09-Nov-2010
  */
-public interface OSGiDeployerClient
-{
-   /**
-    * Deploys an archive from the given location.
-    * @return The unique runtime name for this deployment
-    */
-   String deploy(URL url) throws Exception;
+public interface OSGiDeployerClient {
 
-   /**
-    * Deploys an archive from the given input stream.
-    * @return The unique runtime name for this deployment
-    */
-   String deploy(String name, InputStream input) throws Exception;
+    /**
+     * Deploys an archive from the given location.
+     * 
+     * @return The unique runtime name for this deployment
+     */
+    String deploy(URL url) throws Exception;
 
-   /**
-    * Undeploys the named unique deployment
-    */
-   void undeploy(String uniqueName);
+    /**
+     * Deploys an archive from the given input stream.
+     * 
+     * @return The unique runtime name for this deployment
+     */
+    String deploy(String name, InputStream input) throws Exception;
 
-   final class Factory
-   {
-      public static OSGiDeployerClient getDeployerClient()
-      {
-         OSGiDeployerClient service = ServiceLoader.loadService(OSGiDeployerClient.class);
-         if (service == null)
-            throw new IllegalStateException("Cannot obtain OSGiDeployerClient service");
-         return service;
-      }
-   }
+    /**
+     * Undeploys the named unique deployment
+     */
+    void undeploy(String uniqueName);
+
+    final class Factory {
+
+        public static OSGiDeployerClient getDeployerClient() {
+            OSGiDeployerClient service = ServiceLoader.loadService(OSGiDeployerClient.class);
+            if (service == null)
+                throw new IllegalStateException("Cannot obtain OSGiDeployerClient service");
+            return service;
+        }
+    }
 }

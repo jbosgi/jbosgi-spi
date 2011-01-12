@@ -43,256 +43,209 @@ import org.osgi.framework.Bundle;
 
 /**
  * An OSGi Test Helper
- *
+ * 
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class OSGiTestHelper
-{
-   // Provide logging
-   private static final Logger log = Logger.getLogger(OSGiTestHelper.class);
+public class OSGiTestHelper {
 
-   public static final String SYSPROP_TEST_RESOURCES_DIRECTORY = "test.resources.directory";
-   public static final String SYSPROP_TEST_ARCHIVE_DIRECTORY = "test.archive.directory";
+    // Provide logging
+    private static final Logger log = Logger.getLogger(OSGiTestHelper.class);
 
-   private static String testResourcesDir;
-   private static String testArchiveDir;
-   static
-   {
-      testResourcesDir = System.getProperty(SYSPROP_TEST_RESOURCES_DIRECTORY, "target/test-classes");
-      testArchiveDir = System.getProperty(SYSPROP_TEST_ARCHIVE_DIRECTORY, "target/test-libs");
-   }
+    public static final String SYSPROP_TEST_RESOURCES_DIRECTORY = "test.resources.directory";
+    public static final String SYSPROP_TEST_ARCHIVE_DIRECTORY = "test.archive.directory";
 
-   // Hide ctor
-   private OSGiTestHelper()
-   {
-   }
+    private static String testResourcesDir;
+    private static String testArchiveDir;
+    static {
+        testResourcesDir = System.getProperty(SYSPROP_TEST_RESOURCES_DIRECTORY, "target/test-classes");
+        testArchiveDir = System.getProperty(SYSPROP_TEST_ARCHIVE_DIRECTORY, "target/test-libs");
+    }
 
-   /** Try to discover the URL for the test resource */
-   public static URL getResourceURL(String resource)
-   {
-      URL resURL = null;
-      try
-      {
-         File resourceFile = getResourceFile(resource);
-         resURL = resourceFile.toURI().toURL();
-      }
-      catch (MalformedURLException e)
-      {
-         // ignore
-      }
-      return resURL;
-   }
+    // Hide ctor
+    private OSGiTestHelper() {
+    }
 
-   /** Try to discover the File for the test resource */
-   public static File getResourceFile(String resource)
-   {
-      File file = new File(resource);
-      if (file.exists())
-         return file;
+    /** Try to discover the URL for the test resource */
+    public static URL getResourceURL(String resource) {
+        URL resURL = null;
+        try {
+            File resourceFile = getResourceFile(resource);
+            resURL = resourceFile.toURI().toURL();
+        } catch (MalformedURLException e) {
+            // ignore
+        }
+        return resURL;
+    }
 
-      file = new File(testResourcesDir + "/" + resource);
-      if (file.exists())
-         return file;
+    /** Try to discover the File for the test resource */
+    public static File getResourceFile(String resource) {
+        File file = new File(resource);
+        if (file.exists())
+            return file;
 
-      throw new IllegalArgumentException("Cannot obtain '" + testResourcesDir + "/" + resource + "'");
-   }
+        file = new File(testResourcesDir + "/" + resource);
+        if (file.exists())
+            return file;
 
-   /** Try to discover the URL for the deployment archive */
-   public static URL getTestArchiveURL(String archive)
-   {
-      try
-      {
-         URL archiveURL = new URL(archive);
-         return archiveURL;
-      }
-      catch (MalformedURLException ex)
-      {
-         // ignore
-      }
-      try
-      {
-         File file = getTestArchiveFile(archive);
-         return file.toURI().toURL();
-      }
-      catch (MalformedURLException ex)
-      {
-         throw new IllegalStateException(ex);
-      }
-   }
+        throw new IllegalArgumentException("Cannot obtain '" + testResourcesDir + "/" + resource + "'");
+    }
 
-   /** Try to discover the absolute path for the deployment archive */
-   public static String getTestArchivePath(String archive)
-   {
-      File archiveFile = getTestArchiveFile(archive);
-      return archiveFile.getAbsolutePath();
-   }
+    /** Try to discover the URL for the deployment archive */
+    public static URL getTestArchiveURL(String archive) {
+        try {
+            URL archiveURL = new URL(archive);
+            return archiveURL;
+        } catch (MalformedURLException ex) {
+            // ignore
+        }
+        try {
+            File file = getTestArchiveFile(archive);
+            return file.toURI().toURL();
+        } catch (MalformedURLException ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
 
-   /** Try to discover the File for the deployment archive */
-   public static File getTestArchiveFile(String archive)
-   {
-      File file = new File(archive);
-      if (file.exists())
-         return file;
+    /** Try to discover the absolute path for the deployment archive */
+    public static String getTestArchivePath(String archive) {
+        File archiveFile = getTestArchiveFile(archive);
+        return archiveFile.getAbsolutePath();
+    }
 
-      file = new File(testArchiveDir + "/" + archive);
-      if (file.exists())
-         return file;
+    /** Try to discover the File for the deployment archive */
+    public static File getTestArchiveFile(String archive) {
+        File file = new File(archive);
+        if (file.exists())
+            return file;
 
-      throw new IllegalArgumentException("Cannot obtain '" + testArchiveDir + "/" + archive + "'.");
-   }
+        file = new File(testArchiveDir + "/" + archive);
+        if (file.exists())
+            return file;
 
-   public static String getServerHost()
-   {
-      String bindAddress = System.getProperty("jboss.bind.address", "localhost");
-      return bindAddress;
-   }
+        throw new IllegalArgumentException("Cannot obtain '" + testArchiveDir + "/" + archive + "'.");
+    }
 
-   public static String getTargetContainer()
-   {
-      String targetContainer = System.getProperty("target.container");
-      return targetContainer;
-   }
+    public static String getServerHost() {
+        String bindAddress = System.getProperty("jboss.bind.address", "localhost");
+        return bindAddress;
+    }
 
-   public static String getFrameworkName()
-   {
-      String framework = System.getProperty("framework");
-      if (framework == null || framework.length() == 0 || framework.equals("${framework}"))
-         framework = "jbossmsc";
+    public static String getTargetContainer() {
+        String targetContainer = System.getProperty("target.container");
+        return targetContainer;
+    }
 
-      return framework;
-   }
+    public static String getFrameworkName() {
+        String framework = System.getProperty("framework");
+        if (framework == null || framework.length() == 0 || framework.equals("${framework}"))
+            framework = "jbossmsc";
 
-   public static JavaArchive assembleArchive(String name, String resource, Class<?>... packages) throws Exception
-   {
-      return assembleArchive(name, new String[] { resource }, packages);
-   }
+        return framework;
+    }
 
-   public static JavaArchive assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException
-   {
-      JavaArchive archive = ShrinkWrap.create(JavaArchive.class, name + ".jar");
-      if (resources != null)
-      {
-         for (String res : resources)
-         {
-            URL url = OSGiTestHelper.class.getResource(res);
-            if (url == null)
-               throw new IllegalArgumentException("Cannot load resource: " + res);
+    public static JavaArchive assembleArchive(String name, String resource, Class<?>... packages) throws Exception {
+        return assembleArchive(name, new String[] { resource }, packages);
+    }
 
-            final VirtualFile file = AbstractVFS.toVirtualFile(url);
-            if (file.isDirectory())
-            {
-               addResources(archive, file, file);
+    public static JavaArchive assembleArchive(String name, String[] resources, Class<?>... packages) throws IOException {
+        JavaArchive archive = ShrinkWrap.create(JavaArchive.class, name + ".jar");
+        if (resources != null) {
+            for (String res : resources) {
+                URL url = OSGiTestHelper.class.getResource(res);
+                if (url == null)
+                    throw new IllegalArgumentException("Cannot load resource: " + res);
+
+                final VirtualFile file = AbstractVFS.toVirtualFile(url);
+                if (file.isDirectory()) {
+                    addResources(archive, file, file);
+                } else {
+                    addResource(archive, res, file);
+                }
             }
-            else
-            {
-               addResource(archive, res, file);
+        }
+        if (packages != null) {
+            for (Class<?> clazz : packages) {
+                URL url = clazz.getResource("/");
+                VirtualFile base = AbstractVFS.toVirtualFile(url);
+
+                String path = clazz.getName().replace('.', '/');
+                path = path.substring(0, path.lastIndexOf("/"));
+
+                VirtualFile classes = base.getChild(path);
+                addResources(archive, base, classes);
             }
-         }
-      }
-      if (packages != null)
-      {
-         for (Class<?> clazz : packages)
-         {
-            URL url = clazz.getResource("/");
-            VirtualFile base = AbstractVFS.toVirtualFile(url);
+        }
+        return archive;
+    }
 
-            String path = clazz.getName().replace('.', '/');
-            path = path.substring(0, path.lastIndexOf("/"));
+    public static VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException {
+        ZipExporter exporter = archive.as(ZipExporter.class);
+        return AbstractVFS.toVirtualFile(archive.getName(), exporter.exportZip());
+    }
 
-            VirtualFile classes = base.getChild(path);
-            addResources(archive, base, classes);
-         }
-      }
-      return archive;
-   }
+    public static InputStream toInputStream(Archive<?> archive) throws IOException {
+        ZipExporter exporter = archive.as(ZipExporter.class);
+        return exporter.exportZip();
+    }
 
-   public static VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException
-   {
-      ZipExporter exporter = archive.as(ZipExporter.class);
-      return AbstractVFS.toVirtualFile(archive.getName(), exporter.exportZip());
-   }
+    private static void addResources(JavaArchive archive, VirtualFile basedir, VirtualFile resdir) throws IOException {
+        String basepath = basedir.getPathName();
+        for (final VirtualFile child : resdir.getChildrenRecursively()) {
+            if (child.isDirectory())
+                continue;
 
-   public static InputStream toInputStream(Archive<?> archive) throws IOException
-   {
-      ZipExporter exporter = archive.as(ZipExporter.class);
-      return exporter.exportZip();
-   }
+            String path = child.getPathName();
+            path = path.substring(basepath.length());
 
-   private static void addResources(JavaArchive archive, VirtualFile basedir, VirtualFile resdir) throws IOException
-   {
-      String basepath = basedir.getPathName();
-      for (final VirtualFile child : resdir.getChildrenRecursively())
-      {
-         if (child.isDirectory())
-            continue;
+            addResource(archive, path, child);
+        }
+    }
 
-         String path = child.getPathName();
-         path = path.substring(basepath.length());
+    private static void addResource(JavaArchive archive, String path, final VirtualFile file) {
+        Asset asset = new Asset() {
 
-         addResource(archive, path, child);
-      }
-   }
-
-   private static void addResource(JavaArchive archive, String path, final VirtualFile file)
-   {
-      Asset asset = new Asset()
-      {
-         public InputStream openStream()
-         {
-            try
-            {
-               return file.openStream();
+            public InputStream openStream() {
+                try {
+                    return file.openStream();
+                } catch (IOException ex) {
+                    throw new IllegalStateException("Cannot open stream for: " + file, ex);
+                }
             }
-            catch (IOException ex)
-            {
-               throw new IllegalStateException("Cannot open stream for: " + file, ex);
-            }
-         }
-      };
-      archive.add(asset, path);
-   }
+        };
+        archive.add(asset, path);
+    }
 
-   public static void assertBundleState(int expState, int wasState)
-   {
-      String expstr = ConstantsHelper.bundleState(expState);
-      String wasstr = ConstantsHelper.bundleState(wasState);
-      assertEquals("Bundle " + expstr, expstr, wasstr);
-   }
+    public static void assertBundleState(int expState, int wasState) {
+        String expstr = ConstantsHelper.bundleState(expState);
+        String wasstr = ConstantsHelper.bundleState(wasState);
+        assertEquals("Bundle " + expstr, expstr, wasstr);
+    }
 
-   public static Class<?> assertLoadClass(Bundle bundle, String className)
-   {
-      try
-      {
-         return bundle.loadClass(className);
-      }
-      catch (ClassNotFoundException ex)
-      {
-         String message = "Unexpected ClassNotFoundException for: " + bundle.getSymbolicName() + " loads " + className;
-         log.error(message, ex);
-         fail(message);
-         return null;
-      }
-   }
+    public static Class<?> assertLoadClass(Bundle bundle, String className) {
+        try {
+            return bundle.loadClass(className);
+        } catch (ClassNotFoundException ex) {
+            String message = "Unexpected ClassNotFoundException for: " + bundle.getSymbolicName() + " loads " + className;
+            log.error(message, ex);
+            fail(message);
+            return null;
+        }
+    }
 
-   public static void assertLoadClassFail(Bundle bundle, String className)
-   {
-      try
-      {
-         Class<?> clazz = bundle.loadClass(className);
-         String message = bundle.getSymbolicName() + " loads " + className;
-         fail("ClassNotFoundException expected for: " + message + "\nLoaded from " + clazz.getClassLoader());
-      }
-      catch (ClassNotFoundException ex)
-      {
-         // expected
-      }
-   }
+    public static void assertLoadClassFail(Bundle bundle, String className) {
+        try {
+            Class<?> clazz = bundle.loadClass(className);
+            String message = bundle.getSymbolicName() + " loads " + className;
+            fail("ClassNotFoundException expected for: " + message + "\nLoaded from " + clazz.getClassLoader());
+        } catch (ClassNotFoundException ex) {
+            // expected
+        }
+    }
 
-   public static void assertLoadClass(Bundle bundle, String className, Bundle exporter)
-   {
-      Class<?> importerClazz = assertLoadClass(bundle, className);
-      Class<?> exporterClazz = assertLoadClass(exporter, className);
-      assertEquals("Loaded from ClassLoader", exporterClazz.getClassLoader(), importerClazz.getClassLoader());
-   }
+    public static void assertLoadClass(Bundle bundle, String className, Bundle exporter) {
+        Class<?> importerClazz = assertLoadClass(bundle, className);
+        Class<?> exporterClazz = assertLoadClass(exporter, className);
+        assertEquals("Loaded from ClassLoader", exporterClazz.getClassLoader(), importerClazz.getClassLoader());
+    }
 }

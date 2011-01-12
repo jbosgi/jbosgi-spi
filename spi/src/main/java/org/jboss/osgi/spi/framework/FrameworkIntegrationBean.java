@@ -36,202 +36,166 @@ import org.osgi.framework.launch.Framework;
 /**
  * An abstraction of an OSGi Framework.
  * 
- * In addition to the standard {@link Framework} this implementation also
- * supports properties and initial bundle provisioning.
+ * In addition to the standard {@link Framework} this implementation also supports properties and initial bundle provisioning.
  * 
  * @author thomas.diesler@jboss.com
  * @since 23-Jan-2009
  */
-public abstract class FrameworkIntegrationBean
-{
-   // Provide logging
-   private static final Logger log = Logger.getLogger(FrameworkIntegrationBean.class);
+public abstract class FrameworkIntegrationBean {
 
-   private Map<String, Object> properties = new HashMap<String, Object>();
-   private List<URL> autoInstall = new ArrayList<URL>();
-   private List<URL> autoStart = new ArrayList<URL>();
+    // Provide logging
+    private static final Logger log = Logger.getLogger(FrameworkIntegrationBean.class);
 
-   private Framework framework;
-   
-   public Map<String, Object> getProperties()
-   {
-      return properties;
-   }
+    private Map<String, Object> properties = new HashMap<String, Object>();
+    private List<URL> autoInstall = new ArrayList<URL>();
+    private List<URL> autoStart = new ArrayList<URL>();
 
-   public void setProperties(Map<String, Object> props)
-   {
-      this.properties = props;
-   }
+    private Framework framework;
 
-   public List<URL> getAutoInstall()
-   {
-      return autoInstall;
-   }
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
 
-   public void setAutoInstall(List<URL> autoInstall)
-   {
-      this.autoInstall = autoInstall;
-   }
+    public void setProperties(Map<String, Object> props) {
+        this.properties = props;
+    }
 
-   public List<URL> getAutoStart()
-   {
-      return autoStart;
-   }
+    public List<URL> getAutoInstall() {
+        return autoInstall;
+    }
 
-   public void setAutoStart(List<URL> autoStart)
-   {
-      this.autoStart = autoStart;
-   }
+    public void setAutoInstall(List<URL> autoInstall) {
+        this.autoInstall = autoInstall;
+    }
 
-   public Bundle getBundle()
-   {
-      assertFrameworkStart();
-      return getFramework();
-   }
+    public List<URL> getAutoStart() {
+        return autoStart;
+    }
 
-   public BundleContext getBundleContext()
-   {
-      assertFrameworkStart();
-      return getFramework().getBundleContext();
-   }
+    public void setAutoStart(List<URL> autoStart) {
+        this.autoStart = autoStart;
+    }
 
-   public Framework getFramework()
-   {
-      if (framework == null)
-         framework = createFramework(properties);
-      
-      return framework;
-   }
+    public Bundle getBundle() {
+        assertFrameworkStart();
+        return getFramework();
+    }
 
-   public void create()
-   {
-      if (framework == null)
-         framework = createFramework(properties);
-   }
+    public BundleContext getBundleContext() {
+        assertFrameworkStart();
+        return getFramework().getBundleContext();
+    }
 
-   /** Overwrite to create the framework */
-   protected abstract Framework createFramework(Map<String, Object> properties);
+    public Framework getFramework() {
+        if (framework == null)
+            framework = createFramework(properties);
 
-   public void start()
-   {
-      // Create the Framework instance
-      assertFrameworkCreate();
-      
-      // Start the System Bundle
-      try
-      {
-         getFramework().start();
-      }
-      catch (BundleException ex)
-      {
-         throw new FrameworkException("Cannot start system bundle", ex);
-      }
-      
-      // Get system bundle context
-      BundleContext context = getFramework().getBundleContext();
-      if (context == null)
-         throw new FrameworkException("Cannot obtain system context");
+        return framework;
+    }
 
-      Map<URL, Bundle> autoBundles = new HashMap<URL, Bundle>();
+    public void create() {
+        if (framework == null)
+            framework = createFramework(properties);
+    }
 
-      // Add the autoStart bundles to autoInstall
-      for (URL bundleURL : autoStart)
-      {
-         autoInstall.add(bundleURL);
-      }
+    /** Overwrite to create the framework */
+    protected abstract Framework createFramework(Map<String, Object> properties);
 
-      // Register system services
-      registerSystemServices(context);
-      
-      // Install autoInstall bundles
-      for (URL bundleURL : autoInstall)
-      {
-         try
-         {
-            Bundle bundle = context.installBundle(bundleURL.toString());
-            long bundleId = bundle.getBundleId();
-            log.info("Installed bundle [" + bundleId + "]: " + bundle.getSymbolicName());
-            autoBundles.put(bundleURL, bundle);
-         }
-         catch (BundleException ex)
-         {
-            stop();
-            throw new IllegalStateException("Cannot install bundle: " + bundleURL, ex);
-         }
-      }
+    public void start() {
+        // Create the Framework instance
+        assertFrameworkCreate();
 
-      // Start autoStart bundles
-      for (URL bundleURL : autoStart)
-      {
-         try
-         {
-            Bundle bundle = autoBundles.get(bundleURL);
-            if (bundle != null)
-            {
-               bundle.start();
-               log.info("Started bundle: " + bundle.getSymbolicName());
+        // Start the System Bundle
+        try {
+            getFramework().start();
+        } catch (BundleException ex) {
+            throw new FrameworkException("Cannot start system bundle", ex);
+        }
+
+        // Get system bundle context
+        BundleContext context = getFramework().getBundleContext();
+        if (context == null)
+            throw new FrameworkException("Cannot obtain system context");
+
+        Map<URL, Bundle> autoBundles = new HashMap<URL, Bundle>();
+
+        // Add the autoStart bundles to autoInstall
+        for (URL bundleURL : autoStart) {
+            autoInstall.add(bundleURL);
+        }
+
+        // Register system services
+        registerSystemServices(context);
+
+        // Install autoInstall bundles
+        for (URL bundleURL : autoInstall) {
+            try {
+                Bundle bundle = context.installBundle(bundleURL.toString());
+                long bundleId = bundle.getBundleId();
+                log.info("Installed bundle [" + bundleId + "]: " + bundle.getSymbolicName());
+                autoBundles.put(bundleURL, bundle);
+            } catch (BundleException ex) {
+                stop();
+                throw new IllegalStateException("Cannot install bundle: " + bundleURL, ex);
             }
-         }
-         catch (BundleException ex)
-         {
-            stop();
-            throw new IllegalStateException("Cannot start bundle: " + bundleURL, ex);
-         }
-      }
-   }
+        }
 
-   public void stop()
-   {
-      Framework framework = getFramework();
-      if (framework != null)
-      {
-         // Unregister system services
-         unregisterSystemServices(getBundleContext());
-         
-         try
-         {
-            framework.stop();
-            framework.waitForStop(5000);
-            framework = null;
-            log.debug("SystemBundle STOPPED");
-         }
-         catch (BundleException ex)
-         {
-            log.error("Cannot stop Framework", ex);
-         }
-         catch (InterruptedException ex)
-         {
-            log.error("Cannot stop Framework", ex);
-         }
-      }
-   }
+        // Start autoStart bundles
+        for (URL bundleURL : autoStart) {
+            try {
+                Bundle bundle = autoBundles.get(bundleURL);
+                if (bundle != null) {
+                    bundle.start();
+                    log.info("Started bundle: " + bundle.getSymbolicName());
+                }
+            } catch (BundleException ex) {
+                stop();
+                throw new IllegalStateException("Cannot start bundle: " + bundleURL, ex);
+            }
+        }
+    }
 
-   /**
-    * Overwrite to register system services before bundles get installed.
-    */
-   protected void registerSystemServices(BundleContext context)
-   {
-      // no default system services
-   }
-   
-   /**
-    * Overwrite to unregister system services before bundles get installed.
-    */
-   protected void unregisterSystemServices(BundleContext context)
-   {
-      // no default system services
-   }
-   
-   private void assertFrameworkCreate()
-   {
-      if (getFramework() == null)
-         create();
-   }
+    public void stop() {
+        Framework framework = getFramework();
+        if (framework != null) {
+            // Unregister system services
+            unregisterSystemServices(getBundleContext());
 
-   private void assertFrameworkStart()
-   {
-      assertFrameworkCreate();
-      if ((getFramework().getState() & Bundle.ACTIVE) == 0)
-         start();
-   }
+            try {
+                framework.stop();
+                framework.waitForStop(5000);
+                framework = null;
+                log.debug("SystemBundle STOPPED");
+            } catch (BundleException ex) {
+                log.error("Cannot stop Framework", ex);
+            } catch (InterruptedException ex) {
+                log.error("Cannot stop Framework", ex);
+            }
+        }
+    }
+
+    /**
+     * Overwrite to register system services before bundles get installed.
+     */
+    protected void registerSystemServices(BundleContext context) {
+        // no default system services
+    }
+
+    /**
+     * Overwrite to unregister system services before bundles get installed.
+     */
+    protected void unregisterSystemServices(BundleContext context) {
+        // no default system services
+    }
+
+    private void assertFrameworkCreate() {
+        if (getFramework() == null)
+            create();
+    }
+
+    private void assertFrameworkStart() {
+        assertFrameworkCreate();
+        if ((getFramework().getState() & Bundle.ACTIVE) == 0)
+            start();
+    }
 }

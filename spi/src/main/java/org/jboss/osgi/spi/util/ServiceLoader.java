@@ -33,107 +33,92 @@ import org.jboss.logging.Logger;
 
 /**
  * Loads service implementations from the requesters classpath.
- *
+ * 
  * @author Thomas.Diesler@jboss.com
  * @since 14-Dec-2006
  */
-public abstract class ServiceLoader
-{
-   // Provide logging
-   private static final Logger log = Logger.getLogger(ServiceLoader.class);
+public abstract class ServiceLoader {
 
-   /**
-    * Loads a list of service implementations defined in META-INF/services/${serviceClass}
-    *
-    * @param serviceClass The interface that is implemented by all loaded services
-    * @return The list of available service or an empty list
-    */
-   @SuppressWarnings("unchecked")
-   public static <T> List<T> loadServices(Class<T> serviceClass)
-   {
-      if (serviceClass == null)
-         throw new IllegalArgumentException("Null serviceClass");
+    // Provide logging
+    private static final Logger log = Logger.getLogger(ServiceLoader.class);
 
-      List<T> services = new ArrayList<T>();
-      ClassLoader loader = serviceClass.getClassLoader();
+    /**
+     * Loads a list of service implementations defined in META-INF/services/${serviceClass}
+     * 
+     * @param serviceClass The interface that is implemented by all loaded services
+     * @return The list of available service or an empty list
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> List<T> loadServices(Class<T> serviceClass) {
+        if (serviceClass == null)
+            throw new IllegalArgumentException("Null serviceClass");
 
-      // First try the system property
-      String serviceClassName = System.getProperty(serviceClass.getName());
-      if (serviceClassName != null)
-      {
-         try
-         {
-            Class<T> implClass = (Class<T>)loader.loadClass(serviceClassName);
-            services.add(implClass.newInstance());
-            return Collections.unmodifiableList(services);
-         }
-         catch (Exception ex)
-         {
-            throw new IllegalStateException("Failed to load service: " + serviceClassName, ex);
-         }
-      }
+        List<T> services = new ArrayList<T>();
+        ClassLoader loader = serviceClass.getClassLoader();
 
-      // Use the Services API (as detailed in the JAR specification), if available, to determine the classname.
-      String filename = "META-INF/services/" + serviceClass.getName();
-      InputStream inStream = loader.getResourceAsStream(filename);
-      if (inStream == null)
-         log.debug("Cannot find resource: " + filename);
-
-      if (inStream != null)
-      {
-         try
-         {
-            BufferedReader br = new BufferedReader(new InputStreamReader(inStream, "UTF-8"));
-            String implClassName = br.readLine();
-            while (implClassName != null)
-            {
-               int hashIndex = implClassName.indexOf("#");
-               if (hashIndex > 0)
-                  implClassName = implClassName.substring(0, hashIndex);
-
-               implClassName = implClassName.trim();
-
-               if (implClassName.length() > 0)
-               {
-                  try
-                  {
-                     Class<T> implClass = (Class<T>)loader.loadClass(implClassName);
-                     if (serviceClass.isAssignableFrom(implClass))
-                        services.add(implClass.newInstance());
-                     else
-                        log.warn("Not assignable: " + implClassName);
-                  }
-                  catch (Exception ex)
-                  {
-                     log.debug("Cannot load service: " + implClassName, ex);
-                  }
-               }
-
-               implClassName = br.readLine();
+        // First try the system property
+        String serviceClassName = System.getProperty(serviceClass.getName());
+        if (serviceClassName != null) {
+            try {
+                Class<T> implClass = (Class<T>) loader.loadClass(serviceClassName);
+                services.add(implClass.newInstance());
+                return Collections.unmodifiableList(services);
+            } catch (Exception ex) {
+                throw new IllegalStateException("Failed to load service: " + serviceClassName, ex);
             }
-            br.close();
-         }
-         catch (IOException ex)
-         {
-            throw new IllegalStateException("Failed to load services for: " + serviceClass.getName());
-         }
-      }
+        }
 
-      return Collections.unmodifiableList(services);
-   }
+        // Use the Services API (as detailed in the JAR specification), if available, to determine the classname.
+        String filename = "META-INF/services/" + serviceClass.getName();
+        InputStream inStream = loader.getResourceAsStream(filename);
+        if (inStream == null)
+            log.debug("Cannot find resource: " + filename);
 
-   /**
-    * Loads the first of a list of service implementations defined in META-INF/services/${serviceClass}
-    *
-    * @param serviceClass The interface that is implemented by all loaded services
-    * @return The first available service or null
-    */
-   public static <T> T loadService(Class<T> serviceClass)
-   {
-      List<T> services = loadServices(serviceClass);
-      if (services.isEmpty())
-         return null;
+        if (inStream != null) {
+            try {
+                BufferedReader br = new BufferedReader(new InputStreamReader(inStream, "UTF-8"));
+                String implClassName = br.readLine();
+                while (implClassName != null) {
+                    int hashIndex = implClassName.indexOf("#");
+                    if (hashIndex > 0)
+                        implClassName = implClassName.substring(0, hashIndex);
 
-      return services.get(0);
-   }
+                    implClassName = implClassName.trim();
+
+                    if (implClassName.length() > 0) {
+                        try {
+                            Class<T> implClass = (Class<T>) loader.loadClass(implClassName);
+                            if (serviceClass.isAssignableFrom(implClass))
+                                services.add(implClass.newInstance());
+                            else
+                                log.warn("Not assignable: " + implClassName);
+                        } catch (Exception ex) {
+                            log.debug("Cannot load service: " + implClassName, ex);
+                        }
+                    }
+
+                    implClassName = br.readLine();
+                }
+                br.close();
+            } catch (IOException ex) {
+                throw new IllegalStateException("Failed to load services for: " + serviceClass.getName());
+            }
+        }
+
+        return Collections.unmodifiableList(services);
+    }
+
+    /**
+     * Loads the first of a list of service implementations defined in META-INF/services/${serviceClass}
+     * 
+     * @param serviceClass The interface that is implemented by all loaded services
+     * @return The first available service or null
+     */
+    public static <T> T loadService(Class<T> serviceClass) {
+        List<T> services = loadServices(serviceClass);
+        if (services.isEmpty())
+            return null;
+
+        return services.get(0);
+    }
 }

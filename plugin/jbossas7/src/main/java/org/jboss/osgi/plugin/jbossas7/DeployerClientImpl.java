@@ -40,73 +40,64 @@ import org.jboss.osgi.testing.OSGiRuntime;
 
 /**
  * An abstract deployer for the {@link OSGiRuntime}
- *
+ * 
  * @author Thomas.Diesler@jboss.org
  * @since 09-Nov-2010
  */
-public class DeployerClientImpl implements OSGiDeployerClient
-{
-   // Provide logging
-   private static final Logger log = Logger.getLogger(DeployerClientImpl.class);
+public class DeployerClientImpl implements OSGiDeployerClient {
 
-   private ServerDeploymentManager deploymentManager;
+    // Provide logging
+    private static final Logger log = Logger.getLogger(DeployerClientImpl.class);
 
-   public DeployerClientImpl() throws IOException
-   {
-      InetAddress address = InetAddress.getByName("127.0.0.1");
-      StandaloneClient client = StandaloneClient.Factory.create(address, 9999);
-      deploymentManager = client.getDeploymentManager();
-   }
+    private ServerDeploymentManager deploymentManager;
 
-   @Override
-   public String deploy(URL url) throws Exception
-   {
-      DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
-      builder = builder.add(url).andDeploy();
-      DeploymentPlan plan = builder.build();
-      DeploymentAction deployAction = builder.getLastAction();
-      return executeDeploymentPlan(plan, deployAction);
-   }
+    public DeployerClientImpl() throws IOException {
+        InetAddress address = InetAddress.getByName("127.0.0.1");
+        StandaloneClient client = StandaloneClient.Factory.create(address, 9999);
+        deploymentManager = client.getDeploymentManager();
+    }
 
-   @Override
-   public String deploy(String name, InputStream input) throws Exception
-   {
-      DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
-      builder = builder.add(name, input).andDeploy();
-      DeploymentPlan plan = builder.build();
-      DeploymentAction deployAction = builder.getLastAction();
-      return executeDeploymentPlan(plan, deployAction);
-   }
+    @Override
+    public String deploy(URL url) throws Exception {
+        DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
+        builder = builder.add(url).andDeploy();
+        DeploymentPlan plan = builder.build();
+        DeploymentAction deployAction = builder.getLastAction();
+        return executeDeploymentPlan(plan, deployAction);
+    }
 
-   @Override
-   public void undeploy(String uniqueName)
-   {
-      try
-      {
-         DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
-         DeploymentPlan plan = builder.undeploy(uniqueName).remove(uniqueName).build();
-         Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
-         future.get();
-      }
-      catch (Throwable ex)
-      {
-         log.warn("Cannot undeploy: " + uniqueName, ex);
-      }
-   }
+    @Override
+    public String deploy(String name, InputStream input) throws Exception {
+        DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
+        builder = builder.add(name, input).andDeploy();
+        DeploymentPlan plan = builder.build();
+        DeploymentAction deployAction = builder.getLastAction();
+        return executeDeploymentPlan(plan, deployAction);
+    }
 
-   private String executeDeploymentPlan(DeploymentPlan plan, DeploymentAction deployAction) throws Exception
-   {
-      Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
-      ServerDeploymentPlanResult planResult = future.get();
+    @Override
+    public void undeploy(String uniqueName) {
+        try {
+            DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
+            DeploymentPlan plan = builder.undeploy(uniqueName).remove(uniqueName).build();
+            Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
+            future.get();
+        } catch (Throwable ex) {
+            log.warn("Cannot undeploy: " + uniqueName, ex);
+        }
+    }
 
-      ServerDeploymentActionResult actionResult = planResult.getDeploymentActionResult(deployAction.getId());
-      if (actionResult != null)
-      {
-         Exception deploymentException = (Exception)actionResult.getDeploymentException();
-         if (deploymentException != null)
-            throw deploymentException;
-      }
+    private String executeDeploymentPlan(DeploymentPlan plan, DeploymentAction deployAction) throws Exception {
+        Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
+        ServerDeploymentPlanResult planResult = future.get();
 
-      return deployAction.getDeploymentUnitUniqueName();
-   }
+        ServerDeploymentActionResult actionResult = planResult.getDeploymentActionResult(deployAction.getId());
+        if (actionResult != null) {
+            Exception deploymentException = (Exception) actionResult.getDeploymentException();
+            if (deploymentException != null)
+                throw deploymentException;
+        }
+
+        return deployAction.getDeploymentUnitUniqueName();
+    }
 }

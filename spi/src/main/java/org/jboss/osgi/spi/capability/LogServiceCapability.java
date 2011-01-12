@@ -24,8 +24,7 @@ package org.jboss.osgi.spi.capability;
 import org.osgi.service.log.LogService;
 
 /**
- * Adds the OSGi compedium LogService capability to the OSGiRuntime
- * under test. 
+ * Adds the OSGi compedium LogService capability to the OSGiRuntime under test.
  * 
  * It is ignored if the {@link LogService} is already registered.
  * 
@@ -34,15 +33,14 @@ import org.osgi.service.log.LogService;
  * @author thomas.diesler@jboss.com
  * @since 14-Sep-2009
  */
-public class LogServiceCapability extends Capability
-{
-   public LogServiceCapability()
-   {
-      super(LogService.class.getName());
-      
-      addDependency(new CompendiumCapability());
-      
-      addBundle("bundles/org.apache.felix.log.jar");
-      addBundle("bundles/jboss-osgi-common.jar");
-   }
+public class LogServiceCapability extends Capability {
+
+    public LogServiceCapability() {
+        super(LogService.class.getName());
+
+        addDependency(new CompendiumCapability());
+
+        addBundle("bundles/org.apache.felix.log.jar");
+        addBundle("bundles/jboss-osgi-common.jar");
+    }
 }

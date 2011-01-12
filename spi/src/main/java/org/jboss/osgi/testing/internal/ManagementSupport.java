@@ -39,120 +39,100 @@ import org.osgi.jmx.framework.ServiceStateMBean;
 
 /**
  * A helper for bundle management.
- *
+ * 
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class ManagementSupport
-{
-   private MBeanServerConnection mbeanServer;
+public class ManagementSupport {
 
-   public ManagementSupport(MBeanServerConnection mbeanServer)
-   {
-      if (mbeanServer == null)
-         throw new IllegalArgumentException("Null mbeanServer");
-      this.mbeanServer = mbeanServer;
-   }
+    private MBeanServerConnection mbeanServer;
 
-   public <T> T getMBeanProxy(ObjectName name, Class<T> interf)
-   {
-      return (T)MBeanServerInvocationHandler.newProxyInstance(mbeanServer, name, interf, false);
-   }
+    public ManagementSupport(MBeanServerConnection mbeanServer) {
+        if (mbeanServer == null)
+            throw new IllegalArgumentException("Null mbeanServer");
+        this.mbeanServer = mbeanServer;
+    }
 
-   public MBeanServerConnection getMBeanServer()
-   {
-      return mbeanServer;
-   }
+    public <T> T getMBeanProxy(ObjectName name, Class<T> interf) {
+        return (T) MBeanServerInvocationHandler.newProxyInstance(mbeanServer, name, interf, false);
+    }
 
-   public FrameworkMBean getFrameworkMBean() throws IOException
-   {
-      FrameworkMBean frameworkState = null;
-      ObjectName objectName = ObjectNameFactory.create(FrameworkMBeanExt.OBJECTNAME);
-      if (isRegisteredWithTimeout(objectName))
-      {
-         frameworkState = getMBeanProxy(objectName, FrameworkMBeanExt.class);
-         return frameworkState;
-      }
-      objectName = ObjectNameFactory.create(FrameworkMBean.OBJECTNAME);
-      if (isRegisteredWithTimeout(objectName))
-      {
-         frameworkState = getMBeanProxy(objectName, FrameworkMBean.class);
-         return frameworkState;
-      }
-      return frameworkState;
-   }
+    public MBeanServerConnection getMBeanServer() {
+        return mbeanServer;
+    }
 
-   public BundleStateMBean getBundleStateMBean() throws IOException
-   {
-      BundleStateMBean bundleState = null;
-      ObjectName objectName = ObjectNameFactory.create(BundleStateMBeanExt.OBJECTNAME);
-      if (isRegisteredWithTimeout(objectName))
-      {
-         bundleState = getMBeanProxy(objectName, BundleStateMBeanExt.class);
-         return bundleState;
-      }
-      objectName = ObjectNameFactory.create(BundleStateMBean.OBJECTNAME);
-      if (isRegisteredWithTimeout(objectName))
-      {
-         bundleState = getMBeanProxy(objectName, BundleStateMBean.class);
-         return bundleState;
-      }
-      return bundleState;
-   }
+    public FrameworkMBean getFrameworkMBean() throws IOException {
+        FrameworkMBean frameworkState = null;
+        ObjectName objectName = ObjectNameFactory.create(FrameworkMBeanExt.OBJECTNAME);
+        if (isRegisteredWithTimeout(objectName)) {
+            frameworkState = getMBeanProxy(objectName, FrameworkMBeanExt.class);
+            return frameworkState;
+        }
+        objectName = ObjectNameFactory.create(FrameworkMBean.OBJECTNAME);
+        if (isRegisteredWithTimeout(objectName)) {
+            frameworkState = getMBeanProxy(objectName, FrameworkMBean.class);
+            return frameworkState;
+        }
+        return frameworkState;
+    }
 
-   public PackageStateMBean getPackageStateMBean() throws IOException
-   {
-      PackageStateMBean packageState = null;
-      ObjectName objectName = ObjectNameFactory.create(PackageStateMBeanExt.OBJECTNAME);
-      if (isRegisteredWithTimeout(objectName))
-      {
-         packageState = getMBeanProxy(objectName, PackageStateMBeanExt.class);
-         return packageState;
-      }
-      objectName = ObjectNameFactory.create(PackageStateMBean.OBJECTNAME);
-      if (isRegisteredWithTimeout(objectName))
-      {
-         packageState = getMBeanProxy(objectName, PackageStateMBean.class);
-         return packageState;
-      }
-      return packageState;
-   }
+    public BundleStateMBean getBundleStateMBean() throws IOException {
+        BundleStateMBean bundleState = null;
+        ObjectName objectName = ObjectNameFactory.create(BundleStateMBeanExt.OBJECTNAME);
+        if (isRegisteredWithTimeout(objectName)) {
+            bundleState = getMBeanProxy(objectName, BundleStateMBeanExt.class);
+            return bundleState;
+        }
+        objectName = ObjectNameFactory.create(BundleStateMBean.OBJECTNAME);
+        if (isRegisteredWithTimeout(objectName)) {
+            bundleState = getMBeanProxy(objectName, BundleStateMBean.class);
+            return bundleState;
+        }
+        return bundleState;
+    }
 
-   public ServiceStateMBean getServiceStateMBean() throws IOException
-   {
-      ServiceStateMBean serviceState = null;
-      ObjectName objectName = ObjectNameFactory.create(ServiceStateMBeanExt.OBJECTNAME);
-      if (isRegisteredWithTimeout(objectName))
-      {
-         serviceState = getMBeanProxy(objectName, ServiceStateMBeanExt.class);
-         return serviceState;
-      }
-      objectName = ObjectNameFactory.create(ServiceStateMBean.OBJECTNAME);
-      if (isRegisteredWithTimeout(objectName))
-      {
-         serviceState = getMBeanProxy(objectName, ServiceStateMBean.class);
-         return serviceState;
-      }
-      return serviceState;
-   }
+    public PackageStateMBean getPackageStateMBean() throws IOException {
+        PackageStateMBean packageState = null;
+        ObjectName objectName = ObjectNameFactory.create(PackageStateMBeanExt.OBJECTNAME);
+        if (isRegisteredWithTimeout(objectName)) {
+            packageState = getMBeanProxy(objectName, PackageStateMBeanExt.class);
+            return packageState;
+        }
+        objectName = ObjectNameFactory.create(PackageStateMBean.OBJECTNAME);
+        if (isRegisteredWithTimeout(objectName)) {
+            packageState = getMBeanProxy(objectName, PackageStateMBean.class);
+            return packageState;
+        }
+        return packageState;
+    }
 
-   private boolean isRegisteredWithTimeout(ObjectName objectName) throws IOException
-   {
-      int timeout = 10000;
-      boolean registered = mbeanServer.isRegistered(objectName);
-      while(registered == false && timeout > 0)
-      {
-         try
-         {
-            Thread.sleep(100);
-         }
-         catch (InterruptedException ex)
-         {
-            // ignore
-         }
-         registered = mbeanServer.isRegistered(objectName);
-         timeout -= 100;
-      }
-      return registered;
-   }
+    public ServiceStateMBean getServiceStateMBean() throws IOException {
+        ServiceStateMBean serviceState = null;
+        ObjectName objectName = ObjectNameFactory.create(ServiceStateMBeanExt.OBJECTNAME);
+        if (isRegisteredWithTimeout(objectName)) {
+            serviceState = getMBeanProxy(objectName, ServiceStateMBeanExt.class);
+            return serviceState;
+        }
+        objectName = ObjectNameFactory.create(ServiceStateMBean.OBJECTNAME);
+        if (isRegisteredWithTimeout(objectName)) {
+            serviceState = getMBeanProxy(objectName, ServiceStateMBean.class);
+            return serviceState;
+        }
+        return serviceState;
+    }
+
+    private boolean isRegisteredWithTimeout(ObjectName objectName) throws IOException {
+        int timeout = 10000;
+        boolean registered = mbeanServer.isRegistered(objectName);
+        while (registered == false && timeout > 0) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                // ignore
+            }
+            registered = mbeanServer.isRegistered(objectName);
+            timeout -= 100;
+        }
+        return registered;
+    }
 }

@@ -38,75 +38,64 @@ import org.osgi.framework.Bundle;
  * @author thomas.Diesler@jboss.org
  * @since 03-Feb-2009
  */
-public final class BundleClassLoader extends ClassLoader
-{
-   private final Bundle bundle;
+public final class BundleClassLoader extends ClassLoader {
 
-   public static BundleClassLoader createClassLoader(final Bundle bundle)
-   {
-      if (bundle == null)
-         throw new IllegalArgumentException("Null bundle");
+    private final Bundle bundle;
 
-      return AccessController.doPrivileged(new PrivilegedAction<BundleClassLoader>()
-      {
-         public BundleClassLoader run()
-         {
-            return new BundleClassLoader(bundle);
-         }
-      });
-   }
+    public static BundleClassLoader createClassLoader(final Bundle bundle) {
+        if (bundle == null)
+            throw new IllegalArgumentException("Null bundle");
 
-   private BundleClassLoader(Bundle bundle)
-   {
-      this.bundle = bundle;
-   }
+        return AccessController.doPrivileged(new PrivilegedAction<BundleClassLoader>() {
 
-   protected Class<?> findClass(String name) throws ClassNotFoundException
-   {
-      return bundle.loadClass(name);
-   }
+            public BundleClassLoader run() {
+                return new BundleClassLoader(bundle);
+            }
+        });
+    }
 
-   protected URL findResource(String name)
-   {
-      return bundle.getResource(name);
-   }
+    private BundleClassLoader(Bundle bundle) {
+        this.bundle = bundle;
+    }
 
-   @SuppressWarnings("unchecked")
-   protected Enumeration<URL> findResources(String name) throws IOException
-   {
-      return bundle.getResources(name);
-   }
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
+        return bundle.loadClass(name);
+    }
 
-   public URL getResource(String name)
-   {
-      return findResource(name);
-   }
+    protected URL findResource(String name) {
+        return bundle.getResource(name);
+    }
 
-   public Class<?> loadClass(String name) throws ClassNotFoundException
-   {
-      return findClass(name);
-   }
+    @SuppressWarnings("unchecked")
+    protected Enumeration<URL> findResources(String name) throws IOException {
+        return bundle.getResources(name);
+    }
 
-   public boolean equals(Object obj)
-   {
-      if (this == obj)
-         return true;
+    public URL getResource(String name) {
+        return findResource(name);
+    }
 
-      if (obj instanceof BundleClassLoader == false)
-         return false;
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        return findClass(name);
+    }
 
-      final BundleClassLoader bundleClassLoader = (BundleClassLoader)obj;
-      return bundle.equals(bundleClassLoader.bundle);
-   }
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
 
-   public int hashCode()
-   {
-      return bundle.hashCode();
-   }
+        if (obj instanceof BundleClassLoader == false)
+            return false;
 
-   public String toString()
-   {
-      String shortName = bundle.getSymbolicName() + "-" + bundle.getVersion();
-      return "BundleClassLoader[id=" + bundle.getBundleId() + "," + shortName + "]";
-   }
+        final BundleClassLoader bundleClassLoader = (BundleClassLoader) obj;
+        return bundle.equals(bundleClassLoader.bundle);
+    }
+
+    public int hashCode() {
+        return bundle.hashCode();
+    }
+
+    public String toString() {
+        String shortName = bundle.getSymbolicName() + "-" + bundle.getVersion();
+        return "BundleClassLoader[id=" + bundle.getBundleId() + "," + shortName + "]";
+    }
 }

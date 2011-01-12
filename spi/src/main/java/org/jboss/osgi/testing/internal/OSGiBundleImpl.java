@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.testing.internal;
 
-
 import org.jboss.logging.Logger;
 import org.jboss.osgi.testing.OSGiBundle;
 import org.jboss.osgi.testing.OSGiRuntime;
@@ -34,90 +33,81 @@ import org.osgi.framework.BundleException;
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public abstract class OSGiBundleImpl implements OSGiBundle
-{
-   // Provide logging
-   private static final Logger log = Logger.getLogger(OSGiBundleImpl.class);
+public abstract class OSGiBundleImpl implements OSGiBundle {
 
-   private OSGiRuntime runtime;
-   
-   OSGiBundleImpl(OSGiRuntime runtime)
-   {
-      this.runtime = runtime;
-   }
+    // Provide logging
+    private static final Logger log = Logger.getLogger(OSGiBundleImpl.class);
 
-   public OSGiRuntime getRuntime()
-   {
-      return runtime;
-   }
+    private OSGiRuntime runtime;
 
-   /**
-    * Starts this bundle.
-    */
-   public void start() throws BundleException
-   {
-      log.debug("Start bundle: " + this);
-      startInternal();
-   }
-   
-   protected abstract void startInternal() throws BundleException;
-   
-   /**
-    * Stops this bundle.
-    */
-   public void stop() throws BundleException
-   {
-      log.debug("Stop bundle: " + this);
-      stopInternal();
-   }
-   
-   protected abstract void stopInternal() throws BundleException;
-   
-   /**
-    * Uninstalls this bundle.
-    */
-   public void uninstall() throws BundleException
-   {
-      log.debug("Uninstall bundle: " + this);
-      uninstallInternal();
-   }
-   
-   protected abstract void uninstallInternal() throws BundleException;
-   
-   /**
-    * Return true if symbolic name and version are equal
-    */
-   public boolean equals(Object obj)
-   {
-      if ((obj instanceof OSGiBundle) == false)
-         return false;
-      
-      OSGiBundle other = (OSGiBundle)obj;
-      
-      boolean isEqual =  getSymbolicName().equals(other.getSymbolicName());
-      isEqual = isEqual && getVersion().equals(other.getVersion());
-      return isEqual;
-   }
+    OSGiBundleImpl(OSGiRuntime runtime) {
+        this.runtime = runtime;
+    }
 
-   /**
-    * Returns the hash code for this bundle. 
-    */
-   public int hashCode()
-   {
-      return toString().hashCode();
-   }
+    public OSGiRuntime getRuntime() {
+        return runtime;
+    }
 
-   /**
-    * Returns the string representation of this bundle 
-    */
-   public String toString()
-   {
-      return "[" + getSymbolicName() + ":" + getVersion() + "]";
-   }
-   
-   void assertNotUninstalled()
-   {
-      if (getState() == Bundle.UNINSTALLED)
-         throw new IllegalStateException("Bundle already uninstalled: " + getLocation());
-   }
+    /**
+     * Starts this bundle.
+     */
+    public void start() throws BundleException {
+        log.debug("Start bundle: " + this);
+        startInternal();
+    }
+
+    protected abstract void startInternal() throws BundleException;
+
+    /**
+     * Stops this bundle.
+     */
+    public void stop() throws BundleException {
+        log.debug("Stop bundle: " + this);
+        stopInternal();
+    }
+
+    protected abstract void stopInternal() throws BundleException;
+
+    /**
+     * Uninstalls this bundle.
+     */
+    public void uninstall() throws BundleException {
+        log.debug("Uninstall bundle: " + this);
+        uninstallInternal();
+    }
+
+    protected abstract void uninstallInternal() throws BundleException;
+
+    /**
+     * Return true if symbolic name and version are equal
+     */
+    public boolean equals(Object obj) {
+        if ((obj instanceof OSGiBundle) == false)
+            return false;
+
+        OSGiBundle other = (OSGiBundle) obj;
+
+        boolean isEqual = getSymbolicName().equals(other.getSymbolicName());
+        isEqual = isEqual && getVersion().equals(other.getVersion());
+        return isEqual;
+    }
+
+    /**
+     * Returns the hash code for this bundle.
+     */
+    public int hashCode() {
+        return toString().hashCode();
+    }
+
+    /**
+     * Returns the string representation of this bundle
+     */
+    public String toString() {
+        return "[" + getSymbolicName() + ":" + getVersion() + "]";
+    }
+
+    void assertNotUninstalled() {
+        if (getState() == Bundle.UNINSTALLED)
+            throw new IllegalStateException("Bundle already uninstalled: " + getLocation());
+    }
 }

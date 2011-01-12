@@ -21,7 +21,6 @@
  */
 package org.jboss.osgi.testing.internal;
 
-
 import org.jboss.osgi.testing.OSGiServiceReference;
 import org.osgi.framework.ServiceReference;
 
@@ -31,23 +30,20 @@ import org.osgi.framework.ServiceReference;
  * @author Thomas.Diesler@jboss.org
  * @since 25-Sep-2008
  */
-public class EmbeddedServiceReference implements OSGiServiceReference
-{
-   private ServiceReference sref;
-   
-   public EmbeddedServiceReference(ServiceReference sref)
-   {
-      this.sref = sref;
-   }
+public class EmbeddedServiceReference implements OSGiServiceReference {
 
-   public Object getProperty(String key)
-   {
-      return sref.getProperty(key);
-   }
+    private ServiceReference sref;
 
-   public String[] getPropertyKeys()
-   {
-      return sref.getPropertyKeys();
-   }
+    public EmbeddedServiceReference(ServiceReference sref) {
+        this.sref = sref;
+    }
+
+    public Object getProperty(String key) {
+        return sref.getProperty(key);
+    }
+
+    public String[] getPropertyKeys() {
+        return sref.getPropertyKeys();
+    }
 
 }
