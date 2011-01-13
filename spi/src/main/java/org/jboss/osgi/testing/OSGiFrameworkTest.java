@@ -141,9 +141,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
 
     public static BundleContext getSystemContext() throws BundleException {
         Framework framework = getFramework();
-        if (framework.getState() != Bundle.ACTIVE)
-            throw new IllegalStateException("Framework not ACTIVE. Did you start() the framework?");
-
         return framework.getBundleContext();
     }
 
