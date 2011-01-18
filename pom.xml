@@ -18,7 +18,7 @@
   <artifactId>jbosgi-spi-parent</artifactId>
   <packaging>pom</packaging>
 
-  <version>1.0.21</version>
+  <version>1.0.22-SNAPSHOT</version>
   
   <!-- Parent -->
   <parent>
