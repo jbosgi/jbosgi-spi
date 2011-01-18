@@ -18,7 +18,7 @@
   <artifactId>jbosgi-spi-parent</artifactId>
   <packaging>pom</packaging>
 
-  <version>1.0.21-SNAPSHOT</version>
+  <version>1.0.21</version>
   
   <!-- Parent -->
   <parent>
@@ -31,7 +31,7 @@
   <properties>
     <version.args4j>2.0.12</version.args4j>
     <version.jboss.osgi.jmx>1.0.9</version.jboss.osgi.jmx>
-    <version.jboss.osgi.vfs>1.0.5-SNAPSHOT</version.jboss.osgi.vfs>
+    <version.jboss.osgi.vfs>1.0.5</version.jboss.osgi.vfs>
     <version.jboss.shrinkwrap>1.0.0-alpha-11</version.jboss.shrinkwrap>
     <version.osgi>4.2.0</version.osgi>
   </properties>
