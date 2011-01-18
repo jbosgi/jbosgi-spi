@@ -27,7 +27,7 @@
 
   <!-- Properties -->
   <properties>
-    <version.jboss.as>7.0.0.Alpha1</version.jboss.as>
+    <version.jboss.as>7.0.0.Alpha2-SNAPSHOT</version.jboss.as>
     <version.jboss.marshalling>1.3.0.CR8</version.jboss.marshalling>
   </properties>
   
@@ -40,13 +40,7 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.as</groupId>
-      <artifactId>jboss-as-standalone-client</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jboss.osgi</groupId>
-          <artifactId>jboss-osgi-spi</artifactId>
-        </exclusion>
-      </exclusions>
+      <artifactId>jboss-as-server</artifactId>
       <version>${version.jboss.as}</version>
     </dependency>
     <dependency>
