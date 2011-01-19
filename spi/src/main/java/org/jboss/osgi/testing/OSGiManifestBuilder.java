@@ -55,6 +55,7 @@ public final class OSGiManifestBuilder implements Asset {
     private Set<String> exportPackages = new LinkedHashSet<String>();
     private Set<String> dynamicImportPackages = new LinkedHashSet<String>();
     private Set<String> requiredBundles = new LinkedHashSet<String>();
+    private Set<String> requiredEnvironments = new LinkedHashSet<String>();
     private Manifest manifest;
 
     public static OSGiManifestBuilder newInstance() {
@@ -115,38 +116,45 @@ public final class OSGiManifestBuilder implements Asset {
         return this;
     }
 
+    public OSGiManifestBuilder addRequireExecutionEnvironment(String... environments) {
+        for (String aux : environments) {
+            requiredEnvironments.add(aux);
+        }
+        return this;
+    }
+    
     public OSGiManifestBuilder addImportPackages(Class<?>... packages) {
-        for (Class<?> aux : packages)
+        for (Class<?> aux : packages) {
             importPackages.add(aux.getPackage().getName());
-
+        }
         return this;
     }
 
     public OSGiManifestBuilder addImportPackages(String... packages) {
-        for (String aux : packages)
+        for (String aux : packages) {
             importPackages.add(aux);
-
+        }
         return this;
     }
 
     public OSGiManifestBuilder addDynamicImportPackages(String... packages) {
-        for (String aux : packages)
+        for (String aux : packages) {
             dynamicImportPackages.add(aux);
-
+        }
         return this;
     }
 
     public OSGiManifestBuilder addExportPackages(Class<?>... packages) {
-        for (Class<?> aux : packages)
+        for (Class<?> aux : packages) {
             exportPackages.add(aux.getPackage().getName());
-
+        }
         return this;
     }
 
     public OSGiManifestBuilder addExportPackages(String... packages) {
-        for (String aux : packages)
+        for (String aux : packages) {
             exportPackages.add(aux);
-
+        }
         return this;
     }
 
@@ -161,6 +169,16 @@ public final class OSGiManifestBuilder implements Asset {
             if (requiredBundles.size() > 0) {
                 append(Constants.REQUIRE_BUNDLE + ": ", false);
                 Iterator<String> iterator = requiredBundles.iterator();
+                append(iterator.next(), false);
+                while (iterator.hasNext())
+                    append("," + iterator.next(), false);
+                append(null, true);
+            }
+
+            // Bundle-RequiredExecutionEnvironment
+            if (requiredEnvironments.size() > 0) {
+                append(Constants.BUNDLE_REQUIREDEXECUTIONENVIRONMENT + ": ", false);
+                Iterator<String> iterator = requiredEnvironments.iterator();
                 append(iterator.next(), false);
                 while (iterator.hasNext())
                     append("," + iterator.next(), false);
