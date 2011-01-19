@@ -47,7 +47,7 @@ import org.osgi.framework.Version;
 public class BundleInfo implements Serializable {
 
     /** The fallback {@link Constants#BUNDLE_SYMBOLICNAME} for a v4.1 bundle */
-    final String ANONYMOUS_BUNDLE_SYMBOLIC_NAME = "anonymous-bundle-symbolic-name";
+    public static final String ANONYMOUS_BUNDLE_SYMBOLIC_NAME = "anonymous-bundle";
 
     private static final long serialVersionUID = -2363297020450715134L;
 
