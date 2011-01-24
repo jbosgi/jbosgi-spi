@@ -18,11 +18,13 @@
   <artifactId>jbosgi-spi</artifactId>
   <packaging>jar</packaging>
 
+  <version>1.0.22-SNAPSHOT</version>
+  
   <!-- Parent -->
   <parent>
-    <groupId>org.jboss.osgi.spi</groupId>
-    <artifactId>jbosgi-spi-parent</artifactId>
-    <version>1.0.22-SNAPSHOT</version>
+    <groupId>org.jboss.osgi</groupId>
+    <artifactId>jboss-osgi-parent</artifactId>
+    <version>1.0.9</version>
   </parent>
 
   <!-- Properties -->
@@ -67,6 +69,7 @@
     <dependency>
       <groupId>org.jboss.shrinkwrap</groupId>
       <artifactId>shrinkwrap-impl-base</artifactId>
+      <version>${version.jboss.shrinkwrap}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -77,11 +80,13 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
+      <version>${version.osgi}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
+      <version>${version.osgi}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
