@@ -12,19 +12,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>JBossOSGi SPI Parent</name>
+  <name>JBossOSGi SPI</name>
 
   <groupId>org.jboss.osgi.spi</groupId>
-  <artifactId>jbosgi-spi-parent</artifactId>
-  <packaging>pom</packaging>
+  <artifactId>jbosgi-spi</artifactId>
+  <packaging>jar</packaging>
 
-  <version>1.0.22-SNAPSHOT</version>
-  
   <!-- Parent -->
   <parent>
-    <groupId>org.jboss.osgi</groupId>
-    <artifactId>jboss-osgi-parent</artifactId>
-    <version>1.0.9</version>
+    <groupId>org.jboss.osgi.spi</groupId>
+    <artifactId>jbosgi-spi-parent</artifactId>
+    <version>1.0.22-SNAPSHOT</version>
   </parent>
 
   <!-- Properties -->
@@ -43,14 +41,19 @@
     <url>http://github.com/jbosgi/jbosgi-spi</url>
   </scm>
 
-  <!-- DependencyManagement -->
-  <dependencyManagement>
+  <!-- Dependencies -->
   <dependencies>
+
+    <!-- Compile Dependencies -->
     <dependency>
       <groupId>args4j</groupId>
       <artifactId>args4j</artifactId>
       <version>${version.args4j}</version>
     </dependency> 
+    <dependency>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.jboss.osgi.jmx</groupId>
       <artifactId>jboss-osgi-jmx-api</artifactId>
@@ -64,25 +67,29 @@
     <dependency>
       <groupId>org.jboss.shrinkwrap</groupId>
       <artifactId>shrinkwrap-impl-base</artifactId>
-      <version>${version.jboss.shrinkwrap}</version>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+
+    <!-- Provided Dependencies -->
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
-      <version>${version.osgi}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
-      <version>${version.osgi}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
-  </dependencyManagement>
 
-  <!-- Modules -->
-  <modules>
-    <module>spi</module>
-    <module>plugin</module>
-  </modules>
+  <!-- Build -->
+  <build>
+    <plugins>
+    </plugins>
+  </build>
 
 </project>
