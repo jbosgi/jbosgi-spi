@@ -335,7 +335,7 @@ public class BundleInfo implements Serializable {
     private static String getManifestHeaderInternal(Manifest manifest, String key) {
         Attributes attribs = manifest.getMainAttributes();
         String value = attribs.getValue(key);
-        return value;
+        return value != null ? value.trim() : null;
     }
 
     @Override
