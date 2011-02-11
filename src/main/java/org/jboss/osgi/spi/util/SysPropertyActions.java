@@ -23,38 +23,53 @@ package org.jboss.osgi.spi.util;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Properties;
 
 /**
  * Priviledged actions for the package
  * 
  * @author Scott.Stark@jboss.org
+ * @author David Bosschaert
  */
-@SuppressWarnings("rawtypes")
 public class SysPropertyActions {
 
     interface SysProps {
 
         SysProps NON_PRIVILEDGED = new SysProps() {
-
             public String getProperty(final String name, final String defaultValue) {
                 return System.getProperty(name, defaultValue);
             }
+
+            public Properties getProperties() {
+                return System.getProperties();
+            }
         };
+
         SysProps PRIVILEDGED = new SysProps() {
-
-            @SuppressWarnings("unchecked")
             public String getProperty(final String name, final String defaultValue) {
-                PrivilegedAction action = new PrivilegedAction() {
+                PrivilegedAction<String> action = new PrivilegedAction<String>() {
 
-                    public Object run() {
+                    public String run() {
                         return System.getProperty(name, defaultValue);
                     }
                 };
-                return (String) AccessController.doPrivileged(action);
+                return AccessController.doPrivileged(action);
+            }
+
+            public Properties getProperties() {
+                PrivilegedAction<Properties> action = new PrivilegedAction<Properties>() {
+                    @Override
+                    public Properties run() {
+                        return System.getProperties();
+                    }
+                };
+                return AccessController.doPrivileged(action);
             }
         };
 
         String getProperty(String name, String defaultValue);
+
+        Properties getProperties();
     }
 
     public static String getProperty(String name, String defaultValue) {
@@ -64,5 +79,12 @@ public class SysPropertyActions {
         else
             prop = SysProps.PRIVILEDGED.getProperty(name, defaultValue);
         return prop;
+    }
+
+    public static Properties getProperties() {
+        if (System.getSecurityManager() == null)
+            return SysProps.NON_PRIVILEDGED.getProperties();
+        else
+            return SysProps.PRIVILEDGED.getProperties();
     }
 }
