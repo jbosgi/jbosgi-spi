@@ -18,7 +18,7 @@
   <artifactId>jbosgi-spi</artifactId>
   <packaging>jar</packaging>
 
-  <version>1.0.24-SNAPSHOT</version>
+  <version>1.0.24</version>
   
   <!-- Parent -->
   <parent>
