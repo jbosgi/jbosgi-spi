@@ -23,6 +23,7 @@ package org.jboss.osgi.testing;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.EventObject;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -192,11 +194,10 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
     }
 
     protected void assertFrameworkEvent(int type, Bundle bundle, Class<? extends Throwable> expectedThrowable) throws Exception {
-        waitForEvent(frameworkEvents, type);
+        FrameworkEvent event = (FrameworkEvent) waitForEvent(frameworkEvents, type);
         log.debug("frameworkEvents=" + frameworkEvents);
-        int size = frameworkEvents.size();
-        assertTrue("" + size, size > 0);
-        FrameworkEvent event = frameworkEvents.remove(0);
+        assertNotNull("Event not null", event);
+        frameworkEvents.remove(event);
         assertEquals(ConstantsHelper.frameworkEvent(type), ConstantsHelper.frameworkEvent(event.getType()));
         Throwable t = event.getThrowable();
         if (expectedThrowable == null) {
@@ -227,25 +228,22 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
     }
 
     protected void assertBundleEvent(int type, Bundle bundle) throws Exception {
-        waitForEvent(bundleEvents, type);
-
+        BundleEvent event = (BundleEvent) waitForEvent(bundleEvents, type);
+        
         log.debug("bundleEvents=" + bundleEvents);
-        int size = bundleEvents.size();
-        assertTrue("" + size, size > 0);
+        assertNotNull("Event not null", event);
 
-        BundleEvent foundEvent = null;
         for (int i = 0; i < bundleEvents.size(); i++) {
             BundleEvent aux = bundleEvents.get(i);
             if (type == aux.getType()) {
                 if (bundle.equals(aux.getSource()) && bundle.equals(aux.getBundle())) {
                     bundleEvents.remove(aux);
-                    foundEvent = aux;
+                    event = aux;
                     break;
                 }
             }
         }
-
-        if (foundEvent == null)
+        if (event == null)
             fail("Cannot find event " + ConstantsHelper.bundleEvent(type) + " from " + bundle);
     }
 
@@ -264,11 +262,10 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
     }
 
     protected void assertServiceEvent(int type, ServiceReference reference) throws Exception {
-        waitForEvent(serviceEvents, type);
+        ServiceEvent event = (ServiceEvent) waitForEvent(serviceEvents, type);
         log.debug("serviceEvents=" + serviceEvents);
-        int size = serviceEvents.size();
-        assertTrue("" + size, size > 0);
-        ServiceEvent event = serviceEvents.remove(0);
+        assertNotNull("Event not null", event);
+        serviceEvents.remove(event);
         assertEquals(ConstantsHelper.serviceEvent(type), ConstantsHelper.serviceEvent(event.getType()));
         assertEquals(reference, event.getSource());
         assertEquals(reference, event.getServiceReference());
@@ -456,31 +453,31 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
     }
 
     @SuppressWarnings("rawtypes")
-    private void waitForEvent(List events, int type) throws InterruptedException {
+    private EventObject waitForEvent(List events, int type) throws InterruptedException {
         // Timeout for event delivery: 3 sec
         int timeout = 30;
 
-        boolean eventFound = false;
-        while (eventFound == false && 0 < timeout) {
+        EventObject eventFound = null;
+        while (eventFound == null && 0 < timeout) {
             synchronized (events) {
                 events.wait(100);
                 for (Object aux : events) {
                     if (aux instanceof BundleEvent) {
                         BundleEvent event = (BundleEvent) aux;
                         if (type == event.getType()) {
-                            eventFound = true;
+                            eventFound = event;
                             break;
                         }
                     } else if (aux instanceof ServiceEvent) {
                         ServiceEvent event = (ServiceEvent) aux;
                         if (type == event.getType()) {
-                            eventFound = true;
+                            eventFound = event;
                             break;
                         }
                     } else if (aux instanceof FrameworkEvent) {
                         FrameworkEvent event = (FrameworkEvent) aux;
                         if (type == event.getType()) {
-                            eventFound = true;
+                            eventFound = event;
                             break;
                         }
                     }
@@ -488,5 +485,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
             }
             timeout--;
         }
+        return eventFound;
     }
 }
