@@ -40,14 +40,18 @@ import org.osgi.framework.Version;
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
-public class BundleWrapper implements Bundle {
+public class GenericBundleWrapper<T extends Bundle> implements Bundle {
 
-    protected Bundle bundle;
+    private T bundle;
 
-    public BundleWrapper(Bundle bundle) {
+    public GenericBundleWrapper(T bundle) {
         if (bundle == null)
             throw new IllegalArgumentException("Null bundle");
         this.bundle = bundle;
+    }
+
+    protected T getWrappedBundle() {
+        return bundle;
     }
 
     @SuppressWarnings("rawtypes")
@@ -159,5 +163,20 @@ public class BundleWrapper implements Bundle {
 
     public void update(InputStream input) throws BundleException {
         bundle.update(input);
+    }
+
+    @Override
+    public int hashCode() {
+        return bundle.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return bundle.equals(obj);
+    }
+
+    @Override
+    public String toString() {
+        return bundle.toString();
     }
 }

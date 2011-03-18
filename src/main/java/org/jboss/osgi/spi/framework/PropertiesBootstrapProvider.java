@@ -150,7 +150,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
     private void initFrameworkInstance(final Map<String, Object> props) {
         // Load the framework instance
         final Framework frameworkImpl = createFramework(props);
-        framework = new FrameworkWrapper(frameworkImpl) {
+        framework = new GenericFrameworkWrapper<Framework>(frameworkImpl) {
 
             @Override
             public void start() throws BundleException {

@@ -41,15 +41,19 @@ import org.osgi.framework.launch.Framework;
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
-public class FrameworkWrapper implements Framework {
+public class GenericFrameworkWrapper<T extends Framework> implements Framework {
 
-    protected Framework framework;
+    private T framework;
 
-    public FrameworkWrapper(Framework framework) {
+    public GenericFrameworkWrapper(T framework) {
         if (framework == null)
             throw new IllegalArgumentException("Null framework");
 
         this.framework = framework;
+    }
+
+    protected T getWrappedFramework() {
+        return framework;
     }
 
     @SuppressWarnings("rawtypes")

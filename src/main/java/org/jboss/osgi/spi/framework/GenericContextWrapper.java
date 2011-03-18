@@ -42,16 +42,20 @@ import org.osgi.framework.ServiceRegistration;
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
-public class BundleContextWrapper implements BundleContext {
+public class GenericContextWrapper<T extends BundleContext> implements BundleContext {
 
-    protected BundleContext context;
+    private T context;
 
-    public BundleContextWrapper(BundleContext context) {
+    public GenericContextWrapper(T context) {
         if (context == null)
-            throw new IllegalArgumentException("Null framework");
+            throw new IllegalArgumentException("Null context");
         this.context = context;
     }
 
+    protected T getWrappedContext() {
+        return context;
+    }
+    
     public void addBundleListener(BundleListener listener) {
         context.addBundleListener(listener);
     }
@@ -140,5 +144,20 @@ public class BundleContextWrapper implements BundleContext {
 
     public boolean ungetService(ServiceReference reference) {
         return context.ungetService(reference);
+    }
+
+    @Override
+    public int hashCode() {
+        return context.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return context.equals(obj);
+    }
+
+    @Override
+    public String toString() {
+        return context.toString();
     }
 }

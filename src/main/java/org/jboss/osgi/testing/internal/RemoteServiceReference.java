@@ -49,7 +49,6 @@ public class RemoteServiceReference implements OSGiServiceReference {
         if (propData == null)
             return null;
 
-        // [TODO] decode value
         Object value = propData.get(JmxConstants.VALUE);
         return value;
     }

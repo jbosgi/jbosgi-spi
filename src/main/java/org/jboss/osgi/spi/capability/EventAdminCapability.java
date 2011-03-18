@@ -30,8 +30,6 @@ import org.osgi.service.event.EventAdmin;
  * 
  * Installed bundles: org.apache.felix.eventadmin.jar
  * 
- * [TODO] Add to SPI
- * 
  * @author thomas.diesler@jboss.com
  * @since 08-Dec-2009
  */

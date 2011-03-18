@@ -40,7 +40,7 @@ import org.osgi.framework.BundleContext;
 public final class StringPropertyReplacer {
 
     /** New line string constant */
-    public static final String NEWLINE = SysPropertyActions.getProperty("line.separator", "\n");
+    public static final String NEWLINE = SecurityActions.getSystemProperty("line.separator", "\n");
 
     /** File separator value */
     private static final String FILE_SEPARATOR = File.separator;
