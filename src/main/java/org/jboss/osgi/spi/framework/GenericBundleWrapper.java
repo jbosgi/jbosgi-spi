@@ -172,7 +172,12 @@ public class GenericBundleWrapper<T extends Bundle> implements Bundle {
 
     @Override
     public boolean equals(Object obj) {
-        return bundle.equals(obj);
+        if (obj == this)
+            return true;
+        if (!(obj instanceof GenericBundleWrapper))
+            return false;
+        GenericBundleWrapper<?> other = (GenericBundleWrapper<?>) obj;
+        return bundle.equals(other.bundle);
     }
 
     @Override

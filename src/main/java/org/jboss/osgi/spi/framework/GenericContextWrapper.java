@@ -153,7 +153,12 @@ public class GenericContextWrapper<T extends BundleContext> implements BundleCon
 
     @Override
     public boolean equals(Object obj) {
-        return context.equals(obj);
+        if (obj == this)
+            return true;
+        if (!(obj instanceof GenericContextWrapper))
+            return false;
+        GenericContextWrapper<?> other = (GenericContextWrapper<?>) obj;
+        return context.equals(other.context);
     }
 
     @Override

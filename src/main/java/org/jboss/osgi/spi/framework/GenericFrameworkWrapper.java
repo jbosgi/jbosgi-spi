@@ -21,18 +21,8 @@
  */
 package org.jboss.osgi.spi.framework;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Map;
-
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
 
 /**
@@ -41,137 +31,23 @@ import org.osgi.framework.launch.Framework;
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
-public class GenericFrameworkWrapper<T extends Framework> implements Framework {
-
-    private T framework;
+public class GenericFrameworkWrapper<T extends Framework> extends GenericBundleWrapper<T> implements Framework {
 
     public GenericFrameworkWrapper(T framework) {
-        if (framework == null)
-            throw new IllegalArgumentException("Null framework");
-
-        this.framework = framework;
+        super(framework);
     }
 
     protected T getWrappedFramework() {
-        return framework;
+        return (T)getWrappedBundle();
     }
 
-    @SuppressWarnings("rawtypes")
-    public Enumeration findEntries(String arg0, String arg1, boolean arg2) {
-        return framework.findEntries(arg0, arg1, arg2);
-    }
-
-    public BundleContext getBundleContext() {
-        return framework.getBundleContext();
-    }
-
-    public long getBundleId() {
-        return framework.getBundleId();
-    }
-
-    public URL getEntry(String arg0) {
-        return framework.getEntry(arg0);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public Enumeration getEntryPaths(String arg0) {
-        return framework.getEntryPaths(arg0);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public Dictionary getHeaders() {
-        return framework.getHeaders();
-    }
-
-    @SuppressWarnings("rawtypes")
-    public Dictionary getHeaders(String arg0) {
-        return framework.getHeaders(arg0);
-    }
-
-    public long getLastModified() {
-        return framework.getLastModified();
-    }
-
-    public String getLocation() {
-        return framework.getLocation();
-    }
-
-    public ServiceReference[] getRegisteredServices() {
-        return framework.getRegisteredServices();
-    }
-
-    public URL getResource(String arg0) {
-        return framework.getResource(arg0);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public Enumeration getResources(String arg0) throws IOException {
-        return framework.getResources(arg0);
-    }
-
-    public ServiceReference[] getServicesInUse() {
-        return framework.getServicesInUse();
-    }
-
-    @SuppressWarnings("rawtypes")
-    public Map getSignerCertificates(int arg0) {
-        return framework.getSignerCertificates(arg0);
-    }
-
-    public int getState() {
-        return framework.getState();
-    }
-
-    public String getSymbolicName() {
-        return framework.getSymbolicName();
-    }
-
-    public Version getVersion() {
-        return framework.getVersion();
-    }
-
-    public boolean hasPermission(Object arg0) {
-        return framework.hasPermission(arg0);
-    }
-
+    @Override
     public void init() throws BundleException {
-        framework.init();
+        getWrappedFramework().init();
     }
 
-    @SuppressWarnings("rawtypes")
-    public Class loadClass(String arg0) throws ClassNotFoundException {
-        return framework.loadClass(arg0);
-    }
-
-    public void start() throws BundleException {
-        framework.start();
-    }
-
-    public void start(int arg0) throws BundleException {
-        framework.start(arg0);
-    }
-
-    public void stop() throws BundleException {
-        framework.stop();
-    }
-
-    public void stop(int arg0) throws BundleException {
-        framework.stop(arg0);
-    }
-
-    public void uninstall() throws BundleException {
-        framework.uninstall();
-    }
-
-    public void update() throws BundleException {
-        framework.update();
-    }
-
-    public void update(InputStream arg0) throws BundleException {
-        framework.update(arg0);
-    }
-
-    public FrameworkEvent waitForStop(long arg0) throws InterruptedException {
-        return framework.waitForStop(arg0);
+    @Override
+    public FrameworkEvent waitForStop(long timeout) throws InterruptedException {
+        return getWrappedFramework().waitForStop(timeout);
     }
 }
