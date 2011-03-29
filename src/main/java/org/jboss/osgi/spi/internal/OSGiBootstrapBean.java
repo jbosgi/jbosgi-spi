@@ -198,7 +198,8 @@ public class OSGiBootstrapBean {
             log.info("Initiating shutdown ...");
             try {
                 framework.stop();
-            } catch (BundleException ex) {
+                framework.waitForStop(5000);
+            } catch (Exception ex) {
                 log.error("Cannot stop framework", ex);
             }
             log.info("Shutdown complete");
