@@ -181,12 +181,12 @@ public class OSGiTestHelper {
 
     public static VirtualFile toVirtualFile(Archive<?> archive) throws IOException, MalformedURLException {
         ZipExporter exporter = archive.as(ZipExporter.class);
-        return AbstractVFS.toVirtualFile(archive.getName(), exporter.exportZip());
+        return AbstractVFS.toVirtualFile(archive.getName(), exporter.exportAsInputStream());
     }
 
     public static InputStream toInputStream(Archive<?> archive) throws IOException {
         ZipExporter exporter = archive.as(ZipExporter.class);
-        return exporter.exportZip();
+        return exporter.exportAsInputStream();
     }
 
     private static void addResources(JavaArchive archive, VirtualFile basedir, VirtualFile resdir) throws IOException {
