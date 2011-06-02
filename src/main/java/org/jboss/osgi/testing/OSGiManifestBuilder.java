@@ -21,36 +21,23 @@
  */
 package org.jboss.osgi.testing;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 
 /**
  * A simple OSGi manifest builder.
- * 
+ *
  * @author thomas.diesler@jboss.com
  * @since 08-Mar-2010
  */
-public final class OSGiManifestBuilder implements Asset {
+public final class OSGiManifestBuilder extends ManifestBuilder implements Asset {
 
-    // Provide logging
-    private static final Logger log = Logger.getLogger(OSGiManifestBuilder.class);
-
-    private StringWriter sw;
-    private PrintWriter pw;
     private Set<String> importPackages = new LinkedHashSet<String>();
     private Set<String> exportPackages = new LinkedHashSet<String>();
     private Set<String> dynamicImportPackages = new LinkedHashSet<String>();
@@ -63,9 +50,6 @@ public final class OSGiManifestBuilder implements Asset {
     }
 
     private OSGiManifestBuilder() {
-        sw = new StringWriter();
-        pw = new PrintWriter(sw);
-        append(Attributes.Name.MANIFEST_VERSION + ": 1.0", true);
     }
 
     public OSGiManifestBuilder addBundleManifestVersion(int version) {
@@ -122,7 +106,7 @@ public final class OSGiManifestBuilder implements Asset {
         }
         return this;
     }
-    
+
     public OSGiManifestBuilder addImportPackages(Class<?>... packages) {
         for (Class<?> aux : packages) {
             importPackages.add(aux.getPackage().getName());
@@ -155,11 +139,6 @@ public final class OSGiManifestBuilder implements Asset {
         for (String aux : packages) {
             exportPackages.add(aux);
         }
-        return this;
-    }
-
-    public OSGiManifestBuilder addManifestHeader(String key, String value) {
-        append(key + ": " + value, true);
         return this;
     }
 
@@ -215,38 +194,8 @@ public final class OSGiManifestBuilder implements Asset {
                 append(null, true);
             }
 
-            String manifestString = sw.toString();
-            if (log.isTraceEnabled())
-                log.trace(manifestString);
-
-            try {
-                manifest = new Manifest(new ByteArrayInputStream(manifestString.getBytes()));
-            } catch (IOException ex) {
-                throw new IllegalStateException("Cannot create manifest", ex);
-            }
+            manifest = super.getManifest();
         }
         return manifest;
-    }
-
-    @Override
-    public InputStream openStream() {
-        Manifest manifest = getManifest();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            manifest.write(baos);
-            return new ByteArrayInputStream(baos.toByteArray());
-        } catch (IOException ex) {
-            throw new IllegalStateException("Cannot provide manifest InputStream", ex);
-        }
-    }
-
-    private void append(String line, boolean newline) {
-        if (manifest != null)
-            throw new IllegalStateException("Cannot append to already existing manifest");
-
-        if (line != null)
-            pw.print(line);
-        if (newline == true)
-            pw.println();
     }
 }
