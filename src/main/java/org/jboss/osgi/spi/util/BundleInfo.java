@@ -38,9 +38,9 @@ import org.osgi.framework.Version;
 
 /**
  * Primitive access to bundle meta data and root virtual file.
- * 
+ *
  * The bundle info can be constructed from various locations. If that succeeds, there is a valid OSGi Manifest.
- * 
+ *
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
@@ -126,7 +126,7 @@ public class BundleInfo implements Serializable {
 
     /**
      * Validate manifest from the given virtual file.
-     * 
+     *
      * @param virtualFile The virtualFile that is checked for a valid manifest
      * @return True if the virtualFile conatains a valid manifest
      */
@@ -141,11 +141,11 @@ public class BundleInfo implements Serializable {
 
     /**
      * Validate a given bundle manifest.
-     * 
+     *
      * @param manifest The given manifest
      * @return True if the manifest is valid
      */
-    public static boolean isValidateBundleManifest(Manifest manifest) {
+    public static boolean isValidBundleManifest(Manifest manifest) {
         if (manifest == null)
             return false;
 
@@ -159,7 +159,18 @@ public class BundleInfo implements Serializable {
 
     /**
      * Validate a given bundle manifest.
-     * 
+     *
+     * @param manifest The given manifest
+     * @return True if the manifest is valid
+     * @deprecated use {@link #isValidBundleManifest(Manifest)}
+     */
+    public static boolean isValidateBundleManifest(Manifest manifest) {
+        return isValidBundleManifest(manifest);
+    }
+
+    /**
+     * Validate a given bundle manifest.
+     *
      * @param manifest The given manifest
      * @throws BundleException if this is not a valid bundle manifest
      */
@@ -196,7 +207,7 @@ public class BundleInfo implements Serializable {
 
     /**
      * Get the bundle manifest version.
-     * 
+     *
      * @param manifest The given manifest
      * @return The value of the Bundle-ManifestVersion header, or -1 for a non OSGi manifest
      */
