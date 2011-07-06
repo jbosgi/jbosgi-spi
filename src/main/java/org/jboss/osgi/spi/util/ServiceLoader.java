@@ -33,7 +33,7 @@ import org.jboss.logging.Logger;
 
 /**
  * Loads service implementations from the requesters classpath.
- * 
+ *
  * @author Thomas.Diesler@jboss.com
  * @since 14-Dec-2006
  */
@@ -44,7 +44,7 @@ public abstract class ServiceLoader {
 
     /**
      * Loads a list of service implementations defined in META-INF/services/${serviceClass}
-     * 
+     *
      * @param serviceClass The interface that is implemented by all loaded services
      * @return The list of available service or an empty list
      */
@@ -80,7 +80,7 @@ public abstract class ServiceLoader {
                 String implClassName = br.readLine();
                 while (implClassName != null) {
                     int hashIndex = implClassName.indexOf("#");
-                    if (hashIndex > 0)
+                    if (hashIndex >= 0)
                         implClassName = implClassName.substring(0, hashIndex);
 
                     implClassName = implClassName.trim();
@@ -110,7 +110,7 @@ public abstract class ServiceLoader {
 
     /**
      * Loads the first of a list of service implementations defined in META-INF/services/${serviceClass}
-     * 
+     *
      * @param serviceClass The interface that is implemented by all loaded services
      * @return The first available service or null
      */
