@@ -21,35 +21,10 @@
  */
 package org.jboss.osgi.testing;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.EventObject;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.util.ConstantsHelper;
-import org.jboss.osgi.testing.internal.EmbeddedRuntimeImpl;
-import org.jboss.osgi.testing.internal.ManagementSupport;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.After;
@@ -66,12 +41,28 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.launch.Framework;
-import org.osgi.jmx.framework.BundleStateMBean;
-import org.osgi.jmx.framework.FrameworkMBean;
-import org.osgi.jmx.framework.PackageStateMBean;
-import org.osgi.jmx.framework.ServiceStateMBean;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.service.startlevel.StartLevel;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.EventObject;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Parent for native framework tests.
@@ -89,8 +80,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
     private final List<FrameworkEvent> frameworkEvents = new CopyOnWriteArrayList<FrameworkEvent>();
     private final List<BundleEvent> bundleEvents = new CopyOnWriteArrayList<BundleEvent>();
     private final List<ServiceEvent> serviceEvents = new CopyOnWriteArrayList<ServiceEvent>();
-
-    private ManagementSupport jmxSupport;
 
     @Before
     public void setUp() throws Exception {
@@ -378,38 +367,6 @@ public abstract class OSGiFrameworkTest extends OSGiTest implements ServiceListe
             // should not reach this
             return null;
         }
-    }
-
-    protected MBeanServer getMBeanServer() {
-        MBeanServer mbeanServer = EmbeddedRuntimeImpl.getLocalMBeanServer();
-        return mbeanServer;
-    }
-
-    protected <T> T getMBeanProxy(ObjectName name, Class<T> interf) {
-        return getJMXSupport().getMBeanProxy(name, interf);
-    }
-
-    protected FrameworkMBean getFrameworkMBean() throws IOException {
-        return getJMXSupport().getFrameworkMBean();
-    }
-
-    protected BundleStateMBean getBundleStateMBean() throws IOException {
-        return getJMXSupport().getBundleStateMBean();
-    }
-
-    protected PackageStateMBean getPackageStateMBean() throws IOException {
-        return getJMXSupport().getPackageStateMBean();
-    }
-
-    protected ServiceStateMBean getServiceStateMBean() throws IOException {
-        return getJMXSupport().getServiceStateMBean();
-    }
-
-    private ManagementSupport getJMXSupport() {
-        if (jmxSupport == null)
-            jmxSupport = new ManagementSupport(getMBeanServer());
-
-        return jmxSupport;
     }
 
     /**
