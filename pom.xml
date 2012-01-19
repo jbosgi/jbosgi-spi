@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jboss-osgi-parent</artifactId>
-        <version>1.0.11</version>
+        <version>1.0.12</version>
     </parent>
 
     <name>JBossOSGi SPI</name>
@@ -32,6 +32,7 @@
         <version.jboss.logging>3.1.0.CR2</version.jboss.logging>
         <version.jboss.osgi.vfs>1.0.6</version.jboss.osgi.vfs>
         <version.jboss.shrinkwrap>1.0.0-cr-1</version.jboss.shrinkwrap>
+        <version.junit>4.10</version.junit>
         <version.osgi>4.2.0</version.osgi>
     </properties>
 
@@ -64,6 +65,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>${version.junit}</version>
         </dependency>
 
         <!-- Provided Dependencies -->
