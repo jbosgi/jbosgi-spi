@@ -30,12 +30,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 /**
- * A simple OSGi manifest builder.
+ * A simple manifest builder.
  *
  * @author thomas.diesler@jboss.com
  * @since 08-Mar-2010
@@ -45,8 +47,7 @@ public class ManifestBuilder implements Asset {
     // Provide logging
     private static final Logger log = Logger.getLogger(ManifestBuilder.class);
 
-    private StringWriter sw;
-    private PrintWriter pw;
+    private List<String> lines = new ArrayList<String>();
     private Manifest manifest;
 
     public static ManifestBuilder newInstance() {
@@ -54,24 +55,36 @@ public class ManifestBuilder implements Asset {
     }
 
     protected ManifestBuilder() {
-        sw = new StringWriter();
-        pw = new PrintWriter(sw);
-        append(Attributes.Name.MANIFEST_VERSION + ": 1.0", true);
+        append(Attributes.Name.MANIFEST_VERSION + ": 1.0");
     }
 
     public ManifestBuilder addManifestHeader(String key, String value) {
-        append(key + ": " + value, true);
+        append(key + ": " + value);
         return this;
     }
 
     public Manifest getManifest() {
         if (manifest == null) {
-            String manifestString = sw.toString();
+
+            StringWriter out = new StringWriter();
+            PrintWriter pw = new PrintWriter(out);
+            for(String line : lines) {
+                byte[] bytes = line.getBytes();
+                while (bytes.length >= 512) {
+                    byte[] head = Arrays.copyOf(bytes, 256);
+                    bytes = Arrays.copyOfRange(bytes, 256, bytes.length);
+                    pw.println(new String(head));
+                    pw.print(" ");
+                }
+                pw.println(new String(bytes));
+            }
+
+            String content = out.toString();
             if (log.isTraceEnabled())
-                log.trace(manifestString);
+                log.trace(content);
 
             try {
-                manifest = new Manifest(new ByteArrayInputStream(manifestString.getBytes()));
+                manifest = new Manifest(new ByteArrayInputStream(content.getBytes()));
             } catch (IOException ex) {
                 throw new IllegalStateException("Cannot create manifest", ex);
             }
@@ -91,22 +104,10 @@ public class ManifestBuilder implements Asset {
         }
     }
 
-    protected void append(String line, boolean newline) {
+    protected void append(String line) {
         if (manifest != null)
             throw new IllegalStateException("Cannot append to already existing manifest");
 
-        if (line != null) {
-            byte[] bytes = line.getBytes();
-            while (bytes.length >= 512) {
-                byte[] head = Arrays.copyOf(bytes, 256);
-                bytes = Arrays.copyOfRange(bytes, 256, bytes.length);
-                pw.println(new String(head));
-                pw.print(" ");
-            }
-            pw.print(new String(bytes));
-        }
-        if (newline == true) {
-            pw.println();
-        }
+        lines.add(line);
     }
 }

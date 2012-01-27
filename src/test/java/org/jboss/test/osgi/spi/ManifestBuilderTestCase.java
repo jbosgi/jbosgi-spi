@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.Constants;
 
+import java.io.IOException;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -17,7 +18,7 @@ import java.util.jar.Manifest;
 public class ManifestBuilderTestCase {
 
     @Test
-    public void testLongLine() {
+    public void testLongLine() throws IOException {
         String importPackages = "org.jboss.osgi.deployment.interceptor,org.osgi.service.packageadmin,org.osgi.service.http,javax.servlet.http,javax.servlet,org.jboss.osgi.resolver.v2,org.osgi.service.repository,org.osgi.framework.resource,org.junit.runner,org.osgi.framework,org.jboss.shrinkwrap.api.spec,org.jboss.arquillian.container.test.api,org.jboss.arquillian.junit,org.jboss.arquillian.osgi,org.jboss.arquillian.test.api,org.jboss.osgi.testing,org.jboss.shrinkwrap.api,org.jboss.shrinkwrap.api.asset,org.junit,javax.inject";
 
         ManifestBuilder builder = ManifestBuilder.newInstance();

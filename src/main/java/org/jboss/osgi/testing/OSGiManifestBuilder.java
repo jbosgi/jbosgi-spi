@@ -21,14 +21,14 @@
  */
 package org.jboss.osgi.testing;
 
+import org.jboss.shrinkwrap.api.asset.Asset;
+import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
+
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.jar.Manifest;
-
-import org.jboss.shrinkwrap.api.asset.Asset;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Version;
 
 /**
  * A simple OSGi manifest builder.
@@ -53,22 +53,22 @@ public final class OSGiManifestBuilder extends ManifestBuilder implements Asset 
     }
 
     public OSGiManifestBuilder addBundleManifestVersion(int version) {
-        append(Constants.BUNDLE_MANIFESTVERSION + ": " + version, true);
+        append(Constants.BUNDLE_MANIFESTVERSION + ": " + version);
         return this;
     }
 
     public OSGiManifestBuilder addBundleSymbolicName(String symbolicName) {
-        append(Constants.BUNDLE_SYMBOLICNAME + ": " + symbolicName, true);
+        append(Constants.BUNDLE_SYMBOLICNAME + ": " + symbolicName);
         return this;
     }
 
     public OSGiManifestBuilder addBundleName(String name) {
-        append(Constants.BUNDLE_NAME + ": " + name, true);
+        append(Constants.BUNDLE_NAME + ": " + name);
         return this;
     }
 
     public OSGiManifestBuilder addBundleVersion(Version version) {
-        append(Constants.BUNDLE_VERSION + ": " + version, true);
+        append(Constants.BUNDLE_VERSION + ": " + version);
         return this;
     }
 
@@ -81,17 +81,17 @@ public final class OSGiManifestBuilder extends ManifestBuilder implements Asset 
     }
 
     public OSGiManifestBuilder addBundleActivator(String bundleActivator) {
-        append(Constants.BUNDLE_ACTIVATOR + ": " + bundleActivator, true);
+        append(Constants.BUNDLE_ACTIVATOR + ": " + bundleActivator);
         return this;
     }
 
     public OSGiManifestBuilder addBundleActivationPolicy(String activationPolicy) {
-        append(Constants.BUNDLE_ACTIVATIONPOLICY + ": " + activationPolicy, true);
+        append(Constants.BUNDLE_ACTIVATIONPOLICY + ": " + activationPolicy);
         return this;
     }
 
     public OSGiManifestBuilder addFragmentHost(String fragmentHost) {
-        append(Constants.FRAGMENT_HOST + ": " + fragmentHost, true);
+        append(Constants.FRAGMENT_HOST + ": " + fragmentHost);
         return this;
     }
 
@@ -146,52 +146,62 @@ public final class OSGiManifestBuilder extends ManifestBuilder implements Asset 
         if (manifest == null) {
             // Require-Bundle
             if (requiredBundles.size() > 0) {
-                append(Constants.REQUIRE_BUNDLE + ": ", false);
+                StringBuffer buffer = new StringBuffer();
+                buffer.append(Constants.REQUIRE_BUNDLE + ": ");
                 Iterator<String> iterator = requiredBundles.iterator();
-                append(iterator.next(), false);
-                while (iterator.hasNext())
-                    append("," + iterator.next(), false);
-                append(null, true);
+                buffer.append(iterator.next());
+                while (iterator.hasNext()) {
+                    buffer.append("," + iterator.next());
+                }
+                append(buffer.toString());
             }
 
             // Bundle-RequiredExecutionEnvironment
             if (requiredEnvironments.size() > 0) {
-                append(Constants.BUNDLE_REQUIREDEXECUTIONENVIRONMENT + ": ", false);
+                StringBuffer buffer = new StringBuffer();
+                buffer.append(Constants.BUNDLE_REQUIREDEXECUTIONENVIRONMENT + ": ");
                 Iterator<String> iterator = requiredEnvironments.iterator();
-                append(iterator.next(), false);
-                while (iterator.hasNext())
-                    append("," + iterator.next(), false);
-                append(null, true);
+                buffer.append(iterator.next());
+                while (iterator.hasNext()) {
+                    buffer.append("," + iterator.next());
+                }
+                append(buffer.toString());
             }
 
             // Export-Package
             if (exportPackages.size() > 0) {
-                append(Constants.EXPORT_PACKAGE + ": ", false);
+                StringBuffer buffer = new StringBuffer();
+                buffer.append(Constants.EXPORT_PACKAGE + ": ");
                 Iterator<String> iterator = exportPackages.iterator();
-                append(iterator.next(), false);
-                while (iterator.hasNext())
-                    append("," + iterator.next(), false);
-                append(null, true);
+                buffer.append(iterator.next());
+                while (iterator.hasNext()) {
+                    buffer.append("," + iterator.next());
+                }
+                append(buffer.toString());
             }
 
             // Import-Package
             if (importPackages.size() > 0) {
-                append(Constants.IMPORT_PACKAGE + ": ", false);
+                StringBuffer buffer = new StringBuffer();
+                buffer.append(Constants.IMPORT_PACKAGE + ": ");
                 Iterator<String> iterator = importPackages.iterator();
-                append(iterator.next(), false);
-                while (iterator.hasNext())
-                    append("," + iterator.next(), false);
-                append(null, true);
+                buffer.append(iterator.next());
+                while (iterator.hasNext()) {
+                    buffer.append("," + iterator.next());
+                }
+                append(buffer.toString());
             }
 
             // DynamicImport-Package
             if (dynamicImportPackages.size() > 0) {
-                append(Constants.DYNAMICIMPORT_PACKAGE + ": ", false);
+                StringBuffer buffer = new StringBuffer();
+                buffer.append(Constants.DYNAMICIMPORT_PACKAGE + ": ");
                 Iterator<String> iterator = dynamicImportPackages.iterator();
-                append(iterator.next(), false);
-                while (iterator.hasNext())
-                    append("," + iterator.next(), false);
-                append(null, true);
+                buffer.append(iterator.next());
+                while (iterator.hasNext()) {
+                    buffer.append("," + iterator.next());
+                }
+                append(buffer.toString());
             }
 
             manifest = super.getManifest();
