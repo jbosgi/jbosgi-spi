@@ -21,17 +21,18 @@
  */
 package org.jboss.osgi.testing;
 
+import org.jboss.logging.Logger;
+import org.jboss.shrinkwrap.api.asset.Asset;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
-import org.jboss.logging.Logger;
-import org.jboss.shrinkwrap.api.asset.Asset;
 
 /**
  * A simple OSGi manifest builder.
@@ -94,9 +95,18 @@ public class ManifestBuilder implements Asset {
         if (manifest != null)
             throw new IllegalStateException("Cannot append to already existing manifest");
 
-        if (line != null)
-            pw.print(line);
-        if (newline == true)
+        if (line != null) {
+            byte[] bytes = line.getBytes();
+            while (bytes.length >= 512) {
+                byte[] head = Arrays.copyOf(bytes, 256);
+                bytes = Arrays.copyOfRange(bytes, 256, bytes.length);
+                pw.println(new String(head));
+                pw.print(" ");
+            }
+            pw.print(new String(bytes));
+        }
+        if (newline == true) {
             pw.println();
+        }
     }
 }
