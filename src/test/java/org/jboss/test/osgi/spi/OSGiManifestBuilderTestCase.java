@@ -1,11 +1,10 @@
 package org.jboss.test.osgi.spi;
 
-import org.jboss.osgi.spi.ManifestBuilder;
+import org.jboss.osgi.spi.OSGiManifestBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.osgi.framework.Constants;
 
-import java.io.IOException;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -15,17 +14,18 @@ import java.util.jar.Manifest;
  * @author thomas.diesler@jboss.com
  * @since 27-Jan-2012
  */
-public class ManifestBuilderTestCase {
+public class OSGiManifestBuilderTestCase {
 
     @Test
-    public void testLongLine() throws IOException {
+    public void testLongLine() {
         String importPackages = "org.jboss.osgi.deployment.interceptor,org.osgi.service.packageadmin,org.osgi.service.http,javax.servlet.http,javax.servlet,org.jboss.osgi.resolver.v2,org.osgi.service.repository,org.osgi.framework.resource,org.junit.runner,org.osgi.framework,org.jboss.shrinkwrap.api.spec,org.jboss.arquillian.container.test.api,org.jboss.arquillian.junit,org.jboss.arquillian.osgi,org.jboss.arquillian.test.api,org.jboss.osgi.testing,org.jboss.shrinkwrap.api,org.jboss.shrinkwrap.api.asset,org.junit,javax.inject";
 
-        ManifestBuilder builder = ManifestBuilder.newInstance();
-        builder.addManifestHeader(Constants.BUNDLE_MANIFESTVERSION, "2");
-        builder.addManifestHeader(Constants.BUNDLE_SYMBOLICNAME, "example-webapp-negative");
-        builder.addManifestHeader(Constants.EXPORT_PACKAGE, "org.jboss.test.osgi.example.webapp");
-        builder.addManifestHeader(Constants.IMPORT_PACKAGE, importPackages);
+        OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
+        builder.addBundleSymbolicName("example-webapp-negative");
+        builder.addExportPackages("org.jboss.test.osgi.example.webapp");
+        for (String pack : importPackages.split(",")) {
+            builder.addImportPackages(pack);
+        }
         Manifest manifest = builder.getManifest();
         Assert.assertNotNull("Manifest not null", manifest);
 

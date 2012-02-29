@@ -37,7 +37,7 @@ public class GenericFrameworkWrapper<T extends Framework> extends GenericBundleW
         super(framework);
     }
 
-    protected T getWrappedFramework() {
+    private T getWrappedFramework() {
         return (T)getWrappedBundle();
     }
 

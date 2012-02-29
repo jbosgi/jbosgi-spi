@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.osgi.testing;
+package org.jboss.osgi.spi;
 
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.osgi.framework.Constants;

@@ -37,10 +37,14 @@ import org.jboss.logging.Logger;
  * @author Thomas.Diesler@jboss.com
  * @since 14-Dec-2006
  */
-public abstract class ServiceLoader {
+public final class ServiceLoader {
 
     // Provide logging
     private static final Logger log = Logger.getLogger(ServiceLoader.class);
+
+    // Hide ctor
+    private ServiceLoader() {
+    }
 
     /**
      * Loads a list of service implementations defined in META-INF/services/${serviceClass}

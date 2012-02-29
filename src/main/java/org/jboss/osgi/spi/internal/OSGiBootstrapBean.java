@@ -21,8 +21,13 @@
  */
 package org.jboss.osgi.spi.internal;
 
-import static org.jboss.osgi.spi.OSGiConstants.OSGI_HOME;
-import static org.jboss.osgi.spi.OSGiConstants.OSGI_SERVER_HOME;
+import org.jboss.logging.Logger;
+import org.jboss.osgi.spi.framework.OSGiBootstrap;
+import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
+import org.jboss.osgi.spi.framework.PropertiesBootstrapProvider;
+import org.jboss.osgi.spi.util.ServiceLoader;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.launch.Framework;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,19 +35,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
-
-import org.jboss.logging.Logger;
-import org.jboss.osgi.spi.framework.OSGiBootstrap;
-import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
-import org.jboss.osgi.spi.framework.PropertiesBootstrapProvider;
-import org.jboss.osgi.spi.util.ServiceLoader;
-import org.kohsuke.args4j.Option;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.launch.Framework;
 
 /**
  * An internal bean that collabrates with {@link OSGiBootstrap}.
@@ -53,20 +48,6 @@ import org.osgi.framework.launch.Framework;
 public class OSGiBootstrapBean {
 
     private static Logger log;
-
-    private static final String JAVA_PROTOCOL_HANDLERS = "java.protocol.handler.pkgs";
-    private static final String DEFAULT_JAVA_PROTOCOL_HANDLERS = "org.jboss.net.protocol|org.jboss.virtual.protocol|org.jboss.vfs.protocol";
-    private static final String JBOSS_BIND_ADDRESS = "jboss.bind.address";
-    private static final String OSGI_SERVER_NAME = "osgi.server.name";
-
-    @Option(name = "-c", aliases = { "--server-name" }, usage = "The runtime profile to start. (-c minimal)", required = false)
-    public String serverName = "default";
-
-    @Option(name = "-b", aliases = { "--bind-address" }, usage = "The network address various services can bind to (-b 127.0.0.1)", required = false)
-    public String bindAddress = "localhost";
-
-    private String osgiHome;
-    private String osgiServerHome;
 
     public void run() {
         initBootstrap();
@@ -82,32 +63,13 @@ public class OSGiBootstrapBean {
     }
 
     private void initBootstrap() {
-        osgiHome = System.getProperty(OSGI_HOME);
-        if (osgiHome == null)
-            throw new IllegalStateException("Cannot obtain system property: '" + OSGI_HOME + "'");
-
-        osgiServerHome = osgiHome + "/server/" + serverName;
-
-        // Replace the context class loader with one that contains the server conf dir
-        File serverConfDir = new File(osgiServerHome + "/conf");
-        if (serverConfDir.exists()) {
-            ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
-            URLClassLoader confLoader = new URLClassLoader(new URL[] { toURL(serverConfDir) }, ctxLoader);
-            Thread.currentThread().setContextClassLoader(confLoader);
-        }
 
         // This property must be set before the logger is obtained
-        System.setProperty(OSGI_SERVER_HOME, osgiServerHome);
         log = Logger.getLogger(OSGiBootstrapBean.class);
 
         Properties defaults = new Properties();
-        defaults.setProperty(OSGI_SERVER_NAME, serverName);
-        defaults.setProperty(OSGI_SERVER_HOME, osgiServerHome);
-        defaults.setProperty(JBOSS_BIND_ADDRESS, bindAddress);
-        defaults.setProperty(JAVA_PROTOCOL_HANDLERS, DEFAULT_JAVA_PROTOCOL_HANDLERS);
 
         log.debug("JBoss OSGi System Properties");
-        log.debug("   " + OSGI_SERVER_HOME + "=" + osgiServerHome);
 
         Enumeration<?> defaultNames = defaults.propertyNames();
         while (defaultNames.hasMoreElements()) {
