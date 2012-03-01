@@ -24,7 +24,7 @@
     <artifactId>jbosgi-spi</artifactId>
     <packaging>jar</packaging>
 
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.0.1.Final</version>
 
     <!-- Properties -->
     <properties>
