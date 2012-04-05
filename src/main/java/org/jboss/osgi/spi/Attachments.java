@@ -21,6 +21,8 @@
  */
 package org.jboss.osgi.spi;
 
+import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
+
 import java.util.Collection;
 
 /**
@@ -87,7 +89,7 @@ public interface Attachments {
                     try {
                         classPart = Class.forName(className);
                     } catch (ClassNotFoundException ex) {
-                        throw new IllegalArgumentException("Cannot find class '" + className + "' in: " + key);
+                        throw MESSAGES.illegalArgumentCannotFindClassInKey(className, key);
                     }
                 }
                 return new Key(namePart, classPart);

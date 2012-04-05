@@ -21,6 +21,9 @@
  */
 package org.jboss.osgi.spi.util;
 
+import static org.jboss.osgi.spi.internal.SPILogger.LOGGER;
+import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,18 +32,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jboss.logging.Logger;
-
 /**
- * Loads service implementations from the requesters classpath.
+ * Loads service implementations from the classpath that defines the service class.
  *
  * @author Thomas.Diesler@jboss.com
  * @since 14-Dec-2006
  */
 public final class ServiceLoader {
-
-    // Provide logging
-    private static final Logger log = Logger.getLogger(ServiceLoader.class);
 
     // Hide ctor
     private ServiceLoader() {
@@ -55,7 +53,7 @@ public final class ServiceLoader {
     @SuppressWarnings("unchecked")
     public static <T> List<T> loadServices(Class<T> serviceClass) {
         if (serviceClass == null)
-            throw new IllegalArgumentException("Null serviceClass");
+            throw MESSAGES.illegalArgumentNull("serviceClass");
 
         List<T> services = new ArrayList<T>();
         ClassLoader loader = serviceClass.getClassLoader();
@@ -68,7 +66,7 @@ public final class ServiceLoader {
                 services.add(implClass.newInstance());
                 return Collections.unmodifiableList(services);
             } catch (Exception ex) {
-                throw new IllegalStateException("Failed to load service: " + serviceClassName, ex);
+                throw MESSAGES.illegalStateCannotLoadServiceClass(ex, serviceClassName);
             }
         }
 
@@ -76,7 +74,7 @@ public final class ServiceLoader {
         String filename = "META-INF/services/" + serviceClass.getName();
         InputStream inStream = loader.getResourceAsStream(filename);
         if (inStream == null)
-            log.debug("Cannot find resource: " + filename);
+            LOGGER.debugf("Cannot find resource: %s", filename);
 
         if (inStream != null) {
             try {
@@ -95,9 +93,9 @@ public final class ServiceLoader {
                             if (serviceClass.isAssignableFrom(implClass))
                                 services.add(implClass.newInstance());
                             else
-                                log.warn("Not assignable: " + implClassName);
+                                LOGGER.warnServiceNotAssignable(implClassName);
                         } catch (Exception ex) {
-                            log.debug("Cannot load service: " + implClassName, ex);
+                            LOGGER.debugf(ex, "Cannot load service: %s", implClassName);
                         }
                     }
 
@@ -105,7 +103,7 @@ public final class ServiceLoader {
                 }
                 br.close();
             } catch (IOException ex) {
-                throw new IllegalStateException("Failed to load services for: " + serviceClass.getName());
+                throw MESSAGES.illegalStateCannotLoadServiceClass(ex, serviceClassName);
             }
         }
 

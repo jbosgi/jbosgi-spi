@@ -21,6 +21,8 @@
  */
 package org.jboss.osgi.spi.util;
 
+import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
+
 import java.io.Serializable;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -40,7 +42,7 @@ public class UnmodifiableDictionary<K, V> extends Dictionary<K, V> implements Se
 
     public UnmodifiableDictionary(Dictionary<K, V> props) {
         if (props == null)
-            throw new IllegalArgumentException("Null props");
+            throw MESSAGES.illegalArgumentNull("props");
 
         delegate = new Hashtable<K, V>();
         Enumeration<K> keys = props.keys();

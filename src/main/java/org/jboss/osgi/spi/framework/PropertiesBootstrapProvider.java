@@ -21,6 +21,9 @@
  */
 package org.jboss.osgi.spi.framework;
 
+import static org.jboss.osgi.spi.internal.SPILogger.LOGGER;
+import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +38,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.util.ServiceLoader;
 import org.jboss.osgi.spi.util.StringPropertyReplacer;
 import org.osgi.framework.Bundle;
@@ -79,9 +81,6 @@ import org.osgi.framework.launch.FrameworkFactory;
  */
 public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
 
-    // Provide logging
-    private static final Logger log = Logger.getLogger(PropertiesBootstrapProvider.class);
-
     /** The default framework property: jboss.osgi.framework.properties */
     public static final String OSGI_FRAMEWORK_CONFIG = "jboss.osgi.framework.properties";
     /** The default framework config: jboss-osgi-framework.properties */
@@ -110,18 +109,18 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
 
     public void configure(String resourceConfig) {
         if (resourceConfig == null)
-            throw new IllegalArgumentException("Null resouce name");
+            throw MESSAGES.illegalArgumentNull("resourceConfig");
 
         URL urlConfig = Thread.currentThread().getContextClassLoader().getResource(resourceConfig);
         if (urlConfig == null)
-            throw new IllegalStateException("Cannot find resource: " + resourceConfig);
+            throw MESSAGES.illegalStateCannotFindResource(resourceConfig);
 
         configure(urlConfig);
     }
 
     public void configure(URL urlConfig) {
         if (urlConfig == null)
-            throw new IllegalArgumentException("Null config url");
+            throw MESSAGES.illegalArgumentNull("config url");
 
         Map<String, Object> props = getBootstrapProperties(urlConfig);
         initFrameworkInstance(props);
@@ -134,7 +133,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
 
     private void configureInternal(String resourceConfig) {
         if (resourceConfig == null)
-            throw new IllegalArgumentException("Null resouce name");
+            throw MESSAGES.illegalArgumentNull("resourceConfig");
 
         Map<String, Object> props;
         URL urlConfig = Thread.currentThread().getContextClassLoader().getResource(resourceConfig);
@@ -142,7 +141,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
             props = getBootstrapProperties(urlConfig);
         } else {
             props = new HashMap<String, Object>();
-            log.debug("Bootstrap using framework defaults");
+            LOGGER.debugf("Bootstrap using framework defaults");
         }
         initFrameworkInstance(props);
     }
@@ -159,7 +158,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
                 // Get system bundle context
                 BundleContext context = getBundleContext();
                 if (context == null)
-                    throw new FrameworkException("Cannot obtain system context");
+                    throw MESSAGES.bundleCannotOptainSystemContext();
 
                 // Init the the autoInstall URLs
                 List<URL> autoInstall = getBundleURLs(props, PROP_OSGI_FRAMEWORK_AUTO_INSTALL);
@@ -180,8 +179,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
                 // Install autoInstall bundles
                 for (URL bundleURL : autoInstall) {
                     Bundle bundle = context.installBundle(bundleURL.toString());
-                    long bundleId = bundle.getBundleId();
-                    log.info("Installed bundle [" + bundleId + "]: " + bundle.getSymbolicName());
+                    LOGGER.infoBundleInstalled(bundle.getBundleId(), bundle);
                     autoBundles.put(bundleURL, bundle);
                 }
 
@@ -190,7 +188,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
                     Bundle bundle = autoBundles.get(bundleURL);
                     if (bundle != null) {
                         bundle.start();
-                        log.info("Started bundle: " + bundle.getSymbolicName());
+                        LOGGER.infoBundleStarted(bundle.getBundleId(), bundle);
                     }
                 }
             }
@@ -199,7 +197,6 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
             public void stop() throws BundleException {
                 // Unregister system services
                 unregisterSystemServices(getBundleContext());
-
                 super.stop();
             }
         };
@@ -211,7 +208,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
     protected Framework createFramework(Map<String, Object> properties) {
         FrameworkFactory factory = ServiceLoader.loadService(FrameworkFactory.class);
         if (factory == null)
-            throw new IllegalStateException("Cannot load: META-INF/services/org.osgi.framework.launch.FrameworkFactory");
+            throw MESSAGES.illegalStateCannotLoadService(FrameworkFactory.class.getName());
 
         Framework framework = factory.newFramework(properties);
         return framework;
@@ -252,7 +249,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
             URL pathURL = new URL(realPath);
             return pathURL;
         } catch (MalformedURLException ex) {
-            throw new IllegalStateException("Invalid path: " + path, ex);
+            throw MESSAGES.illegalStateInvalidPath(ex, path);
         }
     }
 
@@ -270,7 +267,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
             props = getBootstrapProperties(propStream);
             propStream.close();
         } catch (IOException ex) {
-            throw new IllegalStateException("Cannot configure from: " + urlConfig, ex);
+            throw MESSAGES.illegalStateCannotConfigureFrom(ex, urlConfig);
         }
         return props;
     }
@@ -278,7 +275,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
     @SuppressWarnings("unchecked")
     private Map<String, Object> getBootstrapProperties(InputStream propStream) {
         if (propStream == null)
-            throw new IllegalArgumentException("Null properties stream");
+            throw MESSAGES.illegalArgumentNull("propStream");
 
         Map<String, Object> propMap = new HashMap<String, Object>();
         try {
@@ -302,7 +299,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
                         Object instance = Class.forName(value).newInstance();
                         propMap.put(subkey, instance);
                     } catch (Exception ex) {
-                        log.error("Cannot load " + key + "=" + value, ex);
+                        LOGGER.errorCannotLoadPropertyInstance(ex, key, value);
                     }
                 }
             }
@@ -326,14 +323,14 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
                 }
 
                 if (extraPropsURL == null)
-                    throw new IllegalStateException("Invalid properties URL: " + extraPropsValue);
+                    throw MESSAGES.illegalStateInvalidPropertiesURL(extraPropsValue);
 
                 propMap.remove(PROP_OSGI_FRAMEWORK_EXTRA);
                 Map<String, Object> extraProps = getBootstrapProperties(extraPropsURL.openStream());
                 propMap.putAll(extraProps);
             }
         } catch (IOException ex) {
-            throw new IllegalStateException("Cannot load properties", ex);
+            throw MESSAGES.illegalStateCannotLoadProperties(ex);
         }
         return propMap;
     }

@@ -21,8 +21,8 @@
  */
 package org.jboss.osgi.spi;
 
-import org.jboss.logging.Logger;
-import org.jboss.shrinkwrap.api.asset.Asset;
+import static org.jboss.osgi.spi.internal.SPILogger.LOGGER;
+import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import org.jboss.shrinkwrap.api.asset.Asset;
+
 /**
  * A simple manifest builder.
  *
@@ -43,9 +45,6 @@ import java.util.jar.Manifest;
  * @since 08-Mar-2010
  */
 public class ManifestBuilder implements Asset {
-
-    // Provide logging
-    private static final Logger log = Logger.getLogger(ManifestBuilder.class);
 
     private List<String> lines = new ArrayList<String>();
     private Manifest manifest;
@@ -80,13 +79,13 @@ public class ManifestBuilder implements Asset {
             }
 
             String content = out.toString();
-            if (log.isTraceEnabled())
-                log.trace(content);
+            if (LOGGER.isTraceEnabled())
+                LOGGER.tracef(content);
 
             try {
                 manifest = new Manifest(new ByteArrayInputStream(content.getBytes()));
             } catch (IOException ex) {
-                throw new IllegalStateException("Cannot create manifest", ex);
+                throw MESSAGES.illegalStateCannotCreateManifest(ex);
             }
         }
         return manifest;
@@ -100,13 +99,13 @@ public class ManifestBuilder implements Asset {
             manifest.write(baos);
             return new ByteArrayInputStream(baos.toByteArray());
         } catch (IOException ex) {
-            throw new IllegalStateException("Cannot provide manifest InputStream", ex);
+            throw MESSAGES.illegalStateCannotProvideManifestInputStream(ex);
         }
     }
 
     protected void append(String line) {
         if (manifest != null)
-            throw new IllegalStateException("Cannot append to already existing manifest");
+            throw MESSAGES.illegalStateCannotAppendToExistingManifest();
 
         lines.add(line);
     }

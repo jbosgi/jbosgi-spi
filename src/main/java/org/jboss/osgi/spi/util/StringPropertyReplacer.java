@@ -21,6 +21,8 @@
  */
 package org.jboss.osgi.spi.util;
 
+import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
+
 import java.io.File;
 
 import org.osgi.framework.BundleContext;
@@ -119,8 +121,10 @@ public final class StringPropertyReplacer {
      *         will be returned.
      */
     public static String replaceProperties(final String string, final PropertyProvider provider) {
+        if (string == null)
+            throw MESSAGES.illegalArgumentNull("string");
         if (provider == null)
-            throw new IllegalArgumentException("Null provider");
+            throw MESSAGES.illegalArgumentNull("provider");
 
         final char[] chars = string.toCharArray();
         StringBuffer buffer = new StringBuffer();

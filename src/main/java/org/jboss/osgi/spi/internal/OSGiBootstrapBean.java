@@ -21,23 +21,22 @@
  */
 package org.jboss.osgi.spi.internal;
 
-import org.jboss.logging.Logger;
+import static org.jboss.osgi.spi.internal.SPILogger.LOGGER;
+import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
+
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.framework.PropertiesBootstrapProvider;
 import org.jboss.osgi.spi.util.ServiceLoader;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * An internal bean that collabrates with {@link OSGiBootstrap}.
@@ -46,8 +45,6 @@ import java.util.Properties;
  * @since 04-Nov-2008
  */
 public class OSGiBootstrapBean {
-
-    private static Logger log;
 
     public void run() {
         initBootstrap();
@@ -64,12 +61,9 @@ public class OSGiBootstrapBean {
 
     private void initBootstrap() {
 
-        // This property must be set before the logger is obtained
-        log = Logger.getLogger(OSGiBootstrapBean.class);
-
         Properties defaults = new Properties();
 
-        log.debug("JBoss OSGi System Properties");
+        LOGGER.debugf("JBoss OSGi System Properties");
 
         Enumeration<?> defaultNames = defaults.propertyNames();
         while (defaultNames.hasMoreElements()) {
@@ -78,14 +72,12 @@ public class OSGiBootstrapBean {
             if (sysValue == null) {
                 String propValue = defaults.getProperty(propName);
                 System.setProperty(propName, propValue);
-                log.debug("   " + propName + "=" + propValue);
+                LOGGER.debugf("   %s=%s", propName, propValue);
             }
         }
     }
 
     public static OSGiBootstrapProvider getBootstrapProvider() {
-        if (log == null)
-            log = Logger.getLogger(OSGiBootstrap.class);
 
         OSGiBootstrapProvider provider = null;
 
@@ -96,24 +88,16 @@ public class OSGiBootstrapBean {
                 provider = aux;
                 break;
             } catch (Exception ex) {
-                log.debug("Cannot configure [" + aux.getClass().getName() + "]", ex);
+                LOGGER.debugf(ex, "Cannot configure [%s]", aux.getClass().getName());
             }
         }
 
         if (provider == null) {
             provider = new PropertiesBootstrapProvider();
-            log.debug("Using default: " + PropertiesBootstrapProvider.class.getName());
+            LOGGER.debugf("Using default: %s", PropertiesBootstrapProvider.class.getName());
         }
 
         return provider;
-    }
-
-    private URL toURL(File file) {
-        try {
-            return file.toURI().toURL();
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Invalid file: " + file);
-        }
     }
 
     class StartupThread extends Thread {
@@ -130,11 +114,11 @@ public class OSGiBootstrapBean {
             try {
                 framework.start();
             } catch (BundleException ex) {
-                throw new IllegalStateException("Cannot start framework", ex);
+                throw MESSAGES.illegalStateCannotStartFramework(ex);
             }
 
             float diff = (System.currentTimeMillis() - beforeStart) / 1000f;
-            log.info("JBossOSGi Runtime booted in " + diff + "sec");
+            LOGGER.infoRuntimeBooted(diff);
 
             Reader br = new InputStreamReader(System.in);
             try {
@@ -157,14 +141,14 @@ public class OSGiBootstrapBean {
         }
 
         public void run() {
-            log.info("Initiating shutdown ...");
+            LOGGER.infoInitiatingShutdown();
             try {
                 framework.stop();
                 framework.waitForStop(5000);
             } catch (Exception ex) {
-                log.error("Cannot stop framework", ex);
+                LOGGER.errorCannotStopFramework(ex);
             }
-            log.info("Shutdown complete");
+            LOGGER.infoShutdownComplete();
         }
     }
 }

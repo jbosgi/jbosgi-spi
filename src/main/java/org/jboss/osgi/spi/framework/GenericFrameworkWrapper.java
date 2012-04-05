@@ -31,7 +31,7 @@ import org.osgi.framework.launch.Framework;
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
-public class GenericFrameworkWrapper<T extends Framework> extends GenericBundleWrapper<T> implements Framework {
+class GenericFrameworkWrapper<T extends Framework> extends GenericBundleWrapper<T> implements Framework {
 
     public GenericFrameworkWrapper(T framework) {
         super(framework);

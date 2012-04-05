@@ -21,6 +21,8 @@
  */
 package org.jboss.osgi.spi.framework;
 
+import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -40,13 +42,13 @@ import org.osgi.framework.Version;
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
  */
-public class GenericBundleWrapper<T extends Bundle> implements Bundle {
+class GenericBundleWrapper<T extends Bundle> implements Bundle {
 
     private T bundle;
 
     public GenericBundleWrapper(T bundle) {
         if (bundle == null)
-            throw new IllegalArgumentException("Null bundle");
+            throw MESSAGES.illegalArgumentNull("bundle");
         this.bundle = bundle;
     }
 

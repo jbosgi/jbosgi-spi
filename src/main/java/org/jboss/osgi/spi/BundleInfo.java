@@ -21,6 +21,8 @@
  */
 package org.jboss.osgi.spi;
 
+import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -58,18 +60,18 @@ public class BundleInfo implements Serializable {
 
     public static BundleInfo createBundleInfo(String location) throws BundleException {
         if (location == null)
-            throw new IllegalArgumentException("Location cannot be null");
+            throw MESSAGES.illegalArgumentNull("location");
 
         URL url = getRealLocation(location);
         if (url == null)
-            throw new IllegalArgumentException("Cannot obtain real location for: " + location);
+            throw MESSAGES.illegalArgumentCannotObtainRealLocation(location);
 
         return new BundleInfo(toVirtualFile(url), url.toExternalForm());
     }
 
     public static BundleInfo createBundleInfo(URL url) throws BundleException {
         if (url == null)
-            throw new IllegalArgumentException("Null root url");
+            throw MESSAGES.illegalArgumentNull("url");
 
         return new BundleInfo(toVirtualFile(url), url.toExternalForm());
     }
@@ -84,7 +86,7 @@ public class BundleInfo implements Serializable {
 
     private BundleInfo(VirtualFile rootFile, String location) throws BundleException {
         if (rootFile == null)
-            throw new IllegalArgumentException("Root file cannot be null");
+            throw MESSAGES.illegalArgumentNull("rootFile");
 
         this.rootFile = rootFile;
         this.rootURL = toURL(rootFile);
@@ -99,9 +101,9 @@ public class BundleInfo implements Serializable {
         try {
             manifest = VFSUtils.getManifest(rootFile);
             if (manifest == null)
-                throw new BundleException("Cannot get manifest from: " + rootURL);
+                throw MESSAGES.bundleCannotGetManifest(null, rootURL);
         } catch (IOException ex) {
-            throw new BundleException("Cannot get manifest from: " + rootURL, ex);
+            throw MESSAGES.bundleCannotGetManifest(ex, rootURL);
         }
 
         // Validate the manifest
@@ -184,21 +186,21 @@ public class BundleInfo implements Serializable {
         // express this in such manifests.
         int manifestVersion = getBundleManifestVersion(manifest);
         if (manifestVersion < 0)
-            throw new BundleException("Cannot determine Bundle-ManifestVersion");
+            throw MESSAGES.bundleCannotObtainBundleManifestVersion();
         if (manifestVersion > 2)
-            throw new BundleException("Unsupported Bundle-ManifestVersion: " + manifestVersion);
+            throw MESSAGES.bundleUnsupportedBundleManifestVersion(manifestVersion);
 
         String symbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
         String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
 
         // R3 Framework
         if (manifestVersion == 1 && symbolicName != null)
-            throw new BundleException("Invalid Bundle-ManifestVersion for: " + symbolicName);
+            throw MESSAGES.bundleInvalidBundleManifestVersion(manifestVersion, symbolicName);
 
         // R4 Framework
         if (manifestVersion == 2) {
             if (symbolicName == null)
-                throw new BundleException("Cannot obtain Bundle-SymbolicName");
+                throw MESSAGES.bundleCannotObtainBundleSymbolicName();
 
             // Parse the Bundle-Version string
             Version.parseVersion(bundleVersion).toString();
@@ -213,7 +215,7 @@ public class BundleInfo implements Serializable {
      */
     public static int getBundleManifestVersion(Manifest manifest) {
         if (manifest == null)
-            throw new IllegalArgumentException("Null manifest");
+            throw MESSAGES.illegalArgumentNull("manifest");
 
         // At least one of these manifest headers must be there
         // Note, in R3 and R4 there is no common mandatory header
@@ -287,7 +289,7 @@ public class BundleInfo implements Serializable {
             try {
                 manifest = VFSUtils.getManifest(getRoot());
             } catch (Exception ex) {
-                throw new IllegalStateException("Cannot get manifest from: " + rootURL, ex);
+                throw MESSAGES.illegalStateCannotGetManifest(ex, rootURL);
             }
         }
         return manifest;
@@ -296,8 +298,8 @@ public class BundleInfo implements Serializable {
     private static VirtualFile toVirtualFile(URL url) {
         try {
             return AbstractVFS.toVirtualFile(url);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Invalid root url: " + url, e);
+        } catch (IOException ex) {
+            throw MESSAGES.illegalArgumentInvalidRootURL(ex, url);
         }
     }
 
@@ -334,8 +336,8 @@ public class BundleInfo implements Serializable {
     private static URL toURL(VirtualFile file) {
         try {
             return file.toURL();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid root file: " + file);
+        } catch (Exception ex) {
+            throw MESSAGES.illegalArgumentInvalidRootFile(ex, file);
         }
     }
 
