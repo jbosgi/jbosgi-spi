@@ -106,8 +106,8 @@ public interface SPIMessages {
     @Message(id = 10320, value = "Unsupported Bundle-ManifestVersion: %d")
     BundleException bundleUnsupportedBundleManifestVersion(int version);
 
-    @Message(id = 10321, value = "Invalid Bundle-ManifestVersion [%d] for: %s")
-    BundleException bundleInvalidBundleManifestVersion(int version, String symbolicName);
+    @Message(id = 10321, value = "Invalid Bundle-ManifestVersion for: %s")
+    BundleException bundleInvalidBundleManifestVersion(String symbolicName);
 
     @Message(id = 10322, value = "Cannot obtain Bundle-SymbolicName")
     BundleException bundleCannotObtainBundleSymbolicName();

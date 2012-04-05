@@ -195,7 +195,7 @@ public class BundleInfo implements Serializable {
 
         // R3 Framework
         if (manifestVersion == 1 && symbolicName != null)
-            throw MESSAGES.bundleInvalidBundleManifestVersion(manifestVersion, symbolicName);
+            throw MESSAGES.bundleInvalidBundleManifestVersion(symbolicName);
 
         // R4 Framework
         if (manifestVersion == 2) {
