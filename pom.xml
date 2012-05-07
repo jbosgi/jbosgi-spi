@@ -24,13 +24,14 @@
     <artifactId>jbosgi-spi</artifactId>
     <packaging>jar</packaging>
 
-    <version>3.1.1-SNAPSHOT</version>
+    <version>3.1.1.CR1-SNAPSHOT</version>
 
     <!-- Properties -->
     <properties>
         <version.args4j>2.0.12</version.args4j>
         <version.jboss.logging>3.1.0.GA</version.jboss.logging>
         <version.jboss.logging.processor>1.0.0.Final</version.jboss.logging.processor>
+        <version.jboss.osgi.metadata>2.1.1.CR1-SNAPSHOT</version.jboss.osgi.metadata>
         <version.jboss.osgi.vfs>1.1.0.Final</version.jboss.osgi.vfs>
         <version.jboss.shrinkwrap>1.0.0-cr-1</version.jboss.shrinkwrap>
         <version.junit>4.10</version.junit>
@@ -52,6 +53,11 @@
             <groupId>args4j</groupId>
             <artifactId>args4j</artifactId>
             <version>${version.args4j}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.osgi.metadata</groupId>
+            <artifactId>jbosgi-metadata</artifactId>
+            <version>${version.jboss.osgi.metadata}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.osgi.vfs</groupId>

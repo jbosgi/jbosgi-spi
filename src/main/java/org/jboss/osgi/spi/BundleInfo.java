@@ -31,6 +31,8 @@ import java.net.URL;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import org.jboss.osgi.metadata.OSGiMetaData;
+import org.jboss.osgi.metadata.OSGiMetaDataBuilder;
 import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VFSUtils;
 import org.jboss.osgi.vfs.VirtualFile;
@@ -41,7 +43,8 @@ import org.osgi.framework.Version;
 /**
  * Primitive access to bundle meta data and root virtual file.
  *
- * The bundle info can be constructed from various locations. If that succeeds, there is a valid OSGi Manifest.
+ * The bundle info can be constructed from various locations.
+ * If that succeeds, there is a valid OSGi Manifest.
  *
  * @author thomas.diesler@jboss.com
  * @since 16-Oct-2009
@@ -50,10 +53,11 @@ public class BundleInfo implements Serializable {
 
     private static final long serialVersionUID = -2363297020450715134L;
 
-    private URL rootURL;
-    private String location;
-    private String symbolicName;
-    private String bundleVersion;
+    private final URL rootURL;
+    private final String location;
+    private final String symbolicName;
+    private final Version bundleVersion;
+    private final OSGiMetaData metadata;
 
     private transient VirtualFile rootFile;
     private transient Manifest manifest;
@@ -66,25 +70,29 @@ public class BundleInfo implements Serializable {
         if (url == null)
             throw MESSAGES.illegalArgumentCannotObtainRealLocation(location);
 
-        return new BundleInfo(toVirtualFile(url), url.toExternalForm());
+        return new BundleInfo(toVirtualFile(url), url.toExternalForm(), null);
     }
 
     public static BundleInfo createBundleInfo(URL url) throws BundleException {
         if (url == null)
             throw MESSAGES.illegalArgumentNull("url");
 
-        return new BundleInfo(toVirtualFile(url), url.toExternalForm());
+        return new BundleInfo(toVirtualFile(url), url.toExternalForm(), null);
     }
 
     public static BundleInfo createBundleInfo(VirtualFile root) throws BundleException {
-        return new BundleInfo(root, null);
+        return new BundleInfo(root, null, null);
     }
 
     public static BundleInfo createBundleInfo(VirtualFile root, String location) throws BundleException {
-        return new BundleInfo(root, location);
+        return new BundleInfo(root, location, null);
     }
 
-    private BundleInfo(VirtualFile rootFile, String location) throws BundleException {
+    public static BundleInfo createBundleInfo(VirtualFile root, String location, OSGiMetaData metadata) throws BundleException {
+        return new BundleInfo(root, location, metadata);
+    }
+
+    private BundleInfo(VirtualFile rootFile, String location, OSGiMetaData metadata) throws BundleException {
         if (rootFile == null)
             throw MESSAGES.illegalArgumentNull("rootFile");
 
@@ -92,38 +100,28 @@ public class BundleInfo implements Serializable {
         this.rootURL = toURL(rootFile);
 
         // Derive the location from the root
-        if (location == null)
+        if (location == null) {
             location = rootURL.toExternalForm();
-
+        }
         this.location = location;
 
-        // Initialize the manifest
-        try {
-            manifest = VFSUtils.getManifest(rootFile);
-            if (manifest == null)
-                throw MESSAGES.bundleCannotGetManifest(null, rootURL);
-        } catch (IOException ex) {
-            throw MESSAGES.bundleCannotGetManifest(ex, rootURL);
-        }
-
-        // Validate the manifest
-        validateBundleManifest(manifest);
-
-        int manifestVersion = getBundleManifestVersion(manifest);
-        symbolicName = getManifestHeader(Constants.BUNDLE_SYMBOLICNAME);
-        bundleVersion = getManifestHeader(Constants.BUNDLE_VERSION);
-
-        // R3 Framework
-        if (manifestVersion == 1) {
-            // Parse the Bundle-Version string
+        // Initialize the metadata
+        if (metadata == null) {
             try {
-                bundleVersion = Version.parseVersion(bundleVersion).toString();
-            } catch (NumberFormatException ex) {
-                // Install expected to succeed on invalid Bundle-Version
-                // https://www.osgi.org/members/bugzilla/show_bug.cgi?id=1503
-                bundleVersion = Version.emptyVersion.toString();
+                manifest = VFSUtils.getManifest(rootFile);
+                if (manifest == null) {
+                    throw MESSAGES.bundleCannotGetManifest(null, rootURL);
+                }
+                validateBundleManifest(manifest);
+                metadata = OSGiMetaDataBuilder.load(manifest);
+            } catch (IOException ex) {
+                throw MESSAGES.bundleCannotGetManifest(ex, rootURL);
             }
         }
+        this.metadata = metadata;
+
+        symbolicName = metadata.getBundleSymbolicName();
+        bundleVersion = metadata.getBundleVersion();
     }
 
     /**
@@ -135,7 +133,7 @@ public class BundleInfo implements Serializable {
     public static boolean isValidBundle(VirtualFile virtualFile) {
         try {
             Manifest manifest = VFSUtils.getManifest(virtualFile);
-            return isValidateBundleManifest(manifest);
+            return isValidBundleManifest(manifest);
         } catch (IOException e) {
             return false;
         }
@@ -174,9 +172,41 @@ public class BundleInfo implements Serializable {
      * Validate a given bundle manifest.
      *
      * @param manifest The given manifest
-     * @throws BundleException if this is not a valid bundle manifest
+     * @throws BundleException if the given manifest is not a valid
      */
     public static void validateBundleManifest(Manifest manifest) throws BundleException {
+        OSGiMetaData metadata = OSGiMetaDataBuilder.load(manifest);
+        validateOSGiMetadata(metadata);
+    }
+
+    /**
+     * Validate a given OSGi metadata.
+     *
+     * @param metadata The given metadata
+     * @return True if the metadata is valid
+     */
+    public static boolean isValidOSGiMetadata(OSGiMetaData metadata) {
+        if (metadata == null)
+            return false;
+
+        try {
+            validateOSGiMetadata(metadata);
+            return true;
+        } catch (BundleException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Validate a given OSGi metadata.
+     *
+     * @param metadata The given metadata
+     * @throws BundleException if the given metadata is not a valid
+     */
+    public static void validateOSGiMetadata(OSGiMetaData metadata) throws BundleException {
+        if (metadata == null)
+            throw MESSAGES.illegalArgumentNull("metadata");
+
         // A bundle manifest must express the version of the OSGi manifest header
         // syntax in the Bundle-ManifestVersion header. Bundles exploiting this version
         // of the Framework specification (or later) must specify this header.
@@ -184,14 +214,13 @@ public class BundleInfo implements Serializable {
         // Bundle manifests written to previous specifications’ manifest syntax are
         // taken to have a bundle manifest version of '1', although there is no way to
         // express this in such manifests.
-        int manifestVersion = getBundleManifestVersion(manifest);
+        int manifestVersion = metadata.getBundleManifestVersion();
         if (manifestVersion < 0)
             throw MESSAGES.bundleCannotObtainBundleManifestVersion();
         if (manifestVersion > 2)
             throw MESSAGES.bundleUnsupportedBundleManifestVersion(manifestVersion);
 
-        String symbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
-        String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
+        String symbolicName = metadata.getBundleSymbolicName();
 
         // R3 Framework
         if (manifestVersion == 1 && symbolicName != null)
@@ -202,8 +231,8 @@ public class BundleInfo implements Serializable {
             if (symbolicName == null)
                 throw MESSAGES.bundleCannotObtainBundleSymbolicName();
 
-            // Parse the Bundle-Version string
-            Version.parseVersion(bundleVersion).toString();
+            // Check if we can get the bundle version
+            metadata.getBundleVersion();
         }
     }
 
@@ -212,6 +241,7 @@ public class BundleInfo implements Serializable {
      *
      * @param manifest The given manifest
      * @return The value of the Bundle-ManifestVersion header, or -1 for a non OSGi manifest
+     * @deprecated use {@link OSGiMetaData#getBundleManifestVersion()}
      */
     public static int getBundleManifestVersion(Manifest manifest) {
         if (manifest == null)
@@ -273,7 +303,15 @@ public class BundleInfo implements Serializable {
      * Get the bundle version
      */
     public Version getVersion() {
-        return Version.parseVersion(bundleVersion);
+        return bundleVersion;
+    }
+
+
+    /**
+     * Get the OSGi metadata
+     */
+    public OSGiMetaData getOSGiMetadata() {
+        return metadata;
     }
 
     /**
