@@ -176,7 +176,7 @@ public class BundleInfo implements Serializable {
      */
     public static void validateBundleManifest(Manifest manifest) throws BundleException {
         OSGiMetaData metadata = OSGiMetaDataBuilder.load(manifest);
-        validateOSGiMetadata(metadata);
+        validateMetadata(metadata);
     }
 
     /**
@@ -185,12 +185,12 @@ public class BundleInfo implements Serializable {
      * @param metadata The given metadata
      * @return True if the metadata is valid
      */
-    public static boolean isValidOSGiMetadata(OSGiMetaData metadata) {
+    public static boolean isValidMetadata(OSGiMetaData metadata) {
         if (metadata == null)
             return false;
 
         try {
-            validateOSGiMetadata(metadata);
+            validateMetadata(metadata);
             return true;
         } catch (BundleException e) {
             return false;
@@ -203,7 +203,7 @@ public class BundleInfo implements Serializable {
      * @param metadata The given metadata
      * @throws BundleException if the given metadata is not a valid
      */
-    public static void validateOSGiMetadata(OSGiMetaData metadata) throws BundleException {
+    public static void validateMetadata(OSGiMetaData metadata) throws BundleException {
         if (metadata == null)
             throw MESSAGES.illegalArgumentNull("metadata");
 
@@ -214,7 +214,7 @@ public class BundleInfo implements Serializable {
         // Bundle manifests written to previous specifications’ manifest syntax are
         // taken to have a bundle manifest version of '1', although there is no way to
         // express this in such manifests.
-        int manifestVersion = metadata.getBundleManifestVersion();
+        int manifestVersion = getBundleManifestVersion(metadata);
         if (manifestVersion < 0)
             throw MESSAGES.bundleCannotObtainBundleManifestVersion();
         if (manifestVersion > 2)
@@ -236,12 +236,26 @@ public class BundleInfo implements Serializable {
         }
     }
 
+    private static int getBundleManifestVersion(OSGiMetaData metaData) {
+
+        // At least one of these manifest headers must be there
+        // Note, in R3 and R4 there is no common mandatory header
+        String bundleName = metaData.getBundleName();
+        String bundleSymbolicName = metaData.getBundleSymbolicName();
+        Version bundleVersion = metaData.getBundleVersion();
+
+        if (bundleName == null && bundleSymbolicName == null && bundleVersion.equals(Version.emptyVersion))
+            return -1;
+
+        Integer manifestVersion = metaData.getBundleManifestVersion();
+        return manifestVersion != null ? manifestVersion : 1;
+    }
+
     /**
      * Get the bundle manifest version.
      *
      * @param manifest The given manifest
      * @return The value of the Bundle-ManifestVersion header, or -1 for a non OSGi manifest
-     * @deprecated use {@link OSGiMetaData#getBundleManifestVersion()}
      */
     public static int getBundleManifestVersion(Manifest manifest) {
         if (manifest == null)
