@@ -21,14 +21,18 @@
  */
 package org.jboss.osgi.spi;
 
-import org.jboss.shrinkwrap.api.asset.Asset;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Version;
+import static org.jboss.osgi.metadata.internal.MetadataMessages.MESSAGES;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+
+import org.jboss.shrinkwrap.api.asset.Asset;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
 
 /**
  * A simple OSGi manifest builder.
@@ -203,9 +207,101 @@ public final class OSGiManifestBuilder extends ManifestBuilder implements Asset 
                 }
                 append(buffer.toString());
             }
-
-            manifest = super.getManifest();
+            Manifest auxmanifest = super.getManifest();
+            try {
+                validateBundleManifest(auxmanifest);
+            } catch (BundleException ex) {
+                throw new IllegalStateException(ex);
+            }
+            manifest = auxmanifest;
         }
         return manifest;
+    }
+
+    /**
+     * Validate a given bundle manifest.
+     *
+     * @param manifest The given manifest
+     * @return True if the manifest is valid
+     */
+    public static boolean isValidBundleManifest(Manifest manifest) {
+        if (manifest == null)
+            return false;
+
+        try {
+            validateBundleManifest(manifest);
+            return true;
+        } catch (BundleException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Validate a given manifest.
+     *
+     * @param manifest The given manifest
+     * @throws BundleException if the given manifest is not a valid OSGi manifest
+     */
+    public static void validateBundleManifest(Manifest manifest) throws BundleException {
+        if (manifest == null)
+            MESSAGES.illegalArgumentNull("manifest");
+
+        // A bundle manifest must express the version of the OSGi manifest header
+        // syntax in the Bundle-ManifestVersion header. Bundles exploiting this version
+        // of the Framework specification (or later) must specify this header.
+        // The Framework version 1.3 (or later) bundle manifest version must be ’2’.
+        // Bundle manifests written to previous specifications’ manifest syntax are
+        // taken to have a bundle manifest version of '1', although there is no way to
+        // express this in such manifests.
+        int manifestVersion = getBundleManifestVersion(manifest);
+        if (manifestVersion < 0)
+            throw MESSAGES.bundleCannotObtainBundleManifestVersion();
+        if (manifestVersion > 2)
+            throw MESSAGES.bundleUnsupportedBundleManifestVersion(manifestVersion);
+
+        String symbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
+        String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
+
+        // R3 Framework
+        if (manifestVersion == 1 && symbolicName != null)
+            throw MESSAGES.bundleInvalidBundleManifestVersion(symbolicName);
+
+        // R4 Framework
+        if (manifestVersion == 2) {
+            if (symbolicName == null)
+                throw MESSAGES.bundleCannotObtainBundleSymbolicName();
+
+            // Parse the Bundle-Version string
+            Version.parseVersion(bundleVersion).toString();
+        }
+    }
+
+    /**
+     * Get the bundle manifest version.
+     *
+     * @param manifest The given manifest
+     * @return The value of the Bundle-ManifestVersion header, or -1 for a non OSGi manifest
+     */
+    public static int getBundleManifestVersion(Manifest manifest) {
+        if (manifest == null)
+            throw MESSAGES.illegalArgumentNull("manifest");
+
+        // At least one of these manifest headers must be there
+        // Note, in R3 and R4 there is no common mandatory header
+        String bundleName = getManifestHeaderInternal(manifest, Constants.BUNDLE_NAME);
+        String bundleSymbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
+        String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
+
+        if (bundleName == null && bundleSymbolicName == null && bundleVersion == null)
+            return -1;
+
+        String manifestVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_MANIFESTVERSION);
+        return manifestVersion != null ? Integer.parseInt(manifestVersion) : 1;
+    }
+
+    private static String getManifestHeaderInternal(Manifest manifest, String key) {
+        Attributes attribs = manifest.getMainAttributes();
+        String value = attribs.getValue(key);
+        return value != null ? value.trim() : null;
     }
 }

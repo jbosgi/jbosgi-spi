@@ -100,16 +100,16 @@ public interface SPIMessages {
     @Message(id = 10318, value = "Cannot get manifest from: %s")
     BundleException bundleCannotGetManifest(@Cause Throwable cause, URL rootURL);
 
-    @Message(id = 10319, value = "Cannot determine Bundle-ManifestVersion")
-    BundleException bundleCannotObtainBundleManifestVersion();
+    //@Message(id = 10319, value = "Cannot determine Bundle-ManifestVersion")
+    //BundleException bundleCannotObtainBundleManifestVersion();
 
-    @Message(id = 10320, value = "Unsupported Bundle-ManifestVersion: %d")
-    BundleException bundleUnsupportedBundleManifestVersion(int version);
+    //@Message(id = 10320, value = "Unsupported Bundle-ManifestVersion: %d")
+    //BundleException bundleUnsupportedBundleManifestVersion(int version);
 
-    @Message(id = 10321, value = "Invalid Bundle-ManifestVersion for: %s")
-    BundleException bundleInvalidBundleManifestVersion(String symbolicName);
+    //@Message(id = 10321, value = "Invalid Bundle-ManifestVersion for: %s")
+    //BundleException bundleInvalidBundleManifestVersion(String symbolicName);
 
-    @Message(id = 10322, value = "Cannot obtain Bundle-SymbolicName")
-    BundleException bundleCannotObtainBundleSymbolicName();
+    //@Message(id = 10322, value = "Cannot obtain Bundle-SymbolicName")
+    //BundleException bundleCannotObtainBundleSymbolicName();
 
 }
