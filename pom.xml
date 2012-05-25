@@ -29,11 +29,11 @@
     <!-- Properties -->
     <properties>
         <version.args4j>2.0.12</version.args4j>
-        <version.jboss.logging>3.1.0.GA</version.jboss.logging>
-        <version.jboss.logging.processor>1.0.0.Final</version.jboss.logging.processor>
-        <version.jboss.osgi.metadata>2.1.1.CR1</version.jboss.osgi.metadata>
+        <version.jboss.logging>3.1.1.GA</version.jboss.logging>
+        <version.jboss.logging.processor>1.0.3.Final</version.jboss.logging.processor>
+        <version.jboss.osgi.metadata>2.1.1.CR2</version.jboss.osgi.metadata>
         <version.jboss.osgi.vfs>1.1.1.Final</version.jboss.osgi.vfs>
-        <version.jboss.shrinkwrap>1.0.0-cr-1</version.jboss.shrinkwrap>
+        <version.jboss.shrinkwrap>1.0.0</version.jboss.shrinkwrap>
         <version.junit>4.10</version.junit>
         <version.osgi>4.2.0</version.osgi>
     </properties>

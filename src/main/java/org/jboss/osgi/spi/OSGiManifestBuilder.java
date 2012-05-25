@@ -5,16 +5,16 @@
  * Copyright (C) 2010 - 2012 JBoss by Red Hat
  * %%
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 2.1 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU General Lesser Public 
+ *
+ * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
@@ -42,7 +42,7 @@
  */
 package org.jboss.osgi.spi;
 
-import static org.jboss.osgi.metadata.internal.MetadataMessages.MESSAGES;
+import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -280,21 +280,15 @@ public final class OSGiManifestBuilder extends ManifestBuilder implements Asset 
         if (manifestVersion > 2)
             throw MESSAGES.bundleUnsupportedBundleManifestVersion(manifestVersion);
 
-        String symbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
-        String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
-
         // R3 Framework
+        String symbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
         if (manifestVersion == 1 && symbolicName != null)
             throw MESSAGES.bundleInvalidBundleManifestVersion(symbolicName);
 
         // R4 Framework
-        if (manifestVersion == 2) {
-            if (symbolicName == null)
-                throw MESSAGES.bundleCannotObtainBundleSymbolicName();
+        if (manifestVersion == 2 && symbolicName == null)
+            throw MESSAGES.bundleCannotObtainBundleSymbolicName();
 
-            // Parse the Bundle-Version string
-            Version.parseVersion(bundleVersion).toString();
-        }
     }
 
     /**
