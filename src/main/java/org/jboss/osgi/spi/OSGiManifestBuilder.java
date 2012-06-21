@@ -115,6 +115,11 @@ public final class OSGiManifestBuilder extends ManifestBuilder implements Asset 
         return this;
     }
 
+    public OSGiManifestBuilder addBundleClasspath(String classpath) {
+        append(Constants.BUNDLE_CLASSPATH + ": " + classpath);
+        return this;
+    }
+
     public OSGiManifestBuilder addFragmentHost(String fragmentHost) {
         append(Constants.FRAGMENT_HOST + ": " + fragmentHost);
         return this;
@@ -167,6 +172,7 @@ public final class OSGiManifestBuilder extends ManifestBuilder implements Asset 
         return this;
     }
 
+    @Override
     public Manifest getManifest() {
         if (manifest == null) {
             // Require-Bundle
