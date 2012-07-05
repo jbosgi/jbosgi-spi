@@ -68,6 +68,8 @@ public final class OSGiManifestBuilder extends ManifestBuilder implements Asset 
     private Set<String> dynamicImportPackages = new LinkedHashSet<String>();
     private Set<String> requiredBundles = new LinkedHashSet<String>();
     private Set<String> requiredEnvironments = new LinkedHashSet<String>();
+    private Set<String> providedCapabilities = new LinkedHashSet<String>();
+    private Set<String> requiredCapabilities = new LinkedHashSet<String>();
     private Manifest manifest;
 
     public static OSGiManifestBuilder newInstance() {
@@ -171,6 +173,20 @@ public final class OSGiManifestBuilder extends ManifestBuilder implements Asset 
         }
         return this;
     }
+    
+    public OSGiManifestBuilder addProvidedCapabilities(String... capabilities) {
+        for (String aux : capabilities) {
+            providedCapabilities.add(aux);
+        }
+        return this;
+    }
+
+    public OSGiManifestBuilder addRequiredCapabilities(String... capabilities) {
+        for (String aux : capabilities) {
+            requiredCapabilities.add(aux);
+        }
+        return this;
+    }
 
     @Override
     public Manifest getManifest() {
@@ -234,6 +250,33 @@ public final class OSGiManifestBuilder extends ManifestBuilder implements Asset 
                 }
                 append(buffer.toString());
             }
+            
+            // Provide-Capability
+            if (providedCapabilities.size() > 0) {
+                StringBuffer buffer = new StringBuffer();
+                // [TODO] Replace with R5 constant
+                buffer.append("Provide-Capability" + ": ");
+                Iterator<String> iterator = providedCapabilities.iterator();
+                buffer.append(iterator.next());
+                while (iterator.hasNext()) {
+                    buffer.append("," + iterator.next());
+                }
+                append(buffer.toString());
+            }
+
+            // Require-Capability
+            if (requiredCapabilities.size() > 0) {
+                StringBuffer buffer = new StringBuffer();
+                // [TODO] Replace with R5 constant
+                buffer.append("Require-Capability" + ": ");
+                Iterator<String> iterator = requiredCapabilities.iterator();
+                buffer.append(iterator.next());
+                while (iterator.hasNext()) {
+                    buffer.append("," + iterator.next());
+                }
+                append(buffer.toString());
+            }
+
             Manifest auxmanifest = super.getManifest();
             try {
                 validateBundleManifest(auxmanifest);
