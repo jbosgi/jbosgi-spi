@@ -42,7 +42,7 @@
  */
 package org.jboss.osgi.spi.framework;
 
-import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
+import static org.jboss.osgi.spi.SPIMessages.MESSAGES;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -5,16 +5,16 @@
  * Copyright (C) 2010 - 2012 JBoss by Red Hat
  * %%
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 2.1 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU General Lesser Public 
+ *
+ * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
@@ -42,8 +42,8 @@
  */
 package org.jboss.osgi.spi.internal;
 
-import static org.jboss.osgi.spi.internal.SPILogger.LOGGER;
-import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
+import static org.jboss.osgi.spi.SPILogger.LOGGER;
+import static org.jboss.osgi.spi.SPIMessages.MESSAGES;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -52,7 +52,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
-import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.osgi.spi.framework.PropertiesBootstrapProvider;
 import org.jboss.osgi.spi.util.ServiceLoader;
@@ -61,7 +60,7 @@ import org.osgi.framework.launch.Framework;
 
 /**
  * An internal bean that collabrates with {@link OSGiBootstrap}.
- * 
+ *
  * @author thomas.diesler@jboss.com
  * @since 04-Nov-2008
  */

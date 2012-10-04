@@ -28,10 +28,9 @@
 
     <!-- Properties -->
     <properties>
-        <version.args4j>2.0.12</version.args4j>
-        <version.jboss.logging>3.1.1.GA</version.jboss.logging>
-        <version.jboss.logging.processor>1.0.3.Final</version.jboss.logging.processor>
-        <version.jboss.osgi.metadata>2.1.1.CR7</version.jboss.osgi.metadata>
+        <version.jboss.logging>3.1.2.GA</version.jboss.logging>
+        <version.jboss.logging.processor>1.1.0.Beta1</version.jboss.logging.processor>
+        <version.jboss.osgi.metadata>2.1.1.CR8</version.jboss.osgi.metadata>
         <version.jboss.osgi.vfs>1.1.2.CR1</version.jboss.osgi.vfs>
         <version.jboss.shrinkwrap>1.0.0</version.jboss.shrinkwrap>
         <version.junit>4.10</version.junit>
@@ -50,12 +49,6 @@
 
         <!-- Compile Dependencies -->
         <dependency>
-            <groupId>args4j</groupId>
-            <artifactId>args4j</artifactId>
-            <version>${version.args4j}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>org.jboss.osgi.metadata</groupId>
             <artifactId>jbosgi-metadata</artifactId>
             <version>${version.jboss.osgi.metadata}</version>
@@ -64,11 +57,6 @@
             <groupId>org.jboss.osgi.vfs</groupId>
             <artifactId>jbosgi-vfs30</artifactId>
             <version>${version.jboss.osgi.vfs}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.shrinkwrap</groupId>
-            <artifactId>shrinkwrap-api</artifactId>
-            <version>${version.jboss.shrinkwrap}</version>
         </dependency>
 
         <!-- Provided Dependencies -->
@@ -84,6 +72,12 @@
             <version>${version.jboss.logging.processor}</version>
             <scope>provided</scope>
 			<optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap</groupId>
+            <artifactId>shrinkwrap-api</artifactId>
+            <version>${version.jboss.shrinkwrap}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>

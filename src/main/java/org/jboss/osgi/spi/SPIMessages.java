@@ -41,14 +41,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.osgi.spi.internal;
+package org.jboss.osgi.spi;
 
 import java.net.URL;
 
-import org.jboss.logging.Cause;
-import org.jboss.logging.Message;
-import org.jboss.logging.MessageBundle;
 import org.jboss.logging.Messages;
+import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.Message;
+import org.jboss.logging.annotations.MessageBundle;
 import org.jboss.osgi.vfs.VirtualFile;
 import org.osgi.framework.BundleException;
 
@@ -106,12 +106,15 @@ public interface SPIMessages {
     @Message(id = 10313, value = "Cannot get manifest from: %s")
     IllegalStateException illegalStateCannotGetManifest(@Cause Throwable cause, URL rootURL);
 
+    @Deprecated
     @Message(id = 10314, value = "Cannot create manifest")
     IllegalStateException illegalStateCannotCreateManifest(@Cause Throwable cause);
 
+    @Deprecated
     @Message(id = 10315, value = "Cannot provide manifest input stream")
     IllegalStateException illegalStateCannotProvideManifestInputStream(@Cause Throwable cause);
 
+    @Deprecated
     @Message(id = 10316, value = "Cannot append to already existing manifest")
     IllegalStateException illegalStateCannotAppendToExistingManifest();
 
@@ -121,15 +124,19 @@ public interface SPIMessages {
     @Message(id = 10318, value = "Cannot get manifest from: %s")
     BundleException bundleCannotGetManifest(@Cause Throwable cause, URL rootURL);
 
+    @Deprecated
     @Message(id = 10319, value = "Cannot obtain Bundle-ManifestVersion")
     BundleException bundleCannotObtainBundleManifestVersion();
 
+    @Deprecated
     @Message(id = 10320, value = "Unsupported Bundle-ManifestVersion: %d")
     BundleException bundleUnsupportedBundleManifestVersion(int version);
 
+    @Deprecated
     @Message(id = 10321, value = "Invalid Bundle-ManifestVersion for: %s")
     BundleException bundleInvalidBundleManifestVersion(String symbolicName);
 
+    @Deprecated
     @Message(id = 10322, value = "Cannot obtain Bundle-SymbolicName")
     BundleException bundleCannotObtainBundleSymbolicName();
 }

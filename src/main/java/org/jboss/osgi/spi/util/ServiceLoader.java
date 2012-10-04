@@ -42,8 +42,8 @@
  */
 package org.jboss.osgi.spi.util;
 
-import static org.jboss.osgi.spi.internal.SPILogger.LOGGER;
-import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
+import static org.jboss.osgi.spi.SPILogger.LOGGER;
+import static org.jboss.osgi.spi.SPIMessages.MESSAGES;
 
 import java.io.BufferedReader;
 import java.io.IOException;
