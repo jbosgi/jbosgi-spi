@@ -5,16 +5,16 @@
  * Copyright (C) 2010 - 2012 JBoss by Red Hat
  * %%
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 2.1 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU General Lesser Public 
+ *
+ * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
@@ -42,46 +42,52 @@
  */
 package org.jboss.osgi.spi.framework;
 
-import org.jboss.osgi.spi.internal.OSGiBootstrapBean;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
+import static org.jboss.osgi.spi.SPILogger.LOGGER;
+
+import java.util.List;
+
+import org.jboss.osgi.spi.util.ServiceLoader;
 
 /**
  * The OSGiBootstrap is the entry point to obtain an {@link OSGiBootstrapProvider}.
- * 
+ *
  * A OSGiBootstrapProvider is discovered in two stages.
- * 
+ *
  * <ol>
  * <li>Read the bootstrap provider class name from a system property
  * <li>Read the bootstrap provider class name from a resource file
  * </ol>
- * 
+ *
  * In both cases the key is the fully qalified name of the {@link OSGiBootstrapProvider} interface.
- * 
+ *
  * @author thomas.diesler@jboss.com
  * @since 18-Jun-2008
  */
 public class OSGiBootstrap {
 
     /**
-     * The main entry point
-     */
-    public static void main(String[] args) {
-        OSGiBootstrapBean bean = new OSGiBootstrapBean();
-        CmdLineParser parser = new CmdLineParser(bean);
-        try {
-            parser.parseArgument(args);
-            bean.run();
-        } catch (CmdLineException ex) {
-            System.err.println("Invalid OSGiBootstrap options");
-            parser.printUsage(System.err);
-        }
-    }
-
-    /**
      * Get an instance of an OSGiBootstrapProvider.
      */
     public static OSGiBootstrapProvider getBootstrapProvider() {
-        return OSGiBootstrapBean.getBootstrapProvider();
+
+        OSGiBootstrapProvider provider = null;
+
+        List<OSGiBootstrapProvider> providers = ServiceLoader.loadServices(OSGiBootstrapProvider.class);
+        for (OSGiBootstrapProvider aux : providers) {
+            try {
+                aux.configure();
+                provider = aux;
+                break;
+            } catch (Exception ex) {
+                LOGGER.debugf(ex, "Cannot configure [%s]", aux.getClass().getName());
+            }
+        }
+
+        if (provider == null) {
+            provider = new PropertiesBootstrapProvider();
+            LOGGER.debugf("Using default: %s", PropertiesBootstrapProvider.class.getName());
+        }
+
+        return provider;
     }
 }

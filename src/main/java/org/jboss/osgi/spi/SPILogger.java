@@ -5,16 +5,16 @@
  * Copyright (C) 2010 - 2012 JBoss by Red Hat
  * %%
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 2.1 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU General Lesser Public 
+ *
+ * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
@@ -41,7 +41,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.osgi.spi.internal;
+package org.jboss.osgi.spi;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
@@ -75,17 +75,17 @@ public interface SPILogger extends BasicLogger {
     @Message(id = 10201, value = "Bundle started [%d]: %s")
     void infoBundleStarted(long bundleId, Bundle bundle);
 
-    @LogMessage(level = INFO)
-    @Message(id = 10202, value = "JBossOSGi Runtime booted in %fsec")
-    void infoRuntimeBooted(float seconds);
+    //@LogMessage(level = INFO)
+    //@Message(id = 10202, value = "JBossOSGi Runtime booted in %fsec")
+    //void infoRuntimeBooted(float seconds);
 
-    @LogMessage(level = INFO)
-    @Message(id = 10203, value = "Initiating shutdown ...")
-    void infoInitiatingShutdown();
+    //@LogMessage(level = INFO)
+    //@Message(id = 10203, value = "Initiating shutdown ...")
+    //void infoInitiatingShutdown();
 
-    @LogMessage(level = INFO)
-    @Message(id = 10204, value = "Shutdown complete")
-    void infoShutdownComplete();
+    //@LogMessage(level = INFO)
+    //@Message(id = 10204, value = "Shutdown complete")
+    //void infoShutdownComplete();
 
     @LogMessage(level = WARN)
     @Message(id = 10205, value = "Service not assignable: %s")
@@ -95,7 +95,7 @@ public interface SPILogger extends BasicLogger {
     @Message(id = 10206, value = "Cannot load property instance [%s=%s]")
     void errorCannotLoadPropertyInstance(@Cause Throwable cause, String key, String value);
 
-    @LogMessage(level = ERROR)
-    @Message(id = 10207, value = "Cannot stop framework")
-    void errorCannotStopFramework(@Cause Throwable cause);
+    //@LogMessage(level = ERROR)
+    //@Message(id = 10207, value = "Cannot stop framework")
+    //void errorCannotStopFramework(@Cause Throwable cause);
 }

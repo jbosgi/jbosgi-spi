@@ -42,17 +42,11 @@
  */
 package org.jboss.osgi.spi;
 
-import static org.jboss.osgi.spi.internal.SPIMessages.MESSAGES;
-
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.jar.Attributes;
+import java.io.InputStream;
 import java.util.jar.Manifest;
 
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 
 /**
@@ -63,14 +57,7 @@ import org.osgi.framework.Version;
  */
 public final class OSGiManifestBuilder extends ManifestBuilder implements Asset {
 
-    private Set<String> importPackages = new LinkedHashSet<String>();
-    private Set<String> exportPackages = new LinkedHashSet<String>();
-    private Set<String> dynamicImportPackages = new LinkedHashSet<String>();
-    private Set<String> requiredBundles = new LinkedHashSet<String>();
-    private Set<String> requiredEnvironments = new LinkedHashSet<String>();
-    private Set<String> providedCapabilities = new LinkedHashSet<String>();
-    private Set<String> requiredCapabilities = new LinkedHashSet<String>();
-    private Manifest manifest;
+    private final org.jboss.osgi.metadata.OSGiManifestBuilder delegate = org.jboss.osgi.metadata.OSGiManifestBuilder.newInstance();
 
     public static OSGiManifestBuilder newInstance() {
         return new OSGiManifestBuilder();
@@ -79,293 +66,123 @@ public final class OSGiManifestBuilder extends ManifestBuilder implements Asset 
     private OSGiManifestBuilder() {
     }
 
+    public static boolean isValidBundleManifest(Manifest manifest) {
+        return org.jboss.osgi.metadata.OSGiManifestBuilder.isValidBundleManifest(manifest);
+    }
+
+    public static void validateBundleManifest(Manifest manifest) throws BundleException {
+        org.jboss.osgi.metadata.OSGiManifestBuilder.validateBundleManifest(manifest);
+    }
+
+    public static int getBundleManifestVersion(Manifest manifest) {
+        return org.jboss.osgi.metadata.OSGiManifestBuilder.getBundleManifestVersion(manifest);
+    }
+
     public OSGiManifestBuilder addBundleManifestVersion(int version) {
-        append(Constants.BUNDLE_MANIFESTVERSION + ": " + version);
+        delegate.addBundleManifestVersion(version);
         return this;
     }
 
     public OSGiManifestBuilder addBundleSymbolicName(String symbolicName) {
-        append(Constants.BUNDLE_SYMBOLICNAME + ": " + symbolicName);
+        delegate.addBundleSymbolicName(symbolicName);
         return this;
     }
 
     public OSGiManifestBuilder addBundleName(String name) {
-        append(Constants.BUNDLE_NAME + ": " + name);
+        delegate.addBundleName(name);
         return this;
     }
 
     public OSGiManifestBuilder addBundleVersion(Version version) {
-        append(Constants.BUNDLE_VERSION + ": " + version);
+        delegate.addBundleVersion(version);
         return this;
     }
 
     public OSGiManifestBuilder addBundleVersion(String version) {
-        return addBundleVersion(Version.parseVersion(version));
+        delegate.addBundleVersion(version);
+        return this;
     }
 
     public OSGiManifestBuilder addBundleActivator(Class<?> bundleActivator) {
-        return addBundleActivator(bundleActivator.getName());
+        delegate.addBundleActivator(bundleActivator);
+        return this;
     }
 
     public OSGiManifestBuilder addBundleActivator(String bundleActivator) {
-        append(Constants.BUNDLE_ACTIVATOR + ": " + bundleActivator);
+        delegate.addBundleActivator(bundleActivator);
         return this;
     }
 
     public OSGiManifestBuilder addBundleActivationPolicy(String activationPolicy) {
-        append(Constants.BUNDLE_ACTIVATIONPOLICY + ": " + activationPolicy);
+        delegate.addBundleActivationPolicy(activationPolicy);
         return this;
     }
 
     public OSGiManifestBuilder addBundleClasspath(String classpath) {
-        append(Constants.BUNDLE_CLASSPATH + ": " + classpath);
+        delegate.addBundleClasspath(classpath);
         return this;
     }
 
     public OSGiManifestBuilder addFragmentHost(String fragmentHost) {
-        append(Constants.FRAGMENT_HOST + ": " + fragmentHost);
+        delegate.addFragmentHost(fragmentHost);
         return this;
     }
 
     public OSGiManifestBuilder addRequireBundle(String requiredBundle) {
-        requiredBundles.add(requiredBundle);
+        delegate.addRequireBundle(requiredBundle);
         return this;
     }
 
     public OSGiManifestBuilder addRequireExecutionEnvironment(String... environments) {
-        for (String aux : environments) {
-            requiredEnvironments.add(aux);
-        }
+        delegate.addRequireExecutionEnvironment(environments);
         return this;
     }
 
     public OSGiManifestBuilder addImportPackages(Class<?>... packages) {
-        for (Class<?> aux : packages) {
-            importPackages.add(aux.getPackage().getName());
-        }
+        delegate.addImportPackages(packages);
         return this;
     }
 
     public OSGiManifestBuilder addImportPackages(String... packages) {
-        for (String aux : packages) {
-            importPackages.add(aux);
-        }
+        delegate.addImportPackages(packages);
         return this;
     }
 
     public OSGiManifestBuilder addDynamicImportPackages(String... packages) {
-        for (String aux : packages) {
-            dynamicImportPackages.add(aux);
-        }
+        delegate.addDynamicImportPackages(packages);
         return this;
     }
 
     public OSGiManifestBuilder addExportPackages(Class<?>... packages) {
-        for (Class<?> aux : packages) {
-            exportPackages.add(aux.getPackage().getName());
-        }
+        delegate.addExportPackages(packages);
         return this;
     }
 
     public OSGiManifestBuilder addExportPackages(String... packages) {
-        for (String aux : packages) {
-            exportPackages.add(aux);
-        }
+        delegate.addExportPackages(packages);
         return this;
     }
-    
+
     public OSGiManifestBuilder addProvidedCapabilities(String... capabilities) {
-        for (String aux : capabilities) {
-            providedCapabilities.add(aux);
-        }
+        delegate.addProvidedCapabilities(capabilities);
         return this;
     }
 
     public OSGiManifestBuilder addRequiredCapabilities(String... capabilities) {
-        for (String aux : capabilities) {
-            requiredCapabilities.add(aux);
-        }
+        delegate.addRequiredCapabilities(capabilities);
         return this;
     }
 
-    @Override
+    public ManifestBuilder addManifestHeader(String key, String value) {
+        delegate.addManifestHeader(key, value);
+        return this;
+    }
+
     public Manifest getManifest() {
-        if (manifest == null) {
-            // Require-Bundle
-            if (requiredBundles.size() > 0) {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append(Constants.REQUIRE_BUNDLE + ": ");
-                Iterator<String> iterator = requiredBundles.iterator();
-                buffer.append(iterator.next());
-                while (iterator.hasNext()) {
-                    buffer.append("," + iterator.next());
-                }
-                append(buffer.toString());
-            }
-
-            // Bundle-RequiredExecutionEnvironment
-            if (requiredEnvironments.size() > 0) {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append(Constants.BUNDLE_REQUIREDEXECUTIONENVIRONMENT + ": ");
-                Iterator<String> iterator = requiredEnvironments.iterator();
-                buffer.append(iterator.next());
-                while (iterator.hasNext()) {
-                    buffer.append("," + iterator.next());
-                }
-                append(buffer.toString());
-            }
-
-            // Export-Package
-            if (exportPackages.size() > 0) {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append(Constants.EXPORT_PACKAGE + ": ");
-                Iterator<String> iterator = exportPackages.iterator();
-                buffer.append(iterator.next());
-                while (iterator.hasNext()) {
-                    buffer.append("," + iterator.next());
-                }
-                append(buffer.toString());
-            }
-
-            // Import-Package
-            if (importPackages.size() > 0) {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append(Constants.IMPORT_PACKAGE + ": ");
-                Iterator<String> iterator = importPackages.iterator();
-                buffer.append(iterator.next());
-                while (iterator.hasNext()) {
-                    buffer.append("," + iterator.next());
-                }
-                append(buffer.toString());
-            }
-
-            // DynamicImport-Package
-            if (dynamicImportPackages.size() > 0) {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append(Constants.DYNAMICIMPORT_PACKAGE + ": ");
-                Iterator<String> iterator = dynamicImportPackages.iterator();
-                buffer.append(iterator.next());
-                while (iterator.hasNext()) {
-                    buffer.append("," + iterator.next());
-                }
-                append(buffer.toString());
-            }
-            
-            // Provide-Capability
-            if (providedCapabilities.size() > 0) {
-                StringBuffer buffer = new StringBuffer();
-                // [TODO] Replace with R5 constant
-                buffer.append("Provide-Capability" + ": ");
-                Iterator<String> iterator = providedCapabilities.iterator();
-                buffer.append(iterator.next());
-                while (iterator.hasNext()) {
-                    buffer.append("," + iterator.next());
-                }
-                append(buffer.toString());
-            }
-
-            // Require-Capability
-            if (requiredCapabilities.size() > 0) {
-                StringBuffer buffer = new StringBuffer();
-                // [TODO] Replace with R5 constant
-                buffer.append("Require-Capability" + ": ");
-                Iterator<String> iterator = requiredCapabilities.iterator();
-                buffer.append(iterator.next());
-                while (iterator.hasNext()) {
-                    buffer.append("," + iterator.next());
-                }
-                append(buffer.toString());
-            }
-
-            Manifest auxmanifest = super.getManifest();
-            try {
-                validateBundleManifest(auxmanifest);
-            } catch (BundleException ex) {
-                throw new IllegalStateException(ex);
-            }
-            manifest = auxmanifest;
-        }
-        return manifest;
+        return delegate.getManifest();
     }
 
-    /**
-     * Validate a given bundle manifest.
-     *
-     * @param manifest The given manifest
-     * @return True if the manifest is valid
-     */
-    public static boolean isValidBundleManifest(Manifest manifest) {
-        if (manifest == null)
-            return false;
-
-        try {
-            validateBundleManifest(manifest);
-            return true;
-        } catch (BundleException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Validate a given manifest.
-     *
-     * @param manifest The given manifest
-     * @throws BundleException if the given manifest is not a valid OSGi manifest
-     */
-    public static void validateBundleManifest(Manifest manifest) throws BundleException {
-        if (manifest == null)
-            MESSAGES.illegalArgumentNull("manifest");
-
-        // A bundle manifest must express the version of the OSGi manifest header
-        // syntax in the Bundle-ManifestVersion header. Bundles exploiting this version
-        // of the Framework specification (or later) must specify this header.
-        // The Framework version 1.3 (or later) bundle manifest version must be ’2’.
-        // Bundle manifests written to previous specifications’ manifest syntax are
-        // taken to have a bundle manifest version of '1', although there is no way to
-        // express this in such manifests.
-        int manifestVersion = getBundleManifestVersion(manifest);
-        if (manifestVersion < 0)
-            throw MESSAGES.bundleCannotObtainBundleManifestVersion();
-        if (manifestVersion > 2)
-            throw MESSAGES.bundleUnsupportedBundleManifestVersion(manifestVersion);
-
-        // R3 Framework
-        String symbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
-        if (manifestVersion == 1 && symbolicName != null)
-            throw MESSAGES.bundleInvalidBundleManifestVersion(symbolicName);
-
-        // R4 Framework
-        if (manifestVersion == 2 && symbolicName == null)
-            throw MESSAGES.bundleCannotObtainBundleSymbolicName();
-
-    }
-
-    /**
-     * Get the bundle manifest version.
-     *
-     * @param manifest The given manifest
-     * @return The value of the Bundle-ManifestVersion header, or -1 for a non OSGi manifest
-     */
-    public static int getBundleManifestVersion(Manifest manifest) {
-        if (manifest == null)
-            throw MESSAGES.illegalArgumentNull("manifest");
-
-        // At least one of these manifest headers must be there
-        // Note, in R3 and R4 there is no common mandatory header
-        String bundleName = getManifestHeaderInternal(manifest, Constants.BUNDLE_NAME);
-        String bundleSymbolicName = getManifestHeaderInternal(manifest, Constants.BUNDLE_SYMBOLICNAME);
-        String bundleVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_VERSION);
-
-        if (bundleName == null && bundleSymbolicName == null && bundleVersion == null)
-            return -1;
-
-        String manifestVersion = getManifestHeaderInternal(manifest, Constants.BUNDLE_MANIFESTVERSION);
-        return manifestVersion != null ? Integer.parseInt(manifestVersion) : 1;
-    }
-
-    private static String getManifestHeaderInternal(Manifest manifest, String key) {
-        Attributes attribs = manifest.getMainAttributes();
-        String value = attribs.getValue(key);
-        return value != null ? value.trim() : null;
+    public InputStream openStream() {
+        return delegate.openStream();
     }
 }

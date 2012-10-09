@@ -41,7 +41,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.osgi.spi.internal;
+package org.jboss.osgi.spi;
 
 import java.net.URL;
 
@@ -97,8 +97,8 @@ public interface SPIMessages {
     @Message(id = 10310, value = "Cannot load properties")
     IllegalStateException illegalStateCannotLoadProperties(@Cause Throwable cause);
 
-    @Message(id = 10311, value = "Cannot start framework")
-    IllegalStateException illegalStateCannotStartFramework(@Cause Throwable cause);
+    //@Message(id = 10311, value = "Cannot start framework")
+    //IllegalStateException illegalStateCannotStartFramework(@Cause Throwable cause);
 
     @Message(id = 10312, value = "Cannot load service: %s")
     IllegalStateException illegalStateCannotLoadServiceClass(@Cause Throwable cause, String serviceClass);
@@ -106,14 +106,14 @@ public interface SPIMessages {
     @Message(id = 10313, value = "Cannot get manifest from: %s")
     IllegalStateException illegalStateCannotGetManifest(@Cause Throwable cause, URL rootURL);
 
-    @Message(id = 10314, value = "Cannot create manifest")
-    IllegalStateException illegalStateCannotCreateManifest(@Cause Throwable cause);
+    //@Message(id = 10314, value = "Cannot create manifest")
+    //IllegalStateException illegalStateCannotCreateManifest(@Cause Throwable cause);
 
-    @Message(id = 10315, value = "Cannot provide manifest input stream")
-    IllegalStateException illegalStateCannotProvideManifestInputStream(@Cause Throwable cause);
+    //@Message(id = 10315, value = "Cannot provide manifest input stream")
+    //IllegalStateException illegalStateCannotProvideManifestInputStream(@Cause Throwable cause);
 
-    @Message(id = 10316, value = "Cannot append to already existing manifest")
-    IllegalStateException illegalStateCannotAppendToExistingManifest();
+    //@Message(id = 10316, value = "Cannot append to already existing manifest")
+    //IllegalStateException illegalStateCannotAppendToExistingManifest();
 
     @Message(id = 10317, value = "Cannot obtain system context")
     BundleException bundleCannotOptainSystemContext();
@@ -121,15 +121,15 @@ public interface SPIMessages {
     @Message(id = 10318, value = "Cannot get manifest from: %s")
     BundleException bundleCannotGetManifest(@Cause Throwable cause, URL rootURL);
 
-    @Message(id = 10319, value = "Cannot obtain Bundle-ManifestVersion")
-    BundleException bundleCannotObtainBundleManifestVersion();
+    //@Message(id = 10319, value = "Cannot obtain Bundle-ManifestVersion")
+    //BundleException bundleCannotObtainBundleManifestVersion();
 
-    @Message(id = 10320, value = "Unsupported Bundle-ManifestVersion: %d")
-    BundleException bundleUnsupportedBundleManifestVersion(int version);
+    //@Message(id = 10320, value = "Unsupported Bundle-ManifestVersion: %d")
+    //BundleException bundleUnsupportedBundleManifestVersion(int version);
 
-    @Message(id = 10321, value = "Invalid Bundle-ManifestVersion for: %s")
-    BundleException bundleInvalidBundleManifestVersion(String symbolicName);
+    //@Message(id = 10321, value = "Invalid Bundle-ManifestVersion for: %s")
+    //BundleException bundleInvalidBundleManifestVersion(String symbolicName);
 
-    @Message(id = 10322, value = "Cannot obtain Bundle-SymbolicName")
-    BundleException bundleCannotObtainBundleSymbolicName();
+    //@Message(id = 10322, value = "Cannot obtain Bundle-SymbolicName")
+    //BundleException bundleCannotObtainBundleSymbolicName();
 }
