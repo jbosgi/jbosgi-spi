@@ -54,6 +54,7 @@ import org.osgi.framework.Version;
  *
  * @author thomas.diesler@jboss.com
  * @since 08-Mar-2010
+ * @deprecated
  */
 public final class OSGiManifestBuilder extends ManifestBuilder implements Asset {
 

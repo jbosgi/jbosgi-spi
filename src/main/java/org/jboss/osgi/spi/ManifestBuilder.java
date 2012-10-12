@@ -52,6 +52,7 @@ import org.jboss.shrinkwrap.api.asset.Asset;
  *
  * @author thomas.diesler@jboss.com
  * @since 08-Mar-2010
+ * @deprecated
  */
 public class ManifestBuilder implements Asset {
 
