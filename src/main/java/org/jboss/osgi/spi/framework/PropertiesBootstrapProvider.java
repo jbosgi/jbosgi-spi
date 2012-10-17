@@ -138,12 +138,12 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
         if (urlConfig == null)
             throw MESSAGES.illegalArgumentNull("config url");
 
-        Map<String, Object> props = getBootstrapProperties(urlConfig);
+        Map<String, String> props = getBootstrapProperties(urlConfig);
         initFrameworkInstance(props);
     }
 
     public void configure(InputStream streamConfig) {
-        Map<String, Object> props = getBootstrapProperties(streamConfig);
+        Map<String, String> props = getBootstrapProperties(streamConfig);
         initFrameworkInstance(props);
     }
 
@@ -151,18 +151,18 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
         if (resourceConfig == null)
             throw MESSAGES.illegalArgumentNull("resourceConfig");
 
-        Map<String, Object> props;
+        Map<String, String> props;
         URL urlConfig = Thread.currentThread().getContextClassLoader().getResource(resourceConfig);
         if (urlConfig != null) {
             props = getBootstrapProperties(urlConfig);
         } else {
-            props = new HashMap<String, Object>();
+            props = new HashMap<String, String>();
             LOGGER.debugf("Bootstrap using framework defaults");
         }
         initFrameworkInstance(props);
     }
 
-    private void initFrameworkInstance(final Map<String, Object> props) {
+    private void initFrameworkInstance(final Map<String, String> props) {
         // Load the framework instance
         final Framework frameworkImpl = createFramework(props);
         framework = new GenericFrameworkWrapper<Framework>(frameworkImpl) {
@@ -221,7 +221,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
     }
 
     /** Overwrite to create the framework */
-    protected Framework createFramework(Map<String, Object> properties) {
+    protected Framework createFramework(Map<String, String> properties) {
         FrameworkFactory factory = ServiceLoader.loadService(FrameworkFactory.class);
         if (factory == null)
             throw MESSAGES.illegalStateCannotLoadService(FrameworkFactory.class.getName());
@@ -244,7 +244,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
         // no default system services
     }
 
-    private List<URL> getBundleURLs(Map<String, Object> props, String key) {
+    private List<URL> getBundleURLs(Map<String, String> props, String key) {
         String bundleList = (String) props.get(key);
         if (bundleList == null)
             bundleList = "";
@@ -276,8 +276,8 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
         return framework;
     }
 
-    private Map<String, Object> getBootstrapProperties(URL urlConfig) {
-        Map<String, Object> props = null;
+    private Map<String, String> getBootstrapProperties(URL urlConfig) {
+        Map<String, String> props = null;
         try {
             InputStream propStream = urlConfig.openStream();
             props = getBootstrapProperties(propStream);
@@ -289,11 +289,11 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> getBootstrapProperties(InputStream propStream) {
+    private Map<String, String> getBootstrapProperties(InputStream propStream) {
         if (propStream == null)
             throw MESSAGES.illegalArgumentNull("propStream");
 
-        Map<String, Object> propMap = new HashMap<String, Object>();
+        Map<String, String> propMap = new HashMap<String, String>();
         try {
             Properties props = new Properties();
             props.load(propStream);
@@ -308,16 +308,6 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
                 // Replace property variables
                 value = StringPropertyReplacer.replaceProperties(value);
                 propMap.put(key, value);
-
-                if (key.endsWith(".instance")) {
-                    try {
-                        String subkey = key.substring(0, key.lastIndexOf(".instance"));
-                        Object instance = Class.forName(value).newInstance();
-                        propMap.put(subkey, instance);
-                    } catch (Exception ex) {
-                        LOGGER.errorCannotLoadPropertyInstance(ex, key, value);
-                    }
-                }
             }
 
             // Merge optional extra properties
@@ -342,7 +332,7 @@ public class PropertiesBootstrapProvider implements OSGiBootstrapProvider {
                     throw MESSAGES.illegalStateInvalidPropertiesURL(extraPropsValue);
 
                 propMap.remove(PROP_OSGI_FRAMEWORK_EXTRA);
-                Map<String, Object> extraProps = getBootstrapProperties(extraPropsURL.openStream());
+                Map<String, String> extraProps = getBootstrapProperties(extraPropsURL.openStream());
                 propMap.putAll(extraProps);
             }
         } catch (IOException ex) {

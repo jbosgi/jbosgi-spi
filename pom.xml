@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jbosgi-parent</artifactId>
-        <version>1.0.22</version>
+        <version>1.0.23</version>
     </parent>
 
     <name>JBossOSGi SPI</name>
@@ -24,17 +24,17 @@
     <artifactId>jbosgi-spi</artifactId>
     <packaging>jar</packaging>
 
-    <version>3.2.1.Final-SNAPSHOT</version>
+    <version>4.0.0.Alpha1-SNAPSHOT</version>
 
     <!-- Properties -->
     <properties>
         <version.jboss.logging>3.1.1.GA</version.jboss.logging>
         <version.jboss.logging.processor>1.0.3.Final</version.jboss.logging.processor>
-        <version.jboss.osgi.metadata>2.2.0.Final</version.jboss.osgi.metadata>
-        <version.jboss.osgi.vfs>1.2.0.Final</version.jboss.osgi.vfs>
+        <version.jboss.osgi.metadata>3.0.0.Alpha1</version.jboss.osgi.metadata>
+        <version.jboss.osgi.vfs>2.0.0.Alpha1</version.jboss.osgi.vfs>
         <version.jboss.shrinkwrap>1.0.0</version.jboss.shrinkwrap>
         <version.junit>4.10</version.junit>
-        <version.osgi>4.2.0</version.osgi>
+        <version.osgi>5.0.0</version.osgi>
     </properties>
 
     <!-- Source Control -->

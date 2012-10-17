@@ -43,17 +43,15 @@
 
 package org.jboss.osgi.spi;
 
+import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.WARN;
+
 import org.jboss.logging.BasicLogger;
-import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
 import org.jboss.logging.Logger;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
 import org.osgi.framework.Bundle;
-
-import static org.jboss.logging.Logger.Level.ERROR;
-import static org.jboss.logging.Logger.Level.INFO;
-import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * Logging Id ranges: 10200-10299
@@ -91,9 +89,9 @@ public interface SPILogger extends BasicLogger {
     @Message(id = 10205, value = "Service not assignable: %s")
     void warnServiceNotAssignable(String classname);
 
-    @LogMessage(level = ERROR)
-    @Message(id = 10206, value = "Cannot load property instance [%s=%s]")
-    void errorCannotLoadPropertyInstance(@Cause Throwable cause, String key, String value);
+    //@LogMessage(level = ERROR)
+    //@Message(id = 10206, value = "Cannot load property instance [%s=%s]")
+    //void errorCannotLoadPropertyInstance(@Cause Throwable cause, String key, String value);
 
     //@LogMessage(level = ERROR)
     //@Message(id = 10207, value = "Cannot stop framework")

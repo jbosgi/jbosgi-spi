@@ -44,11 +44,14 @@ package org.jboss.osgi.spi.framework;
 
 import static org.jboss.osgi.spi.SPIMessages.MESSAGES;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.cert.X509Certificate;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
@@ -77,8 +80,7 @@ class GenericBundleWrapper<T extends Bundle> implements Bundle {
         return bundle;
     }
 
-    @SuppressWarnings("rawtypes")
-    public Enumeration findEntries(String path, String filePattern, boolean recurse) {
+    public Enumeration<URL> findEntries(String path, String filePattern, boolean recurse) {
         return bundle.findEntries(path, filePattern, recurse);
     }
 
@@ -94,18 +96,15 @@ class GenericBundleWrapper<T extends Bundle> implements Bundle {
         return bundle.getEntry(path);
     }
 
-    @SuppressWarnings("rawtypes")
-    public Enumeration getEntryPaths(String path) {
+    public Enumeration<String> getEntryPaths(String path) {
         return bundle.getEntryPaths(path);
     }
 
-    @SuppressWarnings("rawtypes")
-    public Dictionary getHeaders() {
+    public Dictionary<String, String> getHeaders() {
         return bundle.getHeaders();
     }
 
-    @SuppressWarnings("rawtypes")
-    public Dictionary getHeaders(String locale) {
+   public Dictionary<String, String> getHeaders(String locale) {
         return bundle.getHeaders(locale);
     }
 
@@ -117,7 +116,7 @@ class GenericBundleWrapper<T extends Bundle> implements Bundle {
         return bundle.getLocation();
     }
 
-    public ServiceReference[] getRegisteredServices() {
+    public ServiceReference<?>[] getRegisteredServices() {
         return bundle.getRegisteredServices();
     }
 
@@ -125,17 +124,15 @@ class GenericBundleWrapper<T extends Bundle> implements Bundle {
         return bundle.getResource(name);
     }
 
-    @SuppressWarnings("rawtypes")
-    public Enumeration getResources(String name) throws IOException {
+    public Enumeration<URL> getResources(String name) throws IOException {
         return bundle.getResources(name);
     }
 
-    public ServiceReference[] getServicesInUse() {
+    public ServiceReference<?>[] getServicesInUse() {
         return bundle.getServicesInUse();
     }
 
-    @SuppressWarnings("rawtypes")
-    public Map getSignerCertificates(int signersType) {
+    public Map<X509Certificate, List<X509Certificate>> getSignerCertificates(int signersType) {
         return bundle.getSignerCertificates(signersType);
     }
 
@@ -155,8 +152,7 @@ class GenericBundleWrapper<T extends Bundle> implements Bundle {
         return bundle.hasPermission(permission);
     }
 
-    @SuppressWarnings("rawtypes")
-    public Class loadClass(String name) throws ClassNotFoundException {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
         return bundle.loadClass(name);
     }
 
@@ -186,6 +182,18 @@ class GenericBundleWrapper<T extends Bundle> implements Bundle {
 
     public void update(InputStream input) throws BundleException {
         bundle.update(input);
+    }
+
+    public int compareTo(Bundle o) {
+        return bundle.compareTo(o);
+    }
+
+    public <A> A adapt(Class<A> type) {
+        return bundle.adapt(type);
+    }
+
+    public File getDataFile(String filename) {
+        return bundle.getDataFile(filename);
     }
 
     @Override
