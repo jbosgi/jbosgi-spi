@@ -28,9 +28,9 @@
 
     <!-- Properties -->
     <properties>
-        <version.jboss.logging>3.1.1.GA</version.jboss.logging>
+        <version.jboss.logging>3.1.2.GA</version.jboss.logging>
         <version.jboss.logging.processor>1.0.3.Final</version.jboss.logging.processor>
-        <version.jboss.osgi.metadata>3.0.0.Alpha1</version.jboss.osgi.metadata>
+        <version.jboss.osgi.metadata>3.0.0.Alpha2-SNAPSHOT</version.jboss.osgi.metadata>
         <version.jboss.osgi.vfs>2.0.0.Alpha1</version.jboss.osgi.vfs>
         <version.jboss.shrinkwrap>1.0.0</version.jboss.shrinkwrap>
         <version.junit>4.10</version.junit>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>org.jboss.osgi.metadata</groupId>
             <artifactId>jbosgi-metadata</artifactId>
-            <version>2.1.1.CR9</version>
+            <version>${version.jboss.osgi.metadata}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.osgi.vfs</groupId>
