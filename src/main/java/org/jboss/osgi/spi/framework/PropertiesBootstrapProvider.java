@@ -83,18 +83,13 @@ import org.osgi.framework.launch.FrameworkFactory;
  * <pre>
  *    # Properties to configure the Framework
  *    org.osgi.framework.storage.clean=onFirstInit
- *    org.osgi.framework.system.packages=\
- *       org.osgi.framework; version=1.4, \
- *       javax.management
  *    
  *    # Bundles that need to be installed with the Framework automatically 
  *    org.jboss.osgi.framework.autoInstall=\
- *       file://${test.archive.directory}/bundles/org.osgi.compendium.jar
  *    
  *    # Bundles that need to be started automatically 
  *    org.jboss.osgi.framework.autoStart=\
- *       file://${test.archive.directory}/bundles/org.apache.felix.log.jar \
- *       file://${test.archive.directory}/bundles/jboss-osgi-common.jar \
+ *       file://${test.archive.directory}/bundles/org.apache.felix.log.jar 
  * </pre>
  * 
  * @author thomas.diesler@jboss.com
