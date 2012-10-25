@@ -24,7 +24,7 @@
     <artifactId>jbosgi-spi</artifactId>
     <packaging>jar</packaging>
 
-    <version>4.0.0.Alpha2-SNAPSHOT</version>
+    <version>4.0.0.Alpha2</version>
 
     <!-- Properties -->
     <properties>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>org.jboss.osgi.metadata</groupId>
             <artifactId>jbosgi-metadata</artifactId>
-            <version>${version.jboss.osgi.metadata}</version>
+            <version>3.0.0.Alpha2</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.osgi.vfs</groupId>
