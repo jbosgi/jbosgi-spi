@@ -20,35 +20,26 @@
 
 package org.jboss.osgi.spi;
 
+
 /**
- * Adds attachment support
+ * An attachment key
  *
  * @author thomas.diesler@jboss.com
  * @since 02-Jul-2010
  */
-public interface Attachments  {
+public class AttachmentKey<T>  {
 
-    /**
-     * Attach an arbirtary object with this element.
-     *
-     * @param key key for the attachment
-     * @return The previously attachment object or null
-     */
-    <T> T putAttachment(AttachmentKey<T> key, T value);
+    private final Class<T> type;
 
-    /**
-     * Get the attached object for a given key
-     *
-     * @param type key for the attachment
-     * @return The attached object or null
-     */
-    <T> T getAttachment(AttachmentKey<T> type);
+    public static <T> AttachmentKey<T> create(Class<T> type) {
+        return new AttachmentKey<T>(type);
+    }
 
-    /**
-     * Remove an attached object for a given key
-     *
-     * @param clazz key for the attachment
-     * @return The attached object or null
-     */
-    <T> T removeAttachment(AttachmentKey<T> clazz);
+    private AttachmentKey(Class<T> type) {
+        this.type = type;
+    }
+
+    public Class<T> getType() {
+        return type;
+    }
 }
