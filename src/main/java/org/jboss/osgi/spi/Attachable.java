@@ -26,7 +26,7 @@ package org.jboss.osgi.spi;
  * @author thomas.diesler@jboss.com
  * @since 02-Jul-2010
  */
-public interface Attachments  {
+public interface Attachable  {
 
     /**
      * Attach an arbirtary object with this element.
