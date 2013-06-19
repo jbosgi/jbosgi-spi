@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jbosgi-parent</artifactId>
-        <version>1.0.23</version>
+        <version>1.0.24</version>
     </parent>
 
     <name>JBossOSGi SPI</name>
@@ -24,14 +24,14 @@
     <artifactId>jbosgi-spi</artifactId>
     <packaging>jar</packaging>
 
-    <version>4.0.0.CR2</version>
+    <version>4.0.0.CR3-SNAPSHOT</version>
 
     <!-- Properties -->
     <properties>
-        <version.jboss.logging>3.1.2.GA</version.jboss.logging>
-        <version.jboss.logging.processor>1.1.0.Beta1</version.jboss.logging.processor>
-        <version.jboss.osgi.metadata>3.0.0.Alpha5</version.jboss.osgi.metadata>
-        <version.jboss.osgi.vfs>2.0.0.Alpha3</version.jboss.osgi.vfs>
+        <version.jboss.logging>3.1.3.GA</version.jboss.logging>
+        <version.jboss.logging.processor>1.1.0.Final</version.jboss.logging.processor>
+        <version.jboss.osgi.metadata>3.0.0.Final</version.jboss.osgi.metadata>
+        <version.jboss.osgi.vfs>2.0.0.Final</version.jboss.osgi.vfs>
         <version.jboss.shrinkwrap>1.0.0</version.jboss.shrinkwrap>
         <version.junit>4.10</version.junit>
         <version.osgi>5.0.0</version.osgi>
@@ -42,7 +42,7 @@
         <connection>scm:git:git://github.com/jbosgi/jbosgi-spi.git</connection>
         <developerConnection>scm:git:git@github.com:jbosgi/jbosgi-spi.git</developerConnection>
         <url>http://github.com/jbosgi/jbosgi-spi</url>
-    </scm>
+  </scm>
 
     <!-- Dependencies -->
     <dependencies>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>org.jboss.osgi.metadata</groupId>
             <artifactId>jbosgi-metadata</artifactId>
-            <version>3.0.0.Alpha2</version>
+            <version>${version.jboss.osgi.metadata}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.osgi.vfs</groupId>
