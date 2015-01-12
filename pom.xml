@@ -38,7 +38,7 @@
         <connection>scm:git:git://github.com/jbosgi/jbosgi-spi.git</connection>
         <developerConnection>scm:git:git@github.com:jbosgi/jbosgi-spi.git</developerConnection>
         <url>http://github.com/jbosgi/jbosgi-spi</url>
-        <tag>4.0.1.Final</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <!-- Dependencies -->
