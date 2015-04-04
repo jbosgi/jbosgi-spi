@@ -24,12 +24,12 @@
     <artifactId>jbosgi-spi</artifactId>
     <packaging>jar</packaging>
 
-    <version>4.0.1.Final</version>
+    <version>4.0.2.Final</version>
 
     <!-- Properties -->
     <properties>
         <version.jboss.osgi.metadata>4.0.0.Final</version.jboss.osgi.metadata>
-        <version.jboss.osgi.vfs>2.0.1.Final</version.jboss.osgi.vfs>
+        <version.jboss.osgi.vfs>2.0.2.Final</version.jboss.osgi.vfs>
     </properties>
 
     <!-- Source Control -->
@@ -37,7 +37,7 @@
         <connection>scm:git:git://github.com/jbosgi/jbosgi-spi.git</connection>
         <developerConnection>scm:git:git@github.com:jbosgi/jbosgi-spi.git</developerConnection>
         <url>http://github.com/jbosgi/jbosgi-spi</url>
-        <tag>4.0.1.Final</tag>
+        <tag>4.0.2.Final</tag>
     </scm>
 
     <!-- Dependencies -->
