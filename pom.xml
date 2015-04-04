@@ -24,7 +24,7 @@
     <artifactId>jbosgi-spi</artifactId>
     <packaging>jar</packaging>
 
-    <version>4.0.2.Final-SNAPSHOT</version>
+    <version>4.0.2.Final</version>
 
     <!-- Properties -->
     <properties>
@@ -37,7 +37,7 @@
         <connection>scm:git:git://github.com/jbosgi/jbosgi-spi.git</connection>
         <developerConnection>scm:git:git@github.com:jbosgi/jbosgi-spi.git</developerConnection>
         <url>http://github.com/jbosgi/jbosgi-spi</url>
-        <tag>HEAD</tag>
+        <tag>4.0.2.Final</tag>
     </scm>
 
     <!-- Dependencies -->
