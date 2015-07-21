@@ -28,7 +28,7 @@
 
     <!-- Properties -->
     <properties>
-        <version.jboss.osgi.metadata>4.0.0.Final</version.jboss.osgi.metadata>
+        <version.jboss.osgi.metadata>4.0.1.Final</version.jboss.osgi.metadata>
         <version.jboss.osgi.vfs>2.0.2.Final</version.jboss.osgi.vfs>
     </properties>
 
