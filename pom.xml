@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.jboss.osgi</groupId>
         <artifactId>jbosgi-parent</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.2</version>
     </parent>
 
     <name>JBossOSGi SPI</name>
@@ -24,7 +24,7 @@
     <artifactId>jbosgi-spi</artifactId>
     <packaging>jar</packaging>
 
-    <version>6.0.1.Final-SNAPSHOT</version>
+    <version>6.0.1.Final</version>
 
     <!-- Properties -->
     <properties>
@@ -37,7 +37,7 @@
         <connection>scm:git:git://github.com/jbosgi/jbosgi-spi.git</connection>
         <developerConnection>scm:git:git@github.com:jbosgi/jbosgi-spi.git</developerConnection>
         <url>http://github.com/jbosgi/jbosgi-spi</url>
-        <tag>HEAD</tag>
+        <tag>6.0.1.Final</tag>
     </scm>
 
     <!-- Dependencies -->
@@ -47,12 +47,12 @@
         <dependency>
             <groupId>org.jboss.osgi.metadata</groupId>
             <artifactId>jbosgi-metadata</artifactId>
-            <version>${version.jboss.osgi.metadata}</version>
+            <version>6.0.1.Final</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.osgi.vfs</groupId>
             <artifactId>jbosgi-vfs30</artifactId>
-            <version>${version.jboss.osgi.vfs}</version>
+            <version>4.0.1.Final</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.shrinkwrap</groupId>
